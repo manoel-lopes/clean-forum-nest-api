@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
 type EnvParseErrorMap = { _errors: string[] }
+
 type EnvErrorDetails = EnvParseErrorMap | string[]
+
 type EnvParseError = [string, EnvErrorDetails]
 
 const _env = z
