@@ -67,14 +67,7 @@ export class PrismaAnswerAttachmentsRepository implements AnswerAttachmentsRepos
   }
 
   async delete (attachmentId: string): Promise<void> {
-    try {
-      await this.prisma.attachment.delete({ where: { id: attachmentId } })
-    } catch (error) {
-      if (error instanceof Error && 'code' in error && error.code === 'P2025') {
-        return
-      }
-      throw error
-    }
+    await this.prisma.attachment.delete({ where: { id: attachmentId } })
   }
 
   async deleteMany (attachmentIds: string[]): Promise<void> {
