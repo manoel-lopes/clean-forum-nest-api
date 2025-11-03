@@ -58,3 +58,8 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # A.I. generated
 CLAUDE.md
 .claude
+/generated/prisma
+
+# Environment variables
+.env
+.env.*
