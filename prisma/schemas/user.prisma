@@ -1,0 +1,15 @@
+model User {
+    id        String   @id @default(uuid(7))
+    name      String
+    email     String   @unique
+    password  String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    questions     Question[]
+    answers       Answer[]
+    refreshTokens RefreshToken[]
+    comments      Comment[]
+
+    @@map("users")
+}

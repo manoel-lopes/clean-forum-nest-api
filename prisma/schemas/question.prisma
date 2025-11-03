@@ -1,0 +1,20 @@
+model Question {
+    id           String   @id @default(uuid(7))
+    title        String
+    slug         String   @unique
+    content      String
+    authorId     String
+    bestAnswerId String?
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @default(now()) @updatedAt
+
+    author      User         @relation(fields: [authorId], references: [id])
+    answers     Answer[]
+    attachments Attachment[]
+    comments    Comment[]
+
+    @@index([authorId])
+    @@index([createdAt])
+    @@index([slug])
+    @@map("questions")
+}
