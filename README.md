@@ -1,6 +1,10 @@
-# Clean Forum API
+# Clean Forum NestJS API
 
-This project is a robust RESTful API for a forum application, built with Node.js, Fastify, and TypeScript. It follows the principles of Clean Architecture and Domain-Driven Design to create a scalable, maintainable, and testable codebase.
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
+
+A robust RESTful API for a forum application, built with **NestJS**, **TypeScript**, and following **Clean Architecture** and **Domain-Driven Design** principles. This project creates a scalable, maintainable, and testable codebase that is independent of frameworks and external dependencies.
 
 
 ## 🛠️ Technologies
