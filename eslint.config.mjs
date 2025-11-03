@@ -103,7 +103,7 @@ export default [
         {
           groups: [
             [
-              '^node:', '^[^@./]', '^zod', '^fastify', '^@fastify', '^vitest', '^supertest',
+              '^node:', '^[^@./]', '@nestjs/*','^zod', '^fastify', '^@fastify', '^vitest', '^supertest',
               '^@/external',
               '^@/core/presentation', '^@/core/application', '^@/core/domain',
               '^@/external',
