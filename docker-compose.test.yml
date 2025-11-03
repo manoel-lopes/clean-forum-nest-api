@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: forum_pg_test
+    ports:
+      - '${DB_PORT}:5432'
+    env_file:
+      - .env.test
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+
+  redis:
+    image: redis:7-alpine
+    container_name: forum_redis_test
+    ports:
+      - '${REDIS_PORT}:6379'
+    env_file:
+      - .env.test
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - ALLOW_EMPTY_PASSWORD=yes
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: forum_mailhog_test
+    ports:
+      - '1025:1025'  # SMTP port
+      - '8025:8025'  # Web UI port
