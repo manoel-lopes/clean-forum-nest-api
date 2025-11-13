@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify your email address</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #202124;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(60,64,67,0.12), 0 1px 2px rgba(60,64,67,0.24);
+        }
+        .header {
+            background-color: #4285f4;
+            padding: 32px 24px;
+            text-align: center;
+        }
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+        }
+        .content {
+            padding: 48px 24px;
+        }
+        .greeting {
+            font-size: 16px;
+            line-height: 24px;
+            margin-bottom: 24px;
+        }
+        .message {
+            font-size: 16px;
+            line-height: 24px;
+            margin-bottom: 32px;
+        }
+        .code-container {
+            background-color: #f8f9fa;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            margin: 32px 0;
+        }
+        .code-label {
+            font-size: 14px;
+            color: #5f6368;
+            margin-bottom: 8px;
+        }
+        .verification-code {
+            font-family: 'Google Sans Mono', 'Courier New', monospace;
+            font-size: 32px;
+            font-weight: 500;
+            color: #1a73e8;
+            letter-spacing: 8px;
+            margin: 0;
+        }
+        .expiration {
+            font-size: 14px;
+            color: #5f6368;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .security-notice {
+            background-color: #fef7e0;
+            border-left: 4px solid #fbbc04;
+            padding: 16px 20px;
+            margin: 32px 0;
+            border-radius: 4px;
+        }
+        .security-notice p {
+            margin: 0;
+            font-size: 14px;
+            color: #202124;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 24px;
+            text-align: center;
+            font-size: 14px;
+            color: #5f6368;
+            border-top: 1px solid #e8eaed;
+        }
+        .footer p {
+            margin: 0;
+            line-height: 20px;
+        }
+        @media (max-width: 480px) {
+            .container {
+                margin: 0 16px;
+            }
+            .header {
+                padding: 24px 16px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+            .content {
+                padding: 32px 16px;
+            }
+            .verification-code {
+                font-size: 28px;
+                letter-spacing: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Verify your email</h1>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Hi there,
+            </div>
+            
+            <div class="message">
+                We received a request to verify your email address. To complete your registration, please use the verification code below:
+            </div>
+            
+            <div class="code-container">
+                <div class="code-label">Your verification code</div>
+                <p class="verification-code">{{code}}</p>
+            </div>
+            
+            <div class="expiration">
+                This code will expire in 10 minutes for your security.
+            </div>
+            
+            <div class="security-notice">
+                <p><strong>Security reminder:</strong> If you didn't request this verification, please ignore this email. Never share this code with anyone.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>This email was sent to {{email}}</p>
+            <p>If you have any questions, please contact our support team.</p>
+        </div>
+    </div>
+</body>
+</html>
