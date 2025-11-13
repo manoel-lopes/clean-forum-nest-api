@@ -1,5 +1,4 @@
 import { Global, Module } from '@nestjs/common'
-
 import { PrismaModule } from '@/infra/persistence/prisma.module'
 import { PrismaAnswerAttachmentsRepository } from '@/infra/persistence/repositories/prisma/prisma-answer-attachments.repository'
 import { PrismaAnswerCommentsRepository } from '@/infra/persistence/repositories/prisma/prisma-answer-comments.repository'
