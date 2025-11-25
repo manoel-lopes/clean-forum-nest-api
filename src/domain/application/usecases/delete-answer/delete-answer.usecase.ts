@@ -1,5 +1,6 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
@@ -8,8 +9,11 @@ type DeleteAnswerRequest = {
   authorId: string
 }
 
+@Injectable()
 export class DeleteAnswerUseCase implements UseCase {
-  constructor (private readonly answersRepository: AnswersRepository) {}
+  constructor (
+    @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository
+  ) {}
 
   async execute (req: DeleteAnswerRequest) {
     const { answerId, authorId } = req
