@@ -1,15 +1,18 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type { UsersRepository } from '@/domain/application/repositories/users.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { UsersRepository } from '@/domain/application/repositories/users.repository'
+import { PASSWORD_HASHER } from '@/infra/adapters/security/security.module'
 import type { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
 import type { UserProps } from '@/domain/enterprise/entities/user.entity'
 import { UserWithEmailAlreadyRegisteredError } from './errors/user-with-email-already-registered.error'
 
 type CreateAccountRequest = UserProps
 
+@Injectable()
 export class CreateAccountUseCase implements UseCase {
   constructor (
-    private readonly usersRepository: UsersRepository,
-    private readonly passwordHasher: PasswordHasher
+    @Inject(UsersRepository) private readonly usersRepository: UsersRepository,
+    @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher
   ) {}
 
   async execute (req: CreateAccountRequest) {
