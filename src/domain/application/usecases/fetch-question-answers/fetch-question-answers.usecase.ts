@@ -1,18 +1,16 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type {
-  AnswersRepository,
-  FindManyByQuestionIdParams,
-  PaginatedAnswers,
-} from '@/domain/application/repositories/answers.repository'
-import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { AnswersRepository, type FindManyByQuestionIdParams, type PaginatedAnswers } from '@/domain/application/repositories/answers.repository'
+import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type FetchQuestionAnswersRequest = FindManyByQuestionIdParams
 
+@Injectable()
 export class FetchQuestionAnswersUseCase implements UseCase {
   constructor (
-    private readonly answersRepository: AnswersRepository,
-    private readonly questionsRepository: QuestionsRepository
+    @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository,
+    @Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository
   ) {}
 
   async execute (req: FetchQuestionAnswersRequest): Promise<PaginatedAnswers> {
