@@ -1,6 +1,7 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
-import { JWTService } from '@/infra/auth/jwt/jwt-service'
+import { Inject, Injectable } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+import { UseCase } from '@/core/domain/application/use-case'
+import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { ExpiredRefreshTokenError } from './errors/expired-refresh-token.error'
 
@@ -12,8 +13,12 @@ export type RefreshAccessTokenResponse = {
   token: string
 }
 
+@Injectable()
 export class RefreshAccessTokenUseCase implements UseCase {
-  constructor (private readonly refreshTokensRepository: RefreshTokensRepository) {}
+  constructor (
+    @Inject(RefreshTokensRepository) private readonly refreshTokensRepository: RefreshTokensRepository,
+    private readonly jwtService: JwtService
+  ) {}
 
   async execute (req: RefreshAccessTokenRequest): Promise<RefreshAccessTokenResponse> {
     const { refreshTokenId } = req
@@ -27,7 +32,7 @@ export class RefreshAccessTokenUseCase implements UseCase {
       await this.refreshTokensRepository.deleteManyByUserId(userId)
       throw new ExpiredRefreshTokenError()
     }
-    const newToken = JWTService.sign(currentRefreshToken.userId)
+    const newToken = this.jwtService.sign({ sub: currentRefreshToken.userId })
     return { token: newToken }
   }
 }
