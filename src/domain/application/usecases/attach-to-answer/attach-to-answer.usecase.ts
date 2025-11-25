@@ -1,14 +1,17 @@
-import type { AnswerAttachmentsRepository } from '@/domain/application/repositories/answer-attachments.repository'
-import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { AnswerAttachmentsRepository } from '@/domain/application/repositories/answer-attachments.repository'
+import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import type { AnswerAttachment, AnswerAttachmentProps } from '@/domain/enterprise/entities/answer-attachment.entity'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type AttachToAnswerRequest = AnswerAttachmentProps
 
-export class AttachToAnswerUseCase {
+@Injectable()
+export class AttachToAnswerUseCase implements UseCase {
   constructor (
-    private answersRepository: AnswersRepository,
-    private answerAttachmentsRepository: AnswerAttachmentsRepository
+    @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository,
+    @Inject(AnswerAttachmentsRepository) private readonly answerAttachmentsRepository: AnswerAttachmentsRepository
   ) {
     Object.freeze(this)
   }

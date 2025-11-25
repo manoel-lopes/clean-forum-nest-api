@@ -1,9 +1,9 @@
+import { makeAnswerData } from 'tests/factories/domain/make-answer'
 import type { AnswerAttachmentsRepository } from '@/domain/application/repositories/answer-attachments.repository'
 import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { InMemoryAnswerAttachmentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-attachments.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
-import { makeAnswerData } from '@/shared/util/factories/domain/make-answer'
 import { AttachToAnswerUseCase } from './attach-to-answer.usecase'
 
 describe('AttachToAnswerUseCase', () => {
