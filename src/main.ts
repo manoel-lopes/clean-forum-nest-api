@@ -18,7 +18,7 @@ async function bootstrap () {
       transform: true,
     })
   )
-  await app.listen(3333)
+  await app.listen()
 }
 
 bootstrap()
