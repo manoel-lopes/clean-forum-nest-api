@@ -1,28 +1,47 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import swc from 'unplugin-swc'
 import { configDefaults, defineConfig } from 'vitest/config'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const exclude = [
+const coverageExclude = [
   ...configDefaults.exclude,
-  'src/main',
+  '**/05-nest-clean/**',
 ]
 
 export default defineConfig({
+  plugins: [
+    swc.vite({
+      module: { type: 'es6' },
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@tests': path.resolve(__dirname, './tests'),
     },
   },
   test: {
-    exclude,
+    exclude: [...configDefaults.exclude, '**/05-nest-clean/**'],
+    include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)', '**/*.e2e-spec.ts'],
     globals: true,
+    setupFiles: ['./tests/setup-e2e.ts'],
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    } as any,
+    fileParallelism: false,
+    silent: true,
+    hideSkippedTests: true,
     coverage: {
       provider: 'istanbul',
       exclude: [
-        ...exclude,
+        ...coverageExclude,
+        '**/*.e2e-spec.ts',
         '**/prisma/**',
         'test/**',
         'src/lib',
