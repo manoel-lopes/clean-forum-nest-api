@@ -1,5 +1,6 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type { UsersRepository } from '@/domain/application/repositories/users.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import type { User } from '@/domain/enterprise/entities/user.entity'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
@@ -9,8 +10,11 @@ type GetUserByEmailUseCaseRequest = {
 
 type GetUserByEmailUseCaseResponse = Omit<User, 'password'>
 
+@Injectable()
 export class GetUserByEmailUseCase implements UseCase {
-  constructor (private readonly usersRepository: UsersRepository) {}
+  constructor (
+    @Inject(UsersRepository) private readonly usersRepository: UsersRepository
+  ) {}
 
   async execute ({ email }: GetUserByEmailUseCaseRequest): Promise<GetUserByEmailUseCaseResponse> {
     const user = await this.usersRepository.findByEmail(email)

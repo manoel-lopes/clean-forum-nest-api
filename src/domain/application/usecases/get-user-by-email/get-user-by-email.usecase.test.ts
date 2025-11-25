@@ -1,6 +1,6 @@
+import { makeUserData } from 'tests/factories/domain/make-user'
 import type { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
-import { makeUserData } from '@/shared/util/factories/domain/make-user'
 import { GetUserByEmailUseCase } from './get-user-by-email.usecase'
 
 describe('GetUserByEmailUseCase', () => {
