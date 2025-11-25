@@ -1,14 +1,17 @@
-import { InMemoryCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-comments.repository'
-import { makeCommentData } from '@/shared/util/factories/domain/make-comment'
+import { makeQuestionCommentData } from 'tests/factories/domain/make-question-comment'
+import { InMemoryAnswerCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-comments.repository'
+import { InMemoryQuestionCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-comments.repository'
 import { UpdateCommentUseCase } from './update-comment.usecase'
 
 describe('UpdateCommentUseCase', () => {
   let sut: UpdateCommentUseCase
-  let commentsRepository: InMemoryCommentsRepository
+  let questionCommentsRepository: InMemoryQuestionCommentsRepository
+  let answerCommentsRepository: InMemoryAnswerCommentsRepository
 
   beforeEach(() => {
-    commentsRepository = new InMemoryCommentsRepository()
-    sut = new UpdateCommentUseCase(commentsRepository)
+    questionCommentsRepository = new InMemoryQuestionCommentsRepository()
+    answerCommentsRepository = new InMemoryAnswerCommentsRepository()
+    sut = new UpdateCommentUseCase(questionCommentsRepository, answerCommentsRepository)
   })
 
   it('should not update a nonexistent comment', async () => {
@@ -22,7 +25,7 @@ describe('UpdateCommentUseCase', () => {
   })
 
   it('should not update a comment if the user is not the author', async () => {
-    const comment = await commentsRepository.create(makeCommentData({ authorId: 'comment-author-id' }))
+    const comment = await questionCommentsRepository.create(makeQuestionCommentData({ authorId: 'comment-author-id' }))
 
     const request = {
       commentId: comment.id,
@@ -34,7 +37,7 @@ describe('UpdateCommentUseCase', () => {
   })
 
   it('should update a comment', async () => {
-    const comment = await commentsRepository.create(makeCommentData({
+    const comment = await questionCommentsRepository.create(makeQuestionCommentData({
       authorId: 'comment-author-id',
       content: 'Original content',
     }))
