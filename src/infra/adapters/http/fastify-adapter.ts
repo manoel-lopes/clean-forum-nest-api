@@ -1,9 +1,9 @@
 import type { INestApplication } from '@nestjs/common'
-import { FastifyAdapter as BaseFastifyAdapter } from '@nestjs/platform-fastify'
+import { FastifyAdapter as NestFastifyAdapter } from '@nestjs/platform-fastify'
 import { EnvService } from '@/infra/env/env.service'
 import { FallbackController } from '@/presentation/controllers/fallback.controller'
 
-export class FastifyAdapter extends BaseFastifyAdapter {
+export class FastifyAdapter extends NestFastifyAdapter {
   private appInstance?: INestApplication
   private readonly DEFAULT_PORT = 3333
 
