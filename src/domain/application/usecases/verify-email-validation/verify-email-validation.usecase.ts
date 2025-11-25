@@ -1,5 +1,6 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
 import { EmailValidationCode } from '@/domain/enterprise/entities/value-objects/email-validation-code/email-validation-code.vo'
 import { EmailAlreadyVerifiedError } from './errors/email-already-verified.error'
 import { EmailValidationNotFoundError } from './errors/email-validation-not-found.error'
@@ -11,8 +12,11 @@ type VerifyEmailValidationRequest = {
   code: string
 }
 
+@Injectable()
 export class VerifyEmailValidationUseCase implements UseCase {
-  constructor (private readonly emailValidationsRepository: EmailValidationsRepository) {}
+  constructor (
+    @Inject(EmailValidationsRepository) private readonly emailValidationsRepository: EmailValidationsRepository
+  ) {}
 
   async execute (req: VerifyEmailValidationRequest) {
     const { email, code: codeValue } = req
