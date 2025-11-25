@@ -1,8 +1,8 @@
+import { makeUserData } from 'tests/factories/domain/make-user'
 import type { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { PasswordHasherStub } from '@/infra/adapters/security/stubs/password-hasher.stub'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import type { User } from '@/domain/enterprise/entities/user.entity'
-import { makeUserData } from '@/shared/util/factories/domain/make-user'
 import { UpdateAccountUseCase } from './update-account.usecase'
 
 describe('UpdateAccountUseCase', () => {
