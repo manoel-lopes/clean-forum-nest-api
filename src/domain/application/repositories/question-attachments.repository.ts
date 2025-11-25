@@ -16,3 +16,5 @@ export type QuestionAttachmentsRepository = {
   delete(attachmentId: string): Promise<void>
   deleteMany(attachmentIds: string[]): Promise<void>
 }
+
+export const QuestionAttachmentsRepository = Symbol('QuestionAttachmentsRepository')

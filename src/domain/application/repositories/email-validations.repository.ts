@@ -12,3 +12,5 @@ export type EmailValidationsRepository = {
   findById(id: string): Promise<EmailValidation | null>
   delete(id: string): Promise<void>
 }
+
+export const EmailValidationsRepository = Symbol('EmailValidationsRepository')
