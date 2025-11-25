@@ -1,11 +1,11 @@
+import { makeAnswerData } from 'tests/factories/domain/make-answer'
+import { makeQuestionData } from 'tests/factories/domain/make-question'
 import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
-import { makeAnswerData } from '@/shared/util/factories/domain/make-answer'
-import { makeQuestionData } from '@/shared/util/factories/domain/make-question'
 import { ChooseQuestionBestAnswerUseCase } from './choose-question-best-answer.usecase'
 
 describe('ChooseQuestionBestAnswerUseCase', () => {
