@@ -183,7 +183,7 @@ export default [
     },
   },
   {
-    files: ['**/*.test.ts', '**/*.spec.ts'],
+    files: ['**/*.test.ts', '**/*.spec.ts', 'tests/setup-e2e.ts'],
     rules: {
       '@stylistic/padding-line-between-statements': 'off',
       '@stylistic/padding-line-between-statements': [
