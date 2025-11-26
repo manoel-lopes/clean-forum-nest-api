@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config'
 import { UseCasesModule } from './domain/application/usecases/usecases.module'
 import { EmailModule } from './infra/adapters/email/email.module'
 import { SecurityModule } from './infra/adapters/security/security.module'
+import { AuthModule } from './infra/auth/auth.module'
 import { envSchema } from './infra/env/env'
 import { EnvModule } from './infra/env/env.module'
 import { PrismaModule } from './infra/persistence/prisma.module'
@@ -50,6 +51,7 @@ import { VerifyEmailValidationController } from './presentation/controllers/veri
     RepositoriesModule,
     EmailModule,
     SecurityModule,
+    AuthModule,
     UseCasesModule,
   ],
   controllers: [
