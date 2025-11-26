@@ -6,7 +6,7 @@ import request from 'supertest'
 
 import { makeApp } from '@tests/helpers/app/make-app'
 
-describe('RefreshAccessTokenController (e2e)', () => {
+describe('RefreshAccessToken', () => {
   let app: INestApplication
 
   beforeAll(async () => {

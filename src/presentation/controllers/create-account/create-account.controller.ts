@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common'
 import { CreateAccountUseCase } from '@/domain/application/usecases/create-account/create-account.usecase'
 import { UserWithEmailAlreadyRegisteredError } from '@/domain/application/usecases/create-account/errors/user-with-email-already-registered.error'
+import { Public } from '@/infra/auth/decorators/public.decorator'
 
 type CreateAccountBody = {
   name: string
@@ -18,6 +19,7 @@ type CreateAccountBody = {
 export class CreateAccountController {
   constructor (private readonly createAccountUseCase: CreateAccountUseCase) {}
 
+  @Public()
   @Post()
   @HttpCode(201)
   async handle (@Body() body: CreateAccountBody) {

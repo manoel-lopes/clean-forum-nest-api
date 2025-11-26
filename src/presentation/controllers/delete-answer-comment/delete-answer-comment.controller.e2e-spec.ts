@@ -9,7 +9,7 @@ import { authenticateUser } from '@tests/helpers/infra/auth/authentication-reque
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 
-describe('DeleteAnswerCommentController (e2e)', () => {
+describe('DeleteAnswerComment', () => {
   let app: INestApplication
 
   beforeAll(async () => {
@@ -18,6 +18,31 @@ describe('DeleteAnswerCommentController (e2e)', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  it('should return 401 when no token is provided', async () => {
+    const response = await request(app.getHttpServer())
+      .delete('/answers/comments/any-id')
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
+  })
+
+  it('should return 401 when invalid token is provided', async () => {
+    const response = await request(app.getHttpServer())
+      .delete('/answers/comments/any-id')
+      .set('Authorization', 'Bearer invalid-token')
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
   })
 
   it('should delete answer comment and return 204', async () => {

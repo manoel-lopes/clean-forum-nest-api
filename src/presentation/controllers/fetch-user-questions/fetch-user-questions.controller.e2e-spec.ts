@@ -8,7 +8,7 @@ import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
 
-describe('FetchUserQuestionsController (e2e)', () => {
+describe('FetchUserQuestions', () => {
   let app: INestApplication
 
   beforeAll(async () => {

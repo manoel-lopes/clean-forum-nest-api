@@ -8,7 +8,7 @@ import { authenticateUser } from '@tests/helpers/infra/auth/authentication-reque
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createAnswer, deleteAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 
-describe('DeleteAnswerController (e2e)', () => {
+describe('DeleteAnswer', () => {
   let app: INestApplication
 
   beforeAll(async () => {
@@ -17,6 +17,28 @@ describe('DeleteAnswerController (e2e)', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  it('should return 401 when no token is provided', async () => {
+    const response = await deleteAnswer(app, undefined, { answerId: 'any-id' })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
+  })
+
+  it('should return 401 when invalid token is provided', async () => {
+    const response = await deleteAnswer(app, 'invalid-token', { answerId: 'any-id' })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
   })
 
   it('should return 404 when answer does not exist', async () => {

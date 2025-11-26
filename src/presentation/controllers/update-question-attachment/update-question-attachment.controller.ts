@@ -1,13 +1,10 @@
 import {
   Body,
   Controller,
-  Headers,
   NotFoundException,
   Param,
   Put,
-  UnauthorizedException,
 } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
 import { UpdateQuestionAttachmentUseCase } from '@/domain/application/usecases/update-question-attachment/update-question-attachment.usecase'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
@@ -18,19 +15,14 @@ type UpdateQuestionAttachmentBody = {
 
 @Controller('question-attachments/:attachmentId')
 export class UpdateQuestionAttachmentController {
-  constructor (private readonly updateQuestionAttachmentUseCase: UpdateQuestionAttachmentUseCase,
-    private readonly jwtService: JwtService) {}
+  constructor (private readonly updateQuestionAttachmentUseCase: UpdateQuestionAttachmentUseCase) {}
 
   @Put()
   async handle (
-    @Headers('authorization') authorization: string,
     @Param('attachmentId') attachmentId: string,
     @Body() body: UpdateQuestionAttachmentBody
   ) {
     try {
-      const token = authorization?.replace('Bearer ', '')
-      if (!token) throw new UnauthorizedException('Missing authorization token')
-      this.jwtService.verify(token)
       const { title, url } = body
       const attachment = await this.updateQuestionAttachmentUseCase.execute({
         attachmentId,

@@ -7,7 +7,7 @@ import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
 
-describe('CreateQuestionController (e2e)', () => {
+describe('CreateQuestion', () => {
   let app: INestApplication
 
   beforeAll(async () => {
@@ -16,6 +16,32 @@ describe('CreateQuestionController (e2e)', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  it('should return 401 when no token is provided', async () => {
+    const questionData = aQuestion().build()
+
+    const response = await createQuestion(app, undefined, questionData)
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
+  })
+
+  it('should return 401 when invalid token is provided', async () => {
+    const questionData = aQuestion().build()
+
+    const response = await createQuestion(app, 'invalid-token', questionData)
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
   })
 
   it('should return 409 when question with same title already exists', async () => {

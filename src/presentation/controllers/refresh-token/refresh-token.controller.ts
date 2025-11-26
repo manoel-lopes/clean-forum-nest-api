@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common'
 import { ExpiredRefreshTokenError } from '@/domain/application/usecases/refresh-token/errors/expired-refresh-token.error'
 import { RefreshAccessTokenUseCase } from '@/domain/application/usecases/refresh-token/refresh-token.usecase'
+import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type RefreshTokenBody = {
@@ -17,6 +18,7 @@ type RefreshTokenBody = {
 export class RefreshAccessTokenController {
   constructor (private readonly refreshTokenUseCase: RefreshAccessTokenUseCase) {}
 
+  @Public()
   @Post()
   async handle (@Body() body: RefreshTokenBody) {
     try {

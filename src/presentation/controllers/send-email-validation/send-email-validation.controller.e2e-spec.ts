@@ -3,7 +3,7 @@ import request from 'supertest'
 
 import { makeApp } from '@tests/helpers/app/make-app'
 
-describe('SendEmailValidationController (e2e)', () => {
+describe('SendEmailValidation', () => {
   let app: INestApplication
 
   beforeAll(async () => {

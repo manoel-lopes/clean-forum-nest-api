@@ -1,30 +1,24 @@
 import {
   Controller,
   Delete,
-  Headers,
   HttpCode,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
 import { DeleteAccountUseCase } from '@/domain/application/usecases/delete-account/delete-account.usecase'
+import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
+import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { Prisma } from '@prisma/client'
 
 @Controller('users')
 export class DeleteAccountController {
-  constructor (private readonly deleteAccountUseCase: DeleteAccountUseCase,
-    private readonly jwtService: JwtService) {}
+  constructor (private readonly deleteAccountUseCase: DeleteAccountUseCase) {}
 
   @Delete()
   @HttpCode(204)
-  async handle (@Headers('authorization') authorization: string) {
+  async handle (@CurrentUser() user: AuthUser) {
     try {
-      const token = authorization?.replace('Bearer ', '')
-      if (!token) throw new UnauthorizedException('Missing authorization token')
-      const payload = this.jwtService.verify(token)
-      const userId = payload.sub
-      await this.deleteAccountUseCase.execute({ userId })
+      await this.deleteAccountUseCase.execute({ userId: user.id })
     } catch (error) {
       if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)

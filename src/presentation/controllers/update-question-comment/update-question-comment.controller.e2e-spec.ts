@@ -8,7 +8,7 @@ import { createQuestion } from '@tests/helpers/domain/enterprise/questions/quest
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
 
-describe('UpdateQuestionCommentController (e2e)', () => {
+describe('UpdateQuestionComment', () => {
   let app: INestApplication
 
   beforeAll(async () => {
@@ -18,6 +18,33 @@ describe('UpdateQuestionCommentController (e2e)', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  it('should return 401 when no token is provided', async () => {
+    const response = await request(app.getHttpServer())
+      .put('/questions/comments/any-id')
+      .send({ content: 'Content' })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
+  })
+
+  it('should return 401 when invalid token is provided', async () => {
+    const response = await request(app.getHttpServer())
+      .put('/questions/comments/any-id')
+      .set('Authorization', 'Bearer invalid-token')
+      .send({ content: 'Content' })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
   })
 
   it('should update question comment and return 200', async () => {

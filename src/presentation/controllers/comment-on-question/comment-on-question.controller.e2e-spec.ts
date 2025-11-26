@@ -8,7 +8,7 @@ import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
 
-describe('CommentOnQuestionController (e2e)', () => {
+describe('CommentOnQuestion', () => {
   let app: INestApplication
 
   beforeAll(async () => {
@@ -17,6 +17,33 @@ describe('CommentOnQuestionController (e2e)', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  it('should return 401 when no token is provided', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/comments/questions')
+      .send({ questionId: 'any-id', content: 'Content' })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
+  })
+
+  it('should return 401 when invalid token is provided', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/comments/questions')
+      .set('Authorization', 'Bearer invalid-token')
+      .send({ questionId: 'any-id', content: 'Content' })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
   })
 
   it('should create comment on question and return 201', async () => {

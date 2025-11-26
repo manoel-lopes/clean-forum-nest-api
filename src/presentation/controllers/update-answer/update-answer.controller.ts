@@ -2,14 +2,13 @@ import {
   Body,
   Controller,
   ForbiddenException,
-  Headers,
   NotFoundException,
   Param,
   Put,
-  UnauthorizedException,
 } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
 import { UpdateAnswerUseCase } from '@/domain/application/usecases/update-answer/update-answer.usecase'
+import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
+import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
@@ -19,25 +18,20 @@ type UpdateAnswerBody = {
 
 @Controller('answers/:answerId')
 export class UpdateAnswerController {
-  constructor (private readonly updateAnswerUseCase: UpdateAnswerUseCase,
-    private readonly jwtService: JwtService) {}
+  constructor (private readonly updateAnswerUseCase: UpdateAnswerUseCase) {}
 
   @Put()
   async handle (
-    @Headers('authorization') authorization: string,
+    @CurrentUser() user: AuthUser,
     @Param('answerId') answerId: string,
     @Body() body: UpdateAnswerBody
   ) {
     try {
-      const token = authorization?.replace('Bearer ', '')
-      if (!token) throw new UnauthorizedException('Missing authorization token')
-      const payload = this.jwtService.verify(token)
-      const authorId = payload.sub
       const { content } = body
       const answer = await this.updateAnswerUseCase.execute({
         answerId,
         content,
-        authorId,
+        authorId: user.id,
       })
       return { answer }
     } catch (error) {

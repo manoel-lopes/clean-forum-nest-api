@@ -5,8 +5,10 @@ import {
   Param,
 } from '@nestjs/common'
 import { GetUserByEmailUseCase } from '@/domain/application/usecases/get-user-by-email/get-user-by-email.usecase'
+import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
+@Public()
 @Controller('users/email/:email')
 export class GetUserByEmailController {
   constructor (private readonly getUserByEmailUseCase: GetUserByEmailUseCase) {}

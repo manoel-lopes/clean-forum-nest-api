@@ -5,7 +5,7 @@ import { aUser } from '@tests/builders/user.builder'
 import { createUser, fetchUsers } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
 
-describe('FetchUsersController (e2e)', () => {
+describe('FetchUsers', () => {
   let app: INestApplication
 
   beforeAll(async () => {

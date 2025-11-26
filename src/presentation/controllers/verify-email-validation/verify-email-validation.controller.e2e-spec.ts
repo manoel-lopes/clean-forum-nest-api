@@ -4,7 +4,7 @@ import request from 'supertest'
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import { makeApp } from '@tests/helpers/app/make-app'
 
-describe('VerifyEmailValidationController (e2e)', () => {
+describe('VerifyEmailValidation', () => {
   let app: INestApplication
   let prisma: PrismaService
 

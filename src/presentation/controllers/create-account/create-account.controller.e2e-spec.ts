@@ -4,7 +4,7 @@ import { makeApp } from '@tests/helpers/app/make-app'
 import { aUser } from '@tests/builders/user.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 
-describe('CreateAccountController (e2e)', () => {
+describe('CreateAccount', () => {
   let app: INestApplication
 
   beforeAll(async () => {

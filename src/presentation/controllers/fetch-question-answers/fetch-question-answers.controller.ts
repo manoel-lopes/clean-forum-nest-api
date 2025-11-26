@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common'
 import type { AnswerIncludeOption } from '@/domain/application/repositories/answers.repository'
 import { FetchQuestionAnswersUseCase } from '@/domain/application/usecases/fetch-question-answers/fetch-question-answers.usecase'
+import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type FetchQuestionAnswersQuery = {
@@ -16,6 +17,7 @@ type FetchQuestionAnswersQuery = {
   include?: string
 }
 
+@Public()
 @Controller('questions/:questionId/answers')
 export class FetchQuestionAnswersController {
   constructor (private readonly fetchQuestionAnswersUseCase: FetchQuestionAnswersUseCase) {}

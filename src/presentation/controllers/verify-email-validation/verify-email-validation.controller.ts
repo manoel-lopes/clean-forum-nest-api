@@ -11,6 +11,7 @@ import { EmailValidationNotFoundError } from '@/domain/application/usecases/veri
 import { ExpiredValidationCodeError } from '@/domain/application/usecases/verify-email-validation/errors/expired-validation-code.error'
 import { InvalidCodeError } from '@/domain/application/usecases/verify-email-validation/errors/invalid-validation-code.error'
 import { VerifyEmailValidationUseCase } from '@/domain/application/usecases/verify-email-validation/verify-email-validation.usecase'
+import { Public } from '@/infra/auth/decorators/public.decorator'
 
 type VerifyEmailValidationBody = {
   email: string
@@ -21,6 +22,7 @@ type VerifyEmailValidationBody = {
 export class VerifyEmailValidationController {
   constructor (private readonly verifyEmailValidationUseCase: VerifyEmailValidationUseCase) {}
 
+  @Public()
   @Post()
   @HttpCode(204)
   async handle (@Body() body: VerifyEmailValidationBody) {

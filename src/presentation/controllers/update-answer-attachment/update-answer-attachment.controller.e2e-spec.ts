@@ -9,7 +9,7 @@ import { createQuestion } from '@tests/helpers/domain/enterprise/questions/quest
 import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { createAnswerAttachment, updateAnswerAttachment } from '@tests/helpers/domain/enterprise/answers/answer-attachment-requests'
 
-describe('UpdateAnswerAttachmentController (e2e)', () => {
+describe('UpdateAnswerAttachment', () => {
   let app: INestApplication
 
   beforeAll(async () => {
@@ -18,6 +18,36 @@ describe('UpdateAnswerAttachmentController (e2e)', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  it('should return 401 when no token is provided', async () => {
+    const response = await updateAnswerAttachment(app, undefined, {
+      attachmentId: 'any-id',
+      title: 'Title',
+      url: 'https://example.com/file.pdf',
+    })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
+  })
+
+  it('should return 401 when invalid token is provided', async () => {
+    const response = await updateAnswerAttachment(app, 'invalid-token', {
+      attachmentId: 'any-id',
+      title: 'Title',
+      url: 'https://example.com/file.pdf',
+    })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
   })
 
   it('should update answer attachment and return 200', async () => {

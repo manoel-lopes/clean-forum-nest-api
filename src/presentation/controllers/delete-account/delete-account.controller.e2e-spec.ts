@@ -5,7 +5,7 @@ import { aUser } from '@tests/builders/user.builder'
 import { createUser, deleteUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
 
-describe('DeleteAccountController (e2e)', () => {
+describe('DeleteAccount', () => {
   let app: INestApplication
 
   beforeAll(async () => {
@@ -14,6 +14,28 @@ describe('DeleteAccountController (e2e)', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  it('should return 401 when no token is provided', async () => {
+    const response = await deleteUser(app, undefined)
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
+  })
+
+  it('should return 401 when invalid token is provided', async () => {
+    const response = await deleteUser(app, 'invalid-token')
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
   })
 
   it('should return 404 when user does not exist', async () => {

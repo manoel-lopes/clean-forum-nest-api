@@ -5,7 +5,7 @@ import { aUser } from '@tests/builders/user.builder'
 import { createUser, getUserByEmail } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
 
-describe('GetUserByEmailController (e2e)', () => {
+describe('GetUserByEmail', () => {
   let app: INestApplication
 
   beforeAll(async () => {

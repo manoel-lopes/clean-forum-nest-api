@@ -1,14 +1,13 @@
 import {
   Body,
   ForbiddenException,
-  Headers,
   NotFoundException,
   Param,
   Put,
-  UnauthorizedException,
 } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
 import { UseCase } from '@/core/domain/application/use-case'
+import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
+import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
@@ -18,25 +17,20 @@ type UpdateCommentBody = {
 
 export abstract class BaseUpdateCommentController {
   constructor (
-    protected readonly updateCommentUseCase: UseCase,
-    protected readonly jwtService: JwtService
+    protected readonly updateCommentUseCase: UseCase
   ) {}
 
   @Put()
   async handle (
-    @Headers('authorization') authorization: string,
+    @CurrentUser() user: AuthUser,
     @Param('commentId') commentId: string,
     @Body() body: UpdateCommentBody
   ) {
     try {
-      const token = authorization?.replace('Bearer ', '')
-      if (!token) throw new UnauthorizedException('Missing authorization token')
-      const payload = this.jwtService.verify(token)
-      const authorId = payload.sub
       const { content } = body
       const response = await this.updateCommentUseCase.execute({
         commentId,
-        authorId,
+        authorId: user.id,
         content,
       })
       return response

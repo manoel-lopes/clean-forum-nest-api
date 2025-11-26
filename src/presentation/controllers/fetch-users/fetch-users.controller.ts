@@ -5,6 +5,7 @@ import {
   Query,
 } from '@nestjs/common'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
+import { Public } from '@/infra/auth/decorators/public.decorator'
 
 type FetchUsersQuery = {
   page?: number
@@ -12,6 +13,7 @@ type FetchUsersQuery = {
   order?: 'asc' | 'desc'
 }
 
+@Public()
 @Controller('users')
 export class FetchUsersController {
   constructor (@Inject(UsersRepository) private readonly usersRepository: UsersRepository) {}

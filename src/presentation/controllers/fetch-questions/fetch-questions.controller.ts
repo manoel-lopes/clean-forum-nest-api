@@ -5,6 +5,7 @@ import {
   Query,
 } from '@nestjs/common'
 import { type QuestionIncludeOption, QuestionsRepository } from '@/domain/application/repositories/questions.repository'
+import { Public } from '@/infra/auth/decorators/public.decorator'
 
 type FetchQuestionsQuery = {
   page?: number
@@ -17,6 +18,7 @@ type FetchQuestionsQuery = {
 export class FetchQuestionsController {
   constructor (@Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository) {}
 
+  @Public()
   @Get()
   async handle (@Query() query: FetchQuestionsQuery) {
     const { page, pageSize, order, include = [] } = query

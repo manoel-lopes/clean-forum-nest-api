@@ -1,14 +1,13 @@
 import {
   Body,
   Controller,
-  Headers,
   HttpCode,
   NotFoundException,
   Post,
-  UnauthorizedException,
 } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
 import { CommentOnQuestionUseCase } from '@/domain/application/usecases/comment-on-question/comment-on-question.usecase'
+import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
+import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type CommentOnQuestionBody = {
@@ -18,23 +17,18 @@ type CommentOnQuestionBody = {
 
 @Controller('comments/questions')
 export class CommentOnQuestionController {
-  constructor (private readonly commentOnQuestionUseCase: CommentOnQuestionUseCase,
-    private readonly jwtService: JwtService) {}
+  constructor (private readonly commentOnQuestionUseCase: CommentOnQuestionUseCase) {}
 
   @Post()
   @HttpCode(201)
   async handle (
-    @Headers('authorization') authorization: string,
+    @CurrentUser() user: AuthUser,
     @Body() body: CommentOnQuestionBody
   ) {
     try {
-      const token = authorization?.replace('Bearer ', '')
-      if (!token) throw new UnauthorizedException('Missing authorization token')
-      const payload = this.jwtService.verify(token)
-      const authorId = payload.sub
       const { questionId, content } = body
       const response = await this.commentOnQuestionUseCase.execute({
-        authorId,
+        authorId: user.id,
         questionId,
         content,
       })

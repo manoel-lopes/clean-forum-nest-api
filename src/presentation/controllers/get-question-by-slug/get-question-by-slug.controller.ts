@@ -8,6 +8,7 @@ import {
 import type { AnswerIncludeOption } from '@/domain/application/repositories/answers.repository'
 import type { QuestionIncludeOption } from '@/domain/application/repositories/questions.repository'
 import { GetQuestionBySlugUseCase } from '@/domain/application/usecases/get-question-by-slug/get-question-by-slug.usecase'
+import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type GetQuestionBySlugQuery = {
@@ -18,6 +19,7 @@ type GetQuestionBySlugQuery = {
   answerIncludes?: string
 }
 
+@Public()
 @Controller('questions/slug/:slug')
 export class GetQuestionBySlugController {
   constructor (private readonly getQuestionBySlugUseCase: GetQuestionBySlugUseCase) {}

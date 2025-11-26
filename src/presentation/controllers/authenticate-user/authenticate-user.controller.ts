@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common'
 import { AuthenticateUserUseCase } from '@/domain/application/usecases/authenticate-user/authenticate-user.usecase'
 import { InvalidPasswordError } from '@/domain/application/usecases/authenticate-user/errors/invalid-password.error'
+import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type AuthenticateUserBody = {
@@ -18,6 +19,7 @@ type AuthenticateUserBody = {
 export class AuthenticateUserController {
   constructor (private readonly authenticateUserUseCase: AuthenticateUserUseCase) {}
 
+  @Public()
   @Post()
   async handle (@Body() body: AuthenticateUserBody) {
     try {
