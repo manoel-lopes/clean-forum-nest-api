@@ -22,9 +22,12 @@ export function generateUniqueQuestionData (): CreateQuestionData {
   }
 }
 
-export async function createQuestion (app: INestApplication, token: string, questionData: CreateQuestionData) {
-  const response = await request(app.getHttpServer()).post('/questions').set('Authorization', `Bearer ${token}`).send(questionData)
-  return response
+export async function createQuestion (app: INestApplication, token: string | undefined, questionData: CreateQuestionData) {
+  const req = request(app.getHttpServer()).post('/questions')
+  if (token) {
+    req.set('Authorization', `Bearer ${token}`)
+  }
+  return req.send(questionData)
 }
 
 export async function fetchQuestions (
@@ -84,24 +87,32 @@ export async function updateQuestion (app: INestApplication, token: string | und
 
 export async function deleteQuestion (
   app: INestApplication,
-  token: string,
+  token: string | undefined,
   {
     questionId,
   }: {
     questionId: unknown
   }
 ) {
-  return request(app.getHttpServer()).delete(`/questions/${questionId}`).set('Authorization', `Bearer ${token}`)
+  const req = request(app.getHttpServer()).delete(`/questions/${questionId}`)
+  if (token) {
+    req.set('Authorization', `Bearer ${token}`)
+  }
+  return req
 }
 
 export async function chooseQuestionBestAnswer (
   app: INestApplication,
-  token: string,
+  token: string | undefined,
   {
     answerId,
   }: {
     answerId: unknown
   }
 ) {
-  return request(app.getHttpServer()).patch(`/answers/${answerId}/best`).set('Authorization', `Bearer ${token}`)
+  const req = request(app.getHttpServer()).patch(`/answers/${answerId}/best`)
+  if (token) {
+    req.set('Authorization', `Bearer ${token}`)
+  }
+  return req
 }

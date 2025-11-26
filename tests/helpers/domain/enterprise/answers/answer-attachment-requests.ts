@@ -42,8 +42,12 @@ export async function updateAnswerAttachment (
   })
 }
 
-export async function deleteAnswerAttachment (app: INestApplication, token: string, attachmentId: unknown) {
-  return request(app.getHttpServer()).delete(`/answer-attachments/${attachmentId}`).set('Authorization', `Bearer ${token}`)
+export async function deleteAnswerAttachment (app: INestApplication, token: string | undefined, attachmentId: unknown) {
+  const req = request(app.getHttpServer()).delete(`/answer-attachments/${attachmentId}`)
+  if (token) {
+    req.set('Authorization', `Bearer ${token}`)
+  }
+  return req
 }
 
 export async function attachToAnswer (

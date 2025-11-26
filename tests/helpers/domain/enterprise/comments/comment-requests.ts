@@ -7,31 +7,39 @@ export type UpdateCommentData = {
 
 export async function deleteQuestionComment (
   app: INestApplication,
-  token: string,
+  token: string | undefined,
   {
     commentId,
   }: {
     commentId: string
   }
 ) {
-  return request(app.getHttpServer()).delete(`/questions/comments/${commentId}`).set('Authorization', `Bearer ${token}`)
+  const req = request(app.getHttpServer()).delete(`/questions/comments/${commentId}`)
+  if (token) {
+    req.set('Authorization', `Bearer ${token}`)
+  }
+  return req
 }
 
 export async function deleteAnswerComment (
   app: INestApplication,
-  token: string,
+  token: string | undefined,
   {
     commentId,
   }: {
     commentId: string
   }
 ) {
-  return request(app.getHttpServer()).delete(`/answers/comments/${commentId}`).set('Authorization', `Bearer ${token}`)
+  const req = request(app.getHttpServer()).delete(`/answers/comments/${commentId}`)
+  if (token) {
+    req.set('Authorization', `Bearer ${token}`)
+  }
+  return req
 }
 
 export async function updateQuestionComment (
   app: INestApplication,
-  token: string,
+  token: string | undefined,
   {
     commentId,
   }: {
@@ -39,15 +47,16 @@ export async function updateQuestionComment (
   },
   commentData: UpdateCommentData
 ) {
-  return request(app.getHttpServer())
-    .put(`/questions/comments/${commentId}`)
-    .set('Authorization', `Bearer ${token}`)
-    .send(commentData)
+  const req = request(app.getHttpServer()).put(`/questions/comments/${commentId}`)
+  if (token) {
+    req.set('Authorization', `Bearer ${token}`)
+  }
+  return req.send(commentData)
 }
 
 export async function updateAnswerComment (
   app: INestApplication,
-  token: string,
+  token: string | undefined,
   {
     commentId,
   }: {
@@ -55,8 +64,9 @@ export async function updateAnswerComment (
   },
   commentData: UpdateCommentData
 ) {
-  return request(app.getHttpServer())
-    .put(`/answers/comments/${commentId}`)
-    .set('Authorization', `Bearer ${token}`)
-    .send(commentData)
+  const req = request(app.getHttpServer()).put(`/answers/comments/${commentId}`)
+  if (token) {
+    req.set('Authorization', `Bearer ${token}`)
+  }
+  return req.send(commentData)
 }

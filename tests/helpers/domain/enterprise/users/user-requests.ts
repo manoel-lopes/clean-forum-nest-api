@@ -13,9 +13,12 @@ export async function createUser (app: INestApplication, userData: CreateUserDat
   return response
 }
 
-export async function deleteUser (app: INestApplication, authToken: string) {
-  const response = await request(app.getHttpServer()).delete('/users').set('Authorization', `Bearer ${authToken}`)
-  return response
+export async function deleteUser (app: INestApplication, authToken: string | undefined) {
+  const req = request(app.getHttpServer()).delete('/users')
+  if (authToken) {
+    req.set('Authorization', `Bearer ${authToken}`)
+  }
+  return req
 }
 
 export async function fetchUsers (app: INestApplication, authToken: string, params?: PaginationParams) {

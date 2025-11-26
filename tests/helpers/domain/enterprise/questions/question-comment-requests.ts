@@ -6,9 +6,10 @@ export type CreateQuestionCommentData = {
   content?: unknown
 }
 
-export async function commentOnQuestion (app: INestApplication, token: string, commentData: CreateQuestionCommentData) {
-  return await request(app.getHttpServer())
-    .post('/comments/questions')
-    .set('Authorization', `Bearer ${token}`)
-    .send(commentData)
+export async function commentOnQuestion (app: INestApplication, token: string | undefined, commentData: CreateQuestionCommentData) {
+  const req = request(app.getHttpServer()).post('/comments/questions')
+  if (token) {
+    req.set('Authorization', `Bearer ${token}`)
+  }
+  return req.send(commentData)
 }
