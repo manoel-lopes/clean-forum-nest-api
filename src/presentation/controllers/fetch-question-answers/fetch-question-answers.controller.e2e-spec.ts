@@ -1,5 +1,4 @@
 import { INestApplication } from '@nestjs/common'
-import request from 'supertest'
 
 import { makeApp } from '@tests/helpers/app/make-app'
 import { aUser } from '@tests/builders/user.builder'

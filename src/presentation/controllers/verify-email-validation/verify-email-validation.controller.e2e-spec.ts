@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common'
-import { PrismaService } from '@/infra/persistence/prisma.service'
 import request from 'supertest'
 
+import { PrismaService } from '@/infra/persistence/prisma.service'
 import { makeApp } from '@tests/helpers/app/make-app'
 
 describe('VerifyEmailValidationController (e2e)', () => {
@@ -10,6 +10,7 @@ describe('VerifyEmailValidationController (e2e)', () => {
 
   beforeAll(async () => {
     app = await makeApp()
+    prisma = app.get(PrismaService)
   })
 
   afterAll(async () => {

@@ -1,6 +1,5 @@
-import { Test } from '@nestjs/testing'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
-import { AppModule } from '@/app.module'
+import { INestApplication } from '@nestjs/common'
+
 import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
