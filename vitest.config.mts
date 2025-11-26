@@ -31,10 +31,10 @@ export default defineConfig({
     pool: 'forks',
     poolOptions: {
       forks: {
-        singleFork: true,
+        isolate: true,
       },
-    } as any,
-    fileParallelism: false,
+    },
+    fileParallelism: true,
     silent: true,
     hideSkippedTests: true,
     coverage: {
