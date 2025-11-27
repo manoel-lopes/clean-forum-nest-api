@@ -6,18 +6,19 @@ import {
   NotFoundException,
   Post,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { CreateQuestionUseCase } from '@/domain/application/usecases/create-question/create-question.usecase'
 import { QuestionWithTitleAlreadyRegisteredError } from '@/domain/application/usecases/create-question/errors/question-with-title-already-registered.error'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  type CreateQuestionBody,
+  createQuestionBodySchema,
+} from '@/infra/validation/schemas/presentation/questions/create-question.schema'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
-type CreateQuestionBody = {
-  title: string
-  content: string
-  attachments?: Array<{ title: string, url: string }>
-}
-
+@ApiTags('Questions')
 @Controller('questions')
 export class CreateQuestionController {
   constructor (private readonly createQuestionUseCase: CreateQuestionUseCase) {}
@@ -26,7 +27,7 @@ export class CreateQuestionController {
   @HttpCode(201)
   async handle (
     @CurrentUser() user: AuthUser,
-    @Body() body: CreateQuestionBody
+    @Body(new ZodValidationPipe(createQuestionBodySchema)) body: CreateQuestionBody
   ) {
     try {
       const { title, content } = body

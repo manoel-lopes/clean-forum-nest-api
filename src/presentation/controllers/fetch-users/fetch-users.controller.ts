@@ -4,6 +4,7 @@ import {
   Inject,
   Query,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 
@@ -13,6 +14,7 @@ type FetchUsersQuery = {
   order?: 'asc' | 'desc'
 }
 
+@ApiTags('Users')
 @Public()
 @Controller('users')
 export class FetchUsersController {

@@ -5,18 +5,20 @@ import {
   Param,
   Query,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import type { AnswerIncludeOption } from '@/domain/application/repositories/answers.repository'
 import { FetchQuestionAnswersUseCase } from '@/domain/application/usecases/fetch-question-answers/fetch-question-answers.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  type FetchQuestionAnswersParams,
+  fetchQuestionAnswersParamsSchema,
+  type FetchQuestionAnswersQuery,
+  fetchQuestionAnswersQuerySchema,
+} from '@/infra/validation/schemas/presentation/answers/fetch-question-answers.schema'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
-type FetchQuestionAnswersQuery = {
-  page?: number
-  pageSize?: number
-  order?: 'asc' | 'desc'
-  include?: string
-}
-
+@ApiTags('Answers')
 @Public()
 @Controller('questions/:questionId/answers')
 export class FetchQuestionAnswersController {
@@ -24,9 +26,10 @@ export class FetchQuestionAnswersController {
 
   @Get()
   async handle (
-    @Param('questionId') questionId: string,
-    @Query() query: FetchQuestionAnswersQuery
+    @Param(new ZodValidationPipe(fetchQuestionAnswersParamsSchema)) params: FetchQuestionAnswersParams,
+    @Query(new ZodValidationPipe(fetchQuestionAnswersQuerySchema)) query: FetchQuestionAnswersQuery
   ) {
+    const { questionId } = params
     try {
       const { page = 1, pageSize = 20, order = 'desc', include } = query
       let processedInclude: AnswerIncludeOption[] | undefined

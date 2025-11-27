@@ -19,8 +19,14 @@ describe('FetchQuestionAnswers', () => {
     await app.close()
   })
 
+  it('should return 422 when questionId is not a valid UUID', async () => {
+    const response = await fetchQuestionAnswers(app, 'invalid-uuid')
+
+    expect(response.statusCode).toBe(422)
+  })
+
   it('should return 404 when question does not exist', async () => {
-    const response = await fetchQuestionAnswers(app, 'non-existent-id')
+    const response = await fetchQuestionAnswers(app, '123e4567-e89b-12d3-a456-426614174000')
 
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({

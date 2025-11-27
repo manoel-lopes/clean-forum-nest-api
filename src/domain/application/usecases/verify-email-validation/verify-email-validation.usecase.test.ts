@@ -1,7 +1,7 @@
-import { makeEmailValidationData } from 'tests/factories/domain/make-email-validation'
 import type { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
 import { InMemoryEmailValidationsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-email-validations.repository'
 import { VerifyEmailValidationUseCase } from './verify-email-validation.usecase'
+import { makeEmailValidationData } from '@tests/factories/domain/make-email-validation'
 
 describe('VerifyEmailValidationUseCase', () => {
   let sut: VerifyEmailValidationUseCase

@@ -16,6 +16,12 @@ describe('GetUserByEmail', () => {
     await app.close()
   })
 
+  it('should return 422 when email is not a valid email format', async () => {
+    const response = await getUserByEmail(app, undefined, { email: 'invalid-email' })
+
+    expect(response.statusCode).toBe(422)
+  })
+
   it('should return 404 when user with email does not exist', async () => {
     const userData = aUser().build()
     await createUser(app, userData)

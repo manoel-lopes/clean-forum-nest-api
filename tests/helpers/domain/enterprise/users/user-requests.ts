@@ -33,12 +33,16 @@ export async function fetchUsers (app: INestApplication, authToken: string, para
 
 export async function getUserByEmail (
   app: INestApplication,
-  authToken: string,
+  authToken: string | undefined,
   {
     email,
   }: {
     email: unknown
   }
 ) {
-  return await request(app.getHttpServer()).get(`/users/email/${email}`).set('Authorization', `Bearer ${authToken}`)
+  const req = request(app.getHttpServer()).get(`/users/email/${email}`)
+  if (authToken) {
+    req.set('Authorization', `Bearer ${authToken}`)
+  }
+  return await req
 }

@@ -19,15 +19,22 @@ describe('FetchUserQuestions', () => {
     await app.close()
   })
 
+  it('should return 422 when userId is not a valid UUID', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/users/invalid-uuid/questions')
+
+    expect(response.statusCode).toBe(422)
+  })
+
   it('should return 200 and fetch user questions with pagination', async () => {
     const userData = aUser().build()
-    const createUserResponse = await createUser(app, userData)
-    const userId = createUserResponse.body.id
+    await createUser(app, userData)
     const authResponse = await authenticateUser(app, {
       email: userData.email,
       password: userData.password,
     })
     const token = authResponse.body.token
+    const userId = authResponse.body.refreshToken.userId
     const questionData = aQuestion().build()
     await createQuestion(app, token, questionData)
 
@@ -45,13 +52,13 @@ describe('FetchUserQuestions', () => {
 
   it('should return 200 and fetch user questions with custom page and pageSize', async () => {
     const userData = aUser().build()
-    const createUserResponse = await createUser(app, userData)
-    const userId = createUserResponse.body.id
+    await createUser(app, userData)
     const authResponse = await authenticateUser(app, {
       email: userData.email,
       password: userData.password,
     })
     const token = authResponse.body.token
+    const userId = authResponse.body.refreshToken.userId
     const questionData = aQuestion().build()
     await createQuestion(app, token, questionData)
 
@@ -65,8 +72,12 @@ describe('FetchUserQuestions', () => {
 
   it('should return 200 and empty array when user has no questions', async () => {
     const userData = aUser().build()
-    const createUserResponse = await createUser(app, userData)
-    const userId = createUserResponse.body.id
+    await createUser(app, userData)
+    const authResponse = await authenticateUser(app, {
+      email: userData.email,
+      password: userData.password,
+    })
+    const userId = authResponse.body.refreshToken.userId
 
     const response = await request(app.getHttpServer())
       .get(`/users/${userId}/questions`)
@@ -74,4 +85,4 @@ describe('FetchUserQuestions', () => {
     expect(response.statusCode).toBe(200)
     expect(response.body.items).toEqual([])
   })
-  })
+})

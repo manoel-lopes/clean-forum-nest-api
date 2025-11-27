@@ -1,9 +1,9 @@
-import { makeAnswerData } from 'tests/factories/domain/make-answer'
 import type { AnswerCommentsRepository } from '@/domain/application/repositories/answer-comments.repository'
 import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { InMemoryAnswerCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-comments.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { CommentOnAnswerUseCase } from './comment-on-answer.usecase'
+import { makeAnswerData } from '@tests/factories/domain/make-answer'
 
 describe('CommentOnAnswerUseCase', () => {
   let sut: CommentOnAnswerUseCase

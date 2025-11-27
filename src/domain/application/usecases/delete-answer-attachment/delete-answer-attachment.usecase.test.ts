@@ -1,8 +1,8 @@
-import { makeAnswerAttachmentData } from 'tests/factories/domain/make-answer-attachment'
 import type { AnswerAttachmentsRepository } from '@/domain/application/repositories/answer-attachments.repository'
 import { InMemoryAnswerAttachmentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-attachments.repository'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { DeleteAnswerAttachmentUseCase } from './delete-answer-attachment.usecase'
+import { makeAnswerAttachmentData } from '@tests/factories/domain/make-answer-attachment'
 
 describe('DeleteAnswerAttachmentUseCase', () => {
   let sut: DeleteAnswerAttachmentUseCase

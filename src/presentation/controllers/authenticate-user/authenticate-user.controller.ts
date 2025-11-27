@@ -5,23 +5,25 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { AuthenticateUserUseCase } from '@/domain/application/usecases/authenticate-user/authenticate-user.usecase'
 import { InvalidPasswordError } from '@/domain/application/usecases/authenticate-user/errors/invalid-password.error'
 import { Public } from '@/infra/auth/decorators/public.decorator'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  type AuthenticateUserBody,
+  authenticateUserBodySchema,
+} from '@/infra/validation/schemas/presentation/auth/authenticate-user.schema'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
-type AuthenticateUserBody = {
-  email: string
-  password: string
-}
-
+@ApiTags('Session')
 @Controller('auth')
 export class AuthenticateUserController {
   constructor (private readonly authenticateUserUseCase: AuthenticateUserUseCase) {}
 
   @Public()
   @Post()
-  async handle (@Body() body: AuthenticateUserBody) {
+  async handle (@Body(new ZodValidationPipe(authenticateUserBodySchema)) body: AuthenticateUserBody) {
     try {
       const { email, password } = body
       const response = await this.authenticateUserUseCase.execute({

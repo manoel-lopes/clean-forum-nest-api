@@ -1,8 +1,8 @@
-import { makeAnswerData } from 'tests/factories/domain/make-answer'
-import { makeAnswerCommentData } from 'tests/factories/domain/make-answer-comment'
 import { InMemoryAnswerCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-comments.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { DeleteAnswerCommentUseCase } from './delete-answer-comment.usecase'
+import { makeAnswerData } from '@tests/factories/domain/make-answer'
+import { makeAnswerCommentData } from '@tests/factories/domain/make-answer-comment'
 
 describe('DeleteAnswerCommentUseCase', () => {
   let sut: DeleteAnswerCommentUseCase

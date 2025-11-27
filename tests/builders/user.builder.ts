@@ -14,23 +14,29 @@ export class UserBuilder {
     password: 'P@ssword123',
   }
 
-  withName (name: unknown = faker.person.fullName()): UserBuilder {
+  withName (name?: unknown): UserBuilder {
     this.userData.name = name
     return this
   }
 
-  withEmail (email: unknown = faker.internet.email()): UserBuilder {
+  withEmail (email?: unknown): UserBuilder {
     this.userData.email = email
     return this
   }
 
-  withPassword (password: unknown = 'P@ssword123'): UserBuilder {
+  withPassword (password?: unknown): UserBuilder {
     this.userData.password = password
     return this
   }
 
   build (): UserTestData {
-    return { ...this.userData }
+    const result: UserTestData = {}
+    for (const [key, value] of Object.entries(this.userData)) {
+      if (value !== undefined) {
+        result[key as keyof UserTestData] = value
+      }
+    }
+    return result
   }
 }
 

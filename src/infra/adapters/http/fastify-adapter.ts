@@ -1,7 +1,6 @@
 import type { INestApplication } from '@nestjs/common'
 import { FastifyAdapter as NestFastifyAdapter } from '@nestjs/platform-fastify'
 import { EnvService } from '@/infra/env/env.service'
-import { FallbackController } from '@/presentation/controllers/fallback.controller'
 
 export class FastifyAdapter extends NestFastifyAdapter {
   private appInstance?: INestApplication
@@ -28,7 +27,6 @@ export class FastifyAdapter extends NestFastifyAdapter {
     }
     const logLevel = logLevels[nodeEnv] || 'error'
     fastifyInstance.log.level = logLevel
-    fastifyInstance.setErrorHandler(FallbackController.handle)
   }
 
   listen (port?: string | number, hostnameOrCallback?: string | (() => void), callback?: () => void): void {

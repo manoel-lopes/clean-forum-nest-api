@@ -1,8 +1,12 @@
 import { Job } from 'bullmq'
+import { createTransport, type Transporter } from 'nodemailer'
+import type SMTPTransport from 'nodemailer/lib/smtp-transport'
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq'
 import { Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import type { Env } from '@/infra/env/env'
 
-export interface EmailJob {
+export type EmailJob = {
   to: string
   subject: string
   html: string
@@ -18,12 +22,47 @@ export interface EmailJob {
 })
 export class EmailProcessor extends WorkerHost {
   private readonly logger = new Logger(EmailProcessor.name)
+  private readonly transporter: Transporter
+
+  constructor (private readonly configService: ConfigService<Env, true>) {
+    super()
+    this.transporter = this.createTransporter()
+  }
+
+  private createTransporter (): Transporter {
+    const nodeEnv = this.configService.get('NODE_ENV', { infer: true })
+    const host = this.configService.get('EMAIL_HOST', { infer: true })
+    const port = this.configService.get('EMAIL_PORT', { infer: true })
+    const user = this.configService.get('EMAIL_USER', { infer: true })
+    const pass = this.configService.get('EMAIL_PASS', { infer: true })
+    if (nodeEnv === 'test') {
+      return createTransport({
+        streamTransport: true,
+        newline: 'windows',
+        buffer: true,
+      })
+    }
+    const transportConfig: SMTPTransport.Options = {
+      host,
+      port,
+      secure: false,
+    }
+    if (user && pass) {
+      transportConfig.auth = { user, pass }
+    }
+    return createTransport(transportConfig)
+  }
 
   async process (job: Job<EmailJob>): Promise<void> {
     const { to, subject, html } = job.data
+    const from = this.configService.get('EMAIL_FROM', { infer: true })
     try {
-      this.logger.log(`Simulating email send to ${to} with subject: ${subject}`)
-      await this.simulateEmailSend(to, subject, html)
+      await this.transporter.sendMail({
+        from,
+        to,
+        subject,
+        html,
+      })
       this.logger.log(`Email sent successfully to ${to}`)
     } catch (error) {
       this.logger.error(
@@ -31,10 +70,6 @@ export class EmailProcessor extends WorkerHost {
       )
       throw error
     }
-  }
-
-  private async simulateEmailSend (_to: string, _subject: string, _html: string): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 100))
   }
 
   @OnWorkerEvent('completed')

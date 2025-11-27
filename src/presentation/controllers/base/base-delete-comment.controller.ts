@@ -8,6 +8,11 @@ import {
 import { UseCase } from '@/core/domain/application/use-case'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  type DeleteCommentParams,
+  deleteCommentParamsSchema,
+} from '@/infra/validation/schemas/presentation/comments/delete-comment.schema'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
@@ -20,8 +25,9 @@ export abstract class BaseDeleteCommentController {
   @HttpCode(204)
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param('commentId') commentId: string
+    @Param(new ZodValidationPipe(deleteCommentParamsSchema)) params: DeleteCommentParams
   ) {
+    const { commentId } = params
     try {
       await this.deleteCommentUseCase.execute({
         commentId,
