@@ -157,8 +157,6 @@ export default [
         { blankLine: 'never', prev: 'expression', next: 'if' },
         { blankLine: 'never', prev: 'if', next: 'expression' },
         { blankLine: 'never', prev: 'if', next: ['const', 'let', 'var'] },
-
-        // Try-catch - no blank lines
         { blankLine: 'never', prev: ['const', 'let', 'var'], next: 'try' },
         { blankLine: 'never', prev: 'expression', next: 'try' },
         { blankLine: 'never', prev: 'try', next: 'expression' },
