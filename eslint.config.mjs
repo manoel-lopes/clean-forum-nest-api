@@ -120,6 +120,7 @@ export default [
               '^@/shared',
               '^\.',
             ],
+            
           ],
         },
       ],
@@ -217,6 +218,12 @@ export default [
         assertionStyle: 'as',
         objectLiteralTypeAssertions: 'allow',
       }],
+    },
+  },
+  {
+    files: ['vitest.config.mts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 ]
