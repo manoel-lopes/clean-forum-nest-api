@@ -6,3 +6,5 @@ export type RefreshTokensRepository = {
   findByUserId(userId: string): Promise<RefreshToken | null>
   deleteManyByUserId(userId: string): Promise<void>
 }
+
+export const RefreshTokensRepository = Symbol('RefreshTokensRepository')

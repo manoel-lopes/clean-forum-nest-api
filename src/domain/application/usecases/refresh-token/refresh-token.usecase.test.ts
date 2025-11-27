@@ -1,12 +1,12 @@
+import { makeRefreshTokenData } from 'tests/factories/domain/make-refresh-token'
+import { JwtService } from '@nestjs/jwt'
 import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
-import { JWTService } from '@/infra/auth/jwt/jwt-service'
 import { InMemoryRefreshTokensRepository } from '@/infra/persistence/repositories/in-memory/in-memory-refresh-tokens.repository'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
-import { makeRefreshTokenData } from '@/shared/util/factories/domain/make-refresh-token'
 import { ExpiredRefreshTokenError } from './errors/expired-refresh-token.error'
 import { RefreshAccessTokenUseCase } from './refresh-token.usecase'
 
-vi.mock('@/lib/env', () => ({
+vi.mock('@/infra/env/env', () => ({
   env: {
     NODE_ENV: 'development',
     JWT_SECRET: 'any_secret',
@@ -16,10 +16,14 @@ vi.mock('@/lib/env', () => ({
 describe('RefreshAccessTokenUseCase', () => {
   let sut: RefreshAccessTokenUseCase
   let refreshTokensRepository: RefreshTokensRepository
+  let jwtService: JwtService
 
   beforeEach(() => {
     refreshTokensRepository = new InMemoryRefreshTokensRepository()
-    sut = new RefreshAccessTokenUseCase(refreshTokensRepository)
+    jwtService = Object.create(JwtService.prototype)
+    jwtService.sign = vi.fn()
+    jwtService.verify = vi.fn()
+    sut = new RefreshAccessTokenUseCase(refreshTokensRepository, jwtService)
   })
 
   describe('RefreshTokenUseCase', () => {
@@ -48,7 +52,7 @@ describe('RefreshAccessTokenUseCase', () => {
     it('should refresh the access token successfully when the refresh token is valid', async () => {
       const refreshTokenId = 'valid-refresh-token-id'
       const expectedToken = 'new-jwt-token'
-      vi.spyOn(JWTService, 'sign').mockReturnValue(expectedToken)
+      vi.mocked(jwtService.sign).mockReturnValue(expectedToken)
       await refreshTokensRepository.create(makeRefreshTokenData({ id: refreshTokenId }))
 
       const response = await sut.execute({ refreshTokenId })

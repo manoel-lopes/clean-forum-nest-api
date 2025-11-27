@@ -9,3 +9,5 @@ export type AnswerCommentsRepository = CommentsRepository<AnswerComment> & {
   create(comment: AnswerCommentProps): Promise<AnswerComment>
   findManyByAnswerId(answerId: string, params: PaginationParams): Promise<PaginatedAnswerComments>
 }
+
+export const AnswerCommentsRepository = Symbol('AnswerCommentsRepository')

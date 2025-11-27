@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  e2e_tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: forum_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6377:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mailhog:
+        image: mailhog/mailhog:latest
+        ports:
+          - 1025:1025
+          - 8025:8025
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create test environment file
+        run: |
+          cat > .env.test << EOF
+          NODE_ENV=test
+
+          PORT=3333
+
+          DB_PORT=5433
+          DB_USER=postgres
+          DB_PASSWORD=postgres
+          DB_HOST=localhost
+          DB_NAME=forum_test
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5433/forum_test?schema=public
+
+          REDIS_HOST=localhost
+          REDIS_PORT=6377
+          REDIS_DB=1
+
+          JWT_SECRET=c361f4be-96e1-4f22-a3a1-e60092623585
+
+          EMAIL_HOST=localhost
+          EMAIL_PORT=1025
+          EMAIL_USER=
+          EMAIL_PASS=
+          EMAIL_FROM=noreply@cleanforum.com
+
+          EOF
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5433/forum_test?schema=public
+
+      - name: Run database migrations
+        run: pnpm run migrate:test
+
+      - name: Run e2e tests
+        run: pnpm run test:e2e

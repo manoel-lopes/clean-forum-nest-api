@@ -32,3 +32,5 @@ export type AnswersRepository = {
   update(answerData: UpdateAnswerData): Promise<Answer>
   findManyByQuestionId(params: FindManyByQuestionIdParams): Promise<PaginatedAnswers>
 }
+
+export const AnswersRepository = Symbol('AnswersRepository')

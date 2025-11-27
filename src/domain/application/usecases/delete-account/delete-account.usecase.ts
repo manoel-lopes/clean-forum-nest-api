@@ -1,15 +1,17 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
-import type { UsersRepository } from '@/domain/application/repositories/users.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
+import { UsersRepository } from '@/domain/application/repositories/users.repository'
 
 type DeleteAccountRequest = {
   userId: string
 }
 
+@Injectable()
 export class DeleteAccountUseCase implements UseCase {
   constructor (
-    private readonly usersRepository: UsersRepository,
-    private readonly refreshTokensRepository: RefreshTokensRepository
+    @Inject(UsersRepository) private readonly usersRepository: UsersRepository,
+    @Inject(RefreshTokensRepository) private readonly refreshTokensRepository: RefreshTokensRepository
   ) {}
 
   async execute (req: DeleteAccountRequest) {

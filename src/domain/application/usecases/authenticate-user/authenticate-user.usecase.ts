@@ -1,7 +1,9 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
-import type { UsersRepository } from '@/domain/application/repositories/users.repository'
-import { JWTService } from '@/infra/auth/jwt/jwt-service'
+import { Inject, Injectable } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+import { UseCase } from '@/core/domain/application/use-case'
+import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
+import { UsersRepository } from '@/domain/application/repositories/users.repository'
+import { PASSWORD_HASHER } from '@/infra/adapters/security/security.module'
 import type { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
 import type { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
@@ -17,11 +19,13 @@ export type AuthenticateUserResponse = {
   refreshToken: RefreshToken
 }
 
+@Injectable()
 export class AuthenticateUserUseCase implements UseCase {
   constructor (
-    private readonly usersRepository: UsersRepository,
-    private readonly passwordHasher: PasswordHasher,
-    private readonly refreshTokensRepository: RefreshTokensRepository
+    @Inject(UsersRepository) private readonly usersRepository: UsersRepository,
+    @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
+    @Inject(RefreshTokensRepository) private readonly refreshTokensRepository: RefreshTokensRepository,
+    private readonly jwtService: JwtService
   ) {}
 
   async execute (req: AuthenticateUserRequest): Promise<AuthenticateUserResponse> {
@@ -34,7 +38,7 @@ export class AuthenticateUserUseCase implements UseCase {
     if (!doesPasswordMatch) {
       throw new InvalidPasswordError()
     }
-    const token = JWTService.sign(user.id)
+    const token = this.jwtService.sign({ sub: user.id })
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + 7)
     const refreshToken = await this.refreshTokensRepository.create({ userId: user.id, expiresAt })

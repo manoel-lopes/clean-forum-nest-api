@@ -1,8 +1,8 @@
+import { makeQuestionData } from 'tests/factories/domain/make-question'
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
-import { makeQuestionData } from '@/shared/util/factories/domain/make-question'
 import { DeleteQuestionUseCase } from './delete-question.usecase'
 
 describe('DeleteQuestionUseCase', () => {

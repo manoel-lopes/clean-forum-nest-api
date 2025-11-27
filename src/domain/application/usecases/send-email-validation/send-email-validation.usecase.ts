@@ -1,4 +1,7 @@
-import type { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
+import { EMAIL_SERVICE } from '@/infra/adapters/email/email.module'
 import type { EmailService } from '@/infra/adapters/email/ports/email-service'
 import { EmailValidationCode } from '@/domain/enterprise/entities/value-objects/email-validation-code/email-validation-code.vo'
 import { SendEmailValidationError } from './errors/send-email-validation.error'
@@ -7,10 +10,11 @@ type SendEmailValidationRequest = {
   email: string
 }
 
-export class SendEmailValidationUseCase {
+@Injectable()
+export class SendEmailValidationUseCase implements UseCase {
   constructor (
-    private readonly emailValidationsRepository: EmailValidationsRepository,
-    private readonly emailService: EmailService
+    @Inject(EmailValidationsRepository) private readonly emailValidationsRepository: EmailValidationsRepository,
+    @Inject(EMAIL_SERVICE) private readonly emailService: EmailService
   ) {}
 
   async execute ({ email }: SendEmailValidationRequest) {

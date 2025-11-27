@@ -1,11 +1,11 @@
+import { makeQuestionData } from 'tests/factories/domain/make-question'
+import { makeUserData } from 'tests/factories/domain/make-user'
 import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import type { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
-import { makeQuestionData } from '@/shared/util/factories/domain/make-question'
-import { makeUserData } from '@/shared/util/factories/domain/make-user'
 import { AnswerQuestionUseCase } from './answer-question.usecase'
 
 describe('AnswerQuestionUseCase', () => {

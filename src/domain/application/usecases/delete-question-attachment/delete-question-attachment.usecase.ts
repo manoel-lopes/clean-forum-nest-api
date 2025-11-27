@@ -1,13 +1,17 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type { QuestionAttachmentsRepository } from '@/domain/application/repositories/question-attachments.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { QuestionAttachmentsRepository } from '@/domain/application/repositories/question-attachments.repository'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type DeleteQuestionAttachmentRequest = {
   attachmentId: string
 }
 
+@Injectable()
 export class DeleteQuestionAttachmentUseCase implements UseCase {
-  constructor (private readonly questionAttachmentsRepository: QuestionAttachmentsRepository) {
+  constructor (
+    @Inject(QuestionAttachmentsRepository) private readonly questionAttachmentsRepository: QuestionAttachmentsRepository
+  ) {
     Object.freeze(this)
   }
 

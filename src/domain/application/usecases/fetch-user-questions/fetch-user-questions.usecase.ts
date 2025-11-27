@@ -1,16 +1,17 @@
+import { Inject, Injectable } from '@nestjs/common'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
-import type { UseCase } from '@/core/domain/application/use-case'
-import type {
-  PaginatedQuestions,
-  QuestionsRepository,
-} from '@/domain/application/repositories/questions.repository'
+import { UseCase } from '@/core/domain/application/use-case'
+import { type PaginatedQuestions, QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 
 type FetchUserQuestionsRequest = PaginationParams & {
   userId: string
 }
 
+@Injectable()
 export class FetchUserQuestionsUseCase implements UseCase {
-  constructor (private readonly questionsRepository: QuestionsRepository) {
+  constructor (
+    @Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository
+  ) {
     Object.freeze(this)
   }
 

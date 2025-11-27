@@ -1,14 +1,17 @@
-import type { QuestionCommentsRepository } from '@/domain/application/repositories/question-comments.repository'
-import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { QuestionCommentsRepository } from '@/domain/application/repositories/question-comments.repository'
+import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import type { QuestionComment, QuestionCommentProps } from '@/domain/enterprise/entities/question-comment.entity'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type CommentOnQuestionRequest = QuestionCommentProps
 
-export class CommentOnQuestionUseCase {
+@Injectable()
+export class CommentOnQuestionUseCase implements UseCase {
   constructor (
-    private questionsRepository: QuestionsRepository,
-    private questionCommentsRepository: QuestionCommentsRepository
+    @Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository,
+    @Inject(QuestionCommentsRepository) private readonly questionCommentsRepository: QuestionCommentsRepository
   ) {
     Object.freeze(this)
   }

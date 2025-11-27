@@ -1,6 +1,6 @@
+import { makeAnswerData } from 'tests/factories/domain/make-answer'
 import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
-import { makeAnswerData } from '@/shared/util/factories/domain/make-answer'
 import { DeleteAnswerUseCase } from './delete-answer.usecase'
 
 describe('DeleteAnswerUseCase', () => {

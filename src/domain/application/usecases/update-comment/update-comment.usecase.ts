@@ -1,6 +1,10 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type { CommentsRepository } from '@/domain/application/repositories/base/comments.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { AnswerCommentsRepository } from '@/domain/application/repositories/answer-comments.repository'
+import { QuestionCommentsRepository } from '@/domain/application/repositories/question-comments.repository'
+import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 import type { Comment } from '@/domain/enterprise/entities/base/comment.entity'
+import type { QuestionComment } from '@/domain/enterprise/entities/question-comment.entity'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
@@ -10,19 +14,28 @@ type UpdateCommentRequest = {
   content: string
 }
 
+@Injectable()
 export class UpdateCommentUseCase implements UseCase {
-  constructor (private readonly commentRepository: CommentsRepository) {}
+  constructor (
+    @Inject(QuestionCommentsRepository) private readonly questionCommentsRepository: QuestionCommentsRepository,
+    @Inject(AnswerCommentsRepository) private readonly answerCommentsRepository: AnswerCommentsRepository
+  ) {}
 
   async execute (req: UpdateCommentRequest): Promise<Comment> {
     const { commentId, authorId, content } = req
-    const comment = await this.commentRepository.findById(commentId)
+    let comment: QuestionComment | AnswerComment | null = await this.questionCommentsRepository.findById(commentId)
+    let repository: QuestionCommentsRepository | AnswerCommentsRepository = this.questionCommentsRepository
+    if (!comment) {
+      comment = await this.answerCommentsRepository.findById(commentId)
+      repository = this.answerCommentsRepository
+    }
     if (!comment) {
       throw new ResourceNotFoundError('Comment')
     }
     if (comment.authorId !== authorId) {
       throw new NotAuthorError('comment')
     }
-    const updatedComment = await this.commentRepository.update({
+    const updatedComment = await repository.update({
       where: { id: commentId },
       data: { content },
     })

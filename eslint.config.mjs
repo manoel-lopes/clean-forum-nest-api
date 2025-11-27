@@ -13,7 +13,7 @@ export default [
     ignores: resolveIgnoresFromGitignore(),
   }),
   {
-    ignores: ['**/*', '!src/**', '!tests/**'],
+    ignores: ['**/*', '!src/**', '!tests/**', '**/*.e2e-spec.ts'],
   },
   {
     files: ['**/*.ts', '**/*.tsx'],
@@ -36,6 +36,7 @@ export default [
       '@typescript-eslint/no-useless-constructor': 'off',
       'no-unused-vars': 'off',
       'no-var': 'error',
+      'no-redeclare': 'off',
       'no-console': ['error', { allow: ['error'] }],
       'max-len': ['warn', {
         code: 120,
@@ -103,7 +104,8 @@ export default [
         {
           groups: [
             [
-              '^node:', '^[^@./]', '@nestjs/*','^zod', '^fastify', '^@fastify', '^vitest', '^supertest',
+              '^node:', '^[^@./]', '^zod', '^fastify', '^@fastify', '^vitest', '^supertest',
+              '^@nestjs/*',
               '^@/external',
               '^@/core/presentation', '^@/core/application', '^@/core/domain',
               '^@/external',
@@ -116,8 +118,9 @@ export default [
               '^@/util',
               '^@/lib',
               '^@/shared',
-              '^.',
+              '^\.',
             ],
+            
           ],
         },
       ],
@@ -129,20 +132,13 @@ export default [
       'import/export': 'error',
       '@stylistic/padding-line-between-statements': [
         'warn',
-        // Imports
         { blankLine: 'always', prev: 'import', next: '*' },
         { blankLine: 'never', prev: 'import', next: 'import' },
-
-        // Functions and classes - always need blank lines
         { blankLine: 'always', prev: '*', next: 'function' },
         { blankLine: 'always', prev: 'function', next: '*' },
         { blankLine: 'always', prev: '*', next: 'export' },
-
-        // Types - always need blank lines
         { blankLine: 'always', prev: '*', next: 'type' },
         { blankLine: 'always', prev: 'type', next: '*' },
-
-        // Inside functions/blocks - no blank lines between any statements
         { blankLine: 'never', prev: 'singleline-const', next: 'singleline-const' },
         { blankLine: 'never', prev: 'singleline-let', next: 'singleline-let' },
         { blankLine: 'never', prev: 'singleline-const', next: 'singleline-let' },
@@ -166,8 +162,6 @@ export default [
         { blankLine: 'never', prev: 'expression', next: 'try' },
         { blankLine: 'never', prev: 'try', next: 'expression' },
         { blankLine: 'never', prev: 'try', next: ['const', 'let', 'var'] },
-
-        // While/For loops - no blank lines
         { blankLine: 'never', prev: ['const', 'let', 'var'], next: 'while' },
         { blankLine: 'never', prev: 'expression', next: 'while' },
         { blankLine: 'never', prev: 'while', next: 'expression' },
@@ -176,11 +170,7 @@ export default [
         { blankLine: 'never', prev: 'expression', next: 'for' },
         { blankLine: 'never', prev: 'for', next: 'expression' },
         { blankLine: 'never', prev: 'for', next: ['const', 'let', 'var'] },
-
-        // Throw statements - no blank lines before throw
         { blankLine: 'never', prev: '*', next: 'throw' },
-
-        // Return statements - no blank lines before return
         { blankLine: 'never', prev: '*', next: 'return' },
       ],
     },
@@ -194,20 +184,14 @@ export default [
     },
   },
   {
-    files: ['**/*.test.ts', '**/*.spec.ts'],
+    files: ['**/*.test.ts', '**/*.spec.ts', 'tests/setup-e2e.ts'],
     rules: {
       '@stylistic/padding-line-between-statements': 'off',
       '@stylistic/padding-line-between-statements': [
         'warn',
-        // Imports
         { blankLine: 'always', prev: 'import', next: '*' },
         { blankLine: 'never', prev: 'import', next: 'import' },
-
-        // { blankLine: 'never', prev: 'const', next: 'const' },
-        // { blankLine: 'never', prev: 'let', next: 'let' },
-        // { blankLine: 'never', prev: 'const', next: 'let' },
         { blankLine: 'never', prev: 'let', next: 'const' },
-        // { blankLine: 'always', prev: ['let'], next: 'expression' },
       ],
     },
   },
@@ -226,6 +210,7 @@ export default [
   {
     files: [
       'src/infra/persistence/repositories/prisma/prisma-questions.repository.ts',
+      'src/main/server.ts',
     ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
@@ -233,6 +218,12 @@ export default [
         assertionStyle: 'as',
         objectLiteralTypeAssertions: 'allow',
       }],
+    },
+  },
+  {
+    files: ['vitest.config.mts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 ]

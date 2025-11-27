@@ -1,12 +1,13 @@
+import { makeUserData } from 'tests/factories/domain/make-user'
+import { JwtService } from '@nestjs/jwt'
 import type { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { PasswordHasherStub } from '@/infra/adapters/security/stubs/password-hasher.stub'
 import { InMemoryRefreshTokensRepository } from '@/infra/persistence/repositories/in-memory/in-memory-refresh-tokens.repository'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import type { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
-import { makeUserData } from '@/shared/util/factories/domain/make-user'
 import { AuthenticateUserUseCase } from './authenticate-user.usecase'
 
-vi.mock('@/lib/env', () => ({
+vi.mock('@/infra/env/env', () => ({
   env: {
     NODE_ENV: 'development',
     JWT_SECRET: 'any_secret',
@@ -18,13 +19,16 @@ describe('AuthenticateUserUseCase', () => {
   let usersRepository: UsersRepository
   let passwordHasherStub: PasswordHasher
   let refreshTokensRepository: InMemoryRefreshTokensRepository
+  let jwtService: JwtService
   let sut: AuthenticateUserUseCase
 
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository()
     passwordHasherStub = new PasswordHasherStub()
     refreshTokensRepository = new InMemoryRefreshTokensRepository()
-    sut = new AuthenticateUserUseCase(usersRepository, passwordHasherStub, refreshTokensRepository)
+    jwtService = Object.create(JwtService.prototype)
+    jwtService.sign = vi.fn().mockReturnValue('mocked-jwt-token')
+    sut = new AuthenticateUserUseCase(usersRepository, passwordHasherStub, refreshTokensRepository, jwtService)
   })
 
   it('should not authenticate a inexistent user', async () => {

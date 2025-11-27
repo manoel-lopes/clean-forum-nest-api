@@ -1,6 +1,6 @@
+import { makeEmailValidationData } from 'tests/factories/domain/make-email-validation'
 import type { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
 import { InMemoryEmailValidationsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-email-validations.repository'
-import { makeEmailValidationData } from '@/shared/util/factories/domain/make-email-validation'
 import { VerifyEmailValidationUseCase } from './verify-email-validation.usecase'
 
 describe('VerifyEmailValidationUseCase', () => {

@@ -1,17 +1,19 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
-import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
-import type { UsersRepository } from '@/domain/application/repositories/users.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
+import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
+import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type AnswerQuestionRequest = Omit<AnswerProps, 'excerpt'>
 
+@Injectable()
 export class AnswerQuestionUseCase implements UseCase {
   constructor (
-    private readonly answersRepository: AnswersRepository,
-    private readonly userRepository: UsersRepository,
-    private readonly questionsRepository: QuestionsRepository
+    @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository,
+    @Inject(UsersRepository) private readonly userRepository: UsersRepository,
+    @Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository
   ) {}
 
   async execute (req: AnswerQuestionRequest): Promise<Answer> {

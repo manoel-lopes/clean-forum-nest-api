@@ -1,7 +1,7 @@
+import { makeQuestionData } from 'tests/factories/domain/make-question'
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
-import { makeQuestionData } from '@/shared/util/factories/domain/make-question'
 import { GetQuestionBySlugUseCase } from './get-question-by-slug.usecase'
 
 describe('GetQuestionBySlugUseCase', () => {

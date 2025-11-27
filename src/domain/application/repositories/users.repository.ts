@@ -17,3 +17,5 @@ export type UsersRepository = {
   findByEmail(email: string): Promise<User | null>
   findMany(paginationParams: PaginationParams): Promise<PaginatedUsers>
 }
+
+export const UsersRepository = Symbol('UsersRepository')

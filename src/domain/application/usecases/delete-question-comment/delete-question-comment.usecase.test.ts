@@ -1,7 +1,7 @@
+import { makeQuestionData } from 'tests/factories/domain/make-question'
+import { makeQuestionCommentData } from 'tests/factories/domain/make-question-comment'
 import { InMemoryQuestionCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-comments.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
-import { makeQuestionData } from '@/shared/util/factories/domain/make-question'
-import { makeQuestionCommentData } from '@/shared/util/factories/domain/make-question-comment'
 import { DeleteQuestionCommentUseCase } from './delete-question-comment.usecase'
 
 describe('DeleteQuestionCommentUseCase', () => {

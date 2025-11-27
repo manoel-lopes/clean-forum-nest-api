@@ -1,18 +1,20 @@
-import type { UseCase } from '@/core/domain/application/use-case'
-import type { AnswersRepository, UpdateAnswerData } from '@/domain/application/repositories/answers.repository'
+import { Inject, Injectable } from '@nestjs/common'
+import { UseCase } from '@/core/domain/application/use-case'
+import { AnswersRepository, type UpdateAnswerData } from '@/domain/application/repositories/answers.repository'
 import type { Answer } from '@/domain/enterprise/entities/answer.entity'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
-type UpdateAccountRequest = UpdateAnswerData['data'] & {
+type UpdateAnswerRequest = UpdateAnswerData['data'] & {
   answerId: string
 }
 
-export class UpdateAccountUseCase implements UseCase {
-  constructor (private readonly answersRepository: AnswersRepository) {
+@Injectable()
+export class UpdateAnswerUseCase implements UseCase {
+  constructor (@Inject(AnswersRepository) private readonly answersRepository: AnswersRepository) {
     Object.freeze(this)
   }
 
-  async execute (req: UpdateAccountRequest): Promise<Answer> {
+  async execute (req: UpdateAnswerRequest): Promise<Answer> {
     const { answerId, content } = req
     const answer = await this.answersRepository.findById(answerId)
     if (!answer) {

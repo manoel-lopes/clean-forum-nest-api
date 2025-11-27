@@ -48,3 +48,5 @@ export type QuestionsRepository = {
   findMany(params: FindManyQuestionsParams): Promise<PaginatedQuestions>
   findManyByUserId(userId: string, paginationParams: PaginationParams): Promise<PaginatedQuestions>
 }
+
+export const QuestionsRepository = Symbol('QuestionsRepository')
