@@ -85,7 +85,9 @@ jobs:
           EOF
 
       - name: Generate Prisma client
-        run: npx dotenv-cli -e .env.test -- npx prisma generate
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5433/forum_test?schema=public
 
       - name: Run database migrations
         run: pnpm run migrate:test
