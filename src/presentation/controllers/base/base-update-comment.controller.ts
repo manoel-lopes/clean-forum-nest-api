@@ -8,12 +8,15 @@ import {
 import { UseCase } from '@/core/domain/application/use-case'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  type UpdateCommentBody,
+  updateCommentBodySchema,
+  type UpdateCommentParams,
+  updateCommentParamsSchema,
+} from '@/infra/validation/schemas/presentation/comments/update-comment.schema'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
-
-type UpdateCommentBody = {
-  content: string
-}
 
 export abstract class BaseUpdateCommentController {
   constructor (
@@ -23,9 +26,10 @@ export abstract class BaseUpdateCommentController {
   @Put()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param('commentId') commentId: string,
-    @Body() body: UpdateCommentBody
+    @Param(new ZodValidationPipe(updateCommentParamsSchema)) params: UpdateCommentParams,
+    @Body(new ZodValidationPipe(updateCommentBodySchema)) body: UpdateCommentBody
   ) {
+    const { commentId } = params
     try {
       const { content } = body
       const response = await this.updateCommentUseCase.execute({

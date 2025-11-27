@@ -1,7 +1,7 @@
-import { makeQuestionCommentData } from 'tests/factories/domain/make-question-comment'
 import { InMemoryAnswerCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-comments.repository'
 import { InMemoryQuestionCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-comments.repository'
 import { UpdateCommentUseCase } from './update-comment.usecase'
+import { makeQuestionCommentData } from '@tests/factories/domain/make-question-comment'
 
 describe('UpdateCommentUseCase', () => {
   let sut: UpdateCommentUseCase

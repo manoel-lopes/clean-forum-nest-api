@@ -13,7 +13,7 @@ export default [
     ignores: resolveIgnoresFromGitignore(),
   }),
   {
-    ignores: ['**/*', '!src/**', '!tests/**', '**/*.e2e-spec.ts'],
+    ignores: ['**/*', '!src/**', '!tests/**', '**/*.e2e-spec.ts', 'clean-forum-node-api/**'],
   },
   {
     files: ['**/*.ts', '**/*.tsx'],
@@ -29,6 +29,7 @@ export default [
       },
       parserOptions: {
         project: ['./tsconfig.json'],
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     rules: {

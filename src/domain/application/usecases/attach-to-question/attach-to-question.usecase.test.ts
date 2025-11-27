@@ -1,10 +1,10 @@
-import { makeQuestionData } from 'tests/factories/domain/make-question'
 import type { QuestionAttachmentsRepository } from '@/domain/application/repositories/question-attachments.repository'
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryQuestionAttachmentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-attachments.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { AttachToQuestionUseCase } from './attach-to-question.usecase'
+import { makeQuestionData } from '@tests/factories/domain/make-question'
 
 describe('AttachToQuestionUseCase', () => {
   let sut: AttachToQuestionUseCase

@@ -1,9 +1,9 @@
-import { makeQuestionData } from 'tests/factories/domain/make-question'
 import type { QuestionCommentsRepository } from '@/domain/application/repositories/question-comments.repository'
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryQuestionCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-comments.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { CommentOnQuestionUseCase } from './comment-on-question.usecase'
+import { makeQuestionData } from '@tests/factories/domain/make-question'
 
 describe('CommentOnQuestionUseCase', () => {
   let sut: CommentOnQuestionUseCase

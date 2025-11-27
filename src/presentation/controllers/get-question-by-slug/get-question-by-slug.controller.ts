@@ -5,20 +5,21 @@ import {
   Param,
   Query,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import type { AnswerIncludeOption } from '@/domain/application/repositories/answers.repository'
 import type { QuestionIncludeOption } from '@/domain/application/repositories/questions.repository'
 import { GetQuestionBySlugUseCase } from '@/domain/application/usecases/get-question-by-slug/get-question-by-slug.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  type GetQuestionBySlugParams,
+  getQuestionBySlugParamsSchema,
+  type GetQuestionBySlugQuery,
+  getQuestionBySlugQuerySchema,
+} from '@/infra/validation/schemas/presentation/questions/get-question-by-slug.schema'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
-type GetQuestionBySlugQuery = {
-  page?: number
-  pageSize?: number
-  order?: 'asc' | 'desc'
-  include?: string
-  answerIncludes?: string
-}
-
+@ApiTags('Questions')
 @Public()
 @Controller('questions/slug/:slug')
 export class GetQuestionBySlugController {
@@ -26,9 +27,10 @@ export class GetQuestionBySlugController {
 
   @Get()
   async handle (
-    @Param('slug') slug: string,
-    @Query() query: GetQuestionBySlugQuery
+    @Param(new ZodValidationPipe(getQuestionBySlugParamsSchema)) params: GetQuestionBySlugParams,
+    @Query(new ZodValidationPipe(getQuestionBySlugQuerySchema)) query: GetQuestionBySlugQuery
   ) {
+    const { slug } = params
     try {
       const { page, pageSize, order, include, answerIncludes } = query
       let processedInclude: QuestionIncludeOption[] | undefined

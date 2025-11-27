@@ -1,8 +1,8 @@
-import { makeQuestionAttachmentData } from 'tests/factories/domain/make-question-attachment'
 import type { QuestionAttachmentsRepository } from '@/domain/application/repositories/question-attachments.repository'
 import { InMemoryQuestionAttachmentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-attachments.repository'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { UpdateQuestionAttachmentUseCase } from './update-question-attachment.usecase'
+import { makeQuestionAttachmentData } from '@tests/factories/domain/make-question-attachment'
 
 describe('UpdateQuestionAttachmentUseCase', () => {
   let sut: UpdateQuestionAttachmentUseCase

@@ -58,7 +58,7 @@ describe('UpdateQuestion', () => {
     const token = authResponse.body.token
 
     const response = await updateQuestion(app, token, {
-      questionId: 'non-existent-id',
+      questionId: '123e4567-e89b-12d3-a456-426614174000',
       title: 'Updated Title',
       content: 'Updated Content',
     })
@@ -68,6 +68,39 @@ describe('UpdateQuestion', () => {
       statusCode: 404,
       error: 'Not Found',
       message: 'Question not found',
+    })
+  })
+
+  it('should return 403 when user is not the author of the question', async () => {
+    const authorData = aUser().build()
+    await createUser(app, authorData)
+    const authorAuthResponse = await authenticateUser(app, {
+      email: authorData.email,
+      password: authorData.password,
+    })
+    const authorToken = authorAuthResponse.body.token
+    const questionData = aQuestion().build()
+    const createResponse = await createQuestion(app, authorToken, questionData)
+    const questionId = createResponse.body.id
+    const otherUserData = aUser().build()
+    await createUser(app, otherUserData)
+    const otherUserAuthResponse = await authenticateUser(app, {
+      email: otherUserData.email,
+      password: otherUserData.password,
+    })
+    const otherUserToken = otherUserAuthResponse.body.token
+
+    const response = await updateQuestion(app, otherUserToken, {
+      questionId,
+      title: 'Updated Title',
+      content: 'Updated Content',
+    })
+
+    expect(response.statusCode).toBe(403)
+    expect(response.body).toEqual({
+      statusCode: 403,
+      error: 'Forbidden',
+      message: 'The user is not the author of the question',
     })
   })
 

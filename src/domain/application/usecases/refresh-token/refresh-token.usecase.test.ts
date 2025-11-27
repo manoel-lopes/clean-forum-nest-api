@@ -1,10 +1,10 @@
-import { makeRefreshTokenData } from 'tests/factories/domain/make-refresh-token'
 import { JwtService } from '@nestjs/jwt'
 import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { InMemoryRefreshTokensRepository } from '@/infra/persistence/repositories/in-memory/in-memory-refresh-tokens.repository'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { ExpiredRefreshTokenError } from './errors/expired-refresh-token.error'
 import { RefreshAccessTokenUseCase } from './refresh-token.usecase'
+import { makeRefreshTokenData } from '@tests/factories/domain/make-refresh-token'
 
 vi.mock('@/infra/env/env', () => ({
   env: {

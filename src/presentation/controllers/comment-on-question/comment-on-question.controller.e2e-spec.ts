@@ -85,7 +85,7 @@ describe('CommentOnQuestion', () => {
       .post('/comments/questions')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        questionId: 'non-existent-id',
+        questionId: '123e4567-e89b-12d3-a456-426614174000',
         content: 'This is a comment',
       })
 

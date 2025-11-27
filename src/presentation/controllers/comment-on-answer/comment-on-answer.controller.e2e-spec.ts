@@ -88,7 +88,7 @@ describe('CommentOnAnswer', () => {
       .post('/comments/answers')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        answerId: 'non-existent-id',
+        answerId: '123e4567-e89b-12d3-a456-426614174000',
         content: 'This is a comment',
       })
 

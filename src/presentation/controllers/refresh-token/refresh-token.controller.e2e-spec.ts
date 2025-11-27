@@ -40,7 +40,7 @@ describe('RefreshAccessToken', () => {
   it('should return 404 when refresh token does not exist', async () => {
     const response = await request(app.getHttpServer())
       .post('/auth/refresh')
-      .send({ refreshTokenId: 'non-existent-id' })
+      .send({ refreshTokenId: '123e4567-e89b-12d3-a456-426614174000' })
 
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({

@@ -5,16 +5,18 @@ import {
   NotFoundException,
   Post,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { CommentOnAnswerUseCase } from '@/domain/application/usecases/comment-on-answer/comment-on-answer.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  type CommentOnAnswerBody,
+  commentOnAnswerBodySchema,
+} from '@/infra/validation/schemas/presentation/comments/comment-on-answer.schema'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
-type CommentOnAnswerBody = {
-  answerId: string
-  content: string
-}
-
+@ApiTags('Comments')
 @Controller('comments/answers')
 export class CommentOnAnswerController {
   constructor (private readonly commentOnAnswerUseCase: CommentOnAnswerUseCase) {}
@@ -23,7 +25,7 @@ export class CommentOnAnswerController {
   @HttpCode(201)
   async handle (
     @CurrentUser() user: AuthUser,
-    @Body() body: CommentOnAnswerBody
+    @Body(new ZodValidationPipe(commentOnAnswerBodySchema)) body: CommentOnAnswerBody
   ) {
     try {
       const { answerId, content } = body
