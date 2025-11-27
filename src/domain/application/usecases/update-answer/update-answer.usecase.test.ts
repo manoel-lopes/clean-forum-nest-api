@@ -15,6 +15,7 @@ describe('UpdateAnswerUseCase', () => {
   it('should not update a nonexistent answer', async () => {
     const request = {
       answerId: 'nonexistent-answer-id',
+      authorId: 'any-author-id',
     }
 
     await expect(sut.execute(request)).rejects.toThrow('Answer not found')
@@ -25,6 +26,7 @@ describe('UpdateAnswerUseCase', () => {
 
     const request = {
       answerId: answer.id,
+      authorId: answer.authorId,
       content: 'Updated content',
     }
 
