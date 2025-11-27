@@ -94,7 +94,7 @@ export class MyUseCase implements UseCase {
 ## Code Style Rules
 
 **Critical Rules**:
-- `no-explicit-any`: ERROR (exceptions: some Prisma query files)
+- `no-explicit-any`: ERROR (exceptions: `vitest.config.mts`, some Prisma query files)
 - `no-type-assertions`: ERROR (no `as` keyword)
 - `no-console`: ERROR
 - `max-len`: 120 characters
