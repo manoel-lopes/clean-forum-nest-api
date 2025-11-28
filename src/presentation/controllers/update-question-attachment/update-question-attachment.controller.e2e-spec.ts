@@ -66,7 +66,11 @@ describe('UpdateQuestionAttachment', () => {
     })
 
     expect(response.statusCode).toBe(400)
-    expect(response.body.message).toBe('The title is required')
+    expect(response.body).toEqual({
+      statusCode: 400,
+      error: 'Bad Request',
+      message: 'The title is required',
+    })
   })
 
   it('should return 400 when url is missing', async () => {
@@ -85,7 +89,11 @@ describe('UpdateQuestionAttachment', () => {
     })
 
     expect(response.statusCode).toBe(400)
-    expect(response.body.message).toBe('The url is required')
+    expect(response.body).toEqual({
+      statusCode: 400,
+      error: 'Bad Request',
+      message: 'The url is required',
+    })
   })
 
   it('should return 422 when attachmentId is not a valid UUID', async () => {
@@ -104,6 +112,11 @@ describe('UpdateQuestionAttachment', () => {
     })
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: "The 'attachmentId' must be a valid UUID",
+    })
   })
 
   it('should return 422 when url is not a valid URL', async () => {
@@ -122,6 +135,11 @@ describe('UpdateQuestionAttachment', () => {
     })
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: "The 'url' must be a valid URL",
+    })
   })
 
   it('should update question attachment and return 200', async () => {
