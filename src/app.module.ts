@@ -6,7 +6,6 @@ import { SecurityModule } from './infra/adapters/security/security.module'
 import { AuthModule } from './infra/auth/auth.module'
 import { envSchema } from './infra/env/env'
 import { EnvModule } from './infra/env/env.module'
-import { PrismaModule } from './infra/persistence/prisma.module'
 import { RepositoriesModule } from './infra/persistence/repositories/repositories.module'
 import { BullBoardConfigModule } from './infra/queues/bull-board.module'
 import { AnswerQuestionController } from './presentation/controllers/answer-question/answer-question.controller'
@@ -48,7 +47,6 @@ import { VerifyEmailValidationController } from './presentation/controllers/veri
       isGlobal: true,
     }),
     EnvModule,
-    PrismaModule,
     RepositoriesModule,
     EmailModule,
     SecurityModule,
