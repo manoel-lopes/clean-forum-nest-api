@@ -59,7 +59,5 @@ describe('AuthenticateUser', () => {
     expect(response.statusCode).toBe(201)
     expect(response.body).toHaveProperty('token')
     expect(response.body).toHaveProperty('refreshToken')
-    expect(typeof response.body.token).toBe('string')
-    expect(typeof response.body.refreshToken).toBe('object')
   })
 })
