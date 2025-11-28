@@ -20,6 +20,11 @@ describe('GetUserByEmail', () => {
     const response = await getUserByEmail(app, undefined, { email: 'invalid-email' })
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: "The 'email' must be a valid email address",
+    })
   })
 
   it('should return 404 when user with email does not exist', async () => {
