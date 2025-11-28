@@ -15,9 +15,7 @@ export class UpdateAccountUseCase implements UseCase {
   constructor (
     @Inject(UsersRepository) private readonly usersRepository: UsersRepository,
     @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher
-  ) {
-    Object.freeze(this)
-  }
+  ) {}
 
   async execute (req: UpdateAccountRequest): Promise<User> {
     const { userId, name, email, password } = req

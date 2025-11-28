@@ -15,9 +15,7 @@ export class AttachToQuestionUseCase implements UseCase {
   constructor (
     @Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository,
     @Inject(QuestionAttachmentsRepository) private readonly questionAttachmentsRepository: QuestionAttachmentsRepository
-  ) {
-    Object.freeze(this)
-  }
+  ) {}
 
   async execute (request: AttachToQuestionRequest): Promise<QuestionAttachment> {
     const { questionId, title, url } = request

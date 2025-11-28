@@ -12,9 +12,7 @@ export class AttachToAnswerUseCase implements UseCase {
   constructor (
     @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository,
     @Inject(AnswerAttachmentsRepository) private readonly answerAttachmentsRepository: AnswerAttachmentsRepository
-  ) {
-    Object.freeze(this)
-  }
+  ) {}
 
   async execute (request: AttachToAnswerRequest): Promise<AnswerAttachment> {
     const { answerId, title, url } = request

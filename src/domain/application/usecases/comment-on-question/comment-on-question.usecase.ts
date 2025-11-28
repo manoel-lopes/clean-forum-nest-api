@@ -12,9 +12,7 @@ export class CommentOnQuestionUseCase implements UseCase {
   constructor (
     @Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository,
     @Inject(QuestionCommentsRepository) private readonly questionCommentsRepository: QuestionCommentsRepository
-  ) {
-    Object.freeze(this)
-  }
+  ) {}
 
   async execute (request: CommentOnQuestionRequest): Promise<QuestionComment> {
     const { questionId, content, authorId } = request

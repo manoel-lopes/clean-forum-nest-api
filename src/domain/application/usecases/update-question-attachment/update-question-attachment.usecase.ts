@@ -14,9 +14,7 @@ type UpdateQuestionAttachmentRequest = {
 export class UpdateQuestionAttachmentUseCase implements UseCase {
   constructor (
     @Inject(QuestionAttachmentsRepository) private readonly questionAttachmentsRepository: QuestionAttachmentsRepository
-  ) {
-    Object.freeze(this)
-  }
+  ) {}
 
   async execute (request: UpdateQuestionAttachmentRequest): Promise<QuestionAttachment> {
     const { attachmentId, title, url } = request

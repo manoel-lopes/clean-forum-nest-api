@@ -18,9 +18,7 @@ export class ChooseQuestionBestAnswerUseCase implements UseCase {
   constructor (
     @Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository,
     @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository
-  ) {
-    Object.freeze(this)
-  }
+  ) {}
 
   async execute ({ answerId, authorId }: ChooseQuestionBestAnswerRequest): Promise<ChooseQuestionBestAnswerResponse> {
     const answer = await this.answersRepository.findById(answerId)

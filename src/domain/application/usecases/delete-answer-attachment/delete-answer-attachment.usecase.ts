@@ -11,9 +11,7 @@ type DeleteAnswerAttachmentRequest = {
 export class DeleteAnswerAttachmentUseCase implements UseCase {
   constructor (
     @Inject(AnswerAttachmentsRepository) private readonly answerAttachmentsRepository: AnswerAttachmentsRepository
-  ) {
-    Object.freeze(this)
-  }
+  ) {}
 
   async execute (request: DeleteAnswerAttachmentRequest) {
     const { attachmentId } = request

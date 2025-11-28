@@ -12,9 +12,7 @@ type UpdateAnswerRequest = UpdateAnswerData['data'] & {
 
 @Injectable()
 export class UpdateAnswerUseCase implements UseCase {
-  constructor (@Inject(AnswersRepository) private readonly answersRepository: AnswersRepository) {
-    Object.freeze(this)
-  }
+  constructor (@Inject(AnswersRepository) private readonly answersRepository: AnswersRepository) {}
 
   async execute (req: UpdateAnswerRequest): Promise<Answer> {
     const { answerId, authorId, content } = req

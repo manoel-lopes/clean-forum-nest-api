@@ -14,9 +14,7 @@ type UpdateQuestionRequest = UpdateQuestionData['data'] & {
 export class UpdateQuestionUseCase implements UseCase {
   constructor (
     @Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository
-  ) {
-    Object.freeze(this)
-  }
+  ) {}
 
   async execute (req: UpdateQuestionRequest): Promise<Question> {
     const { questionId, authorId, title, content } = req
