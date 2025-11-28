@@ -59,6 +59,11 @@ describe('ChooseQuestionBestAnswer', () => {
       .set('Authorization', `Bearer ${token}`)
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: "The 'answerId' must be a valid UUID",
+    })
   })
 
   it('should choose best answer and return 200', async () => {
