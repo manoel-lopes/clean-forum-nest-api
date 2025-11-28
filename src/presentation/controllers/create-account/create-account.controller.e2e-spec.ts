@@ -21,7 +21,11 @@ describe('CreateAccount', () => {
     const response = await createUser(app, userData)
 
     expect(response.statusCode).toBe(400)
-    expect(response.body.message).toBe('The name is required')
+    expect(response.body).toEqual({
+      statusCode: 400,
+      error: 'Bad Request',
+      message: 'The name is required',
+    })
   })
 
   it('should return 400 when email is missing', async () => {
@@ -30,7 +34,11 @@ describe('CreateAccount', () => {
     const response = await createUser(app, userData)
 
     expect(response.statusCode).toBe(400)
-    expect(response.body.message).toBe('The email is required')
+    expect(response.body).toEqual({
+      statusCode: 400,
+      error: 'Bad Request',
+      message: 'The email is required',
+    })
   })
 
   it('should return 400 when password is missing', async () => {
@@ -39,7 +47,11 @@ describe('CreateAccount', () => {
     const response = await createUser(app, userData)
 
     expect(response.statusCode).toBe(400)
-    expect(response.body.message).toBe('The password is required')
+    expect(response.body).toEqual({
+      statusCode: 400,
+      error: 'Bad Request',
+      message: 'The password is required',
+    })
   })
 
   it('should return 422 when email is invalid', async () => {
@@ -48,6 +60,11 @@ describe('CreateAccount', () => {
     const response = await createUser(app, userData)
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: "The 'email' must be a valid email address",
+    })
   })
 
   it('should return 422 when password is too short', async () => {
@@ -56,6 +73,11 @@ describe('CreateAccount', () => {
     const response = await createUser(app, userData)
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: "The 'password' must contain at least 6 characters",
+    })
   })
 
   it('should return 422 when password is too long', async () => {
@@ -64,6 +86,11 @@ describe('CreateAccount', () => {
     const response = await createUser(app, userData)
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: "The 'password' must contain at most 12 characters",
+    })
   })
 
   it('should return 422 when password does not meet complexity requirements', async () => {
@@ -72,6 +99,13 @@ describe('CreateAccount', () => {
     const response = await createUser(app, userData)
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message:
+        'The password must contain at least one uppercase and one lowercase letter, one number and one' +
+        'special character',
+    })
   })
 
   it('should return 409 when email already exists', async () => {
