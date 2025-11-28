@@ -53,6 +53,11 @@ describe('DeleteQuestionAttachment', () => {
     const response = await deleteQuestionAttachment(app, token, 'invalid-uuid')
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: "The 'attachmentId' must be a valid UUID",
+    })
   })
 
   it('should delete question attachment and return 204', async () => {
