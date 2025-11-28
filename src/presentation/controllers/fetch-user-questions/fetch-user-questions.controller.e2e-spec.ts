@@ -24,6 +24,11 @@ describe('FetchUserQuestions', () => {
       .get('/users/invalid-uuid/questions')
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: "The 'userId' must be a valid UUID",
+    })
   })
 
   it('should return 200 and fetch user questions with pagination', async () => {
