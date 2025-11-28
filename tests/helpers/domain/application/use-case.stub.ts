@@ -5,3 +5,9 @@ export class UseCaseStub implements UseCase {
     return {}
   }
 }
+
+export class ThrowingUseCaseStub implements UseCase {
+  async execute (): Promise<never> {
+    throw new Error('Unexpected error')
+  }
+}
