@@ -62,7 +62,11 @@ describe('UpdateAnswer', () => {
     })
 
     expect(response.statusCode).toBe(400)
-    expect(response.body.message).toBe('The content is required')
+    expect(response.body).toEqual({
+      statusCode: 400,
+      error: 'Bad Request',
+      message: 'The content is required',
+    })
   })
 
   it('should return 422 when answerId is not a valid UUID', async () => {
@@ -80,6 +84,11 @@ describe('UpdateAnswer', () => {
     })
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: "The 'answerId' must be a valid UUID",
+    })
   })
 
   it('should return 404 when answer does not exist', async () => {
