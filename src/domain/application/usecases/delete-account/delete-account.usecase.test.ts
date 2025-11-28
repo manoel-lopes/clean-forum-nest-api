@@ -1,10 +1,10 @@
-import { makeRefreshTokenData } from 'tests/factories/domain/make-refresh-token'
-import { makeUserData } from 'tests/factories/domain/make-user'
 import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import type { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { InMemoryRefreshTokensRepository } from '@/infra/persistence/repositories/in-memory/in-memory-refresh-tokens.repository'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import { DeleteAccountUseCase } from './delete-account.usecase'
+import { makeRefreshTokenData } from '@tests/factories/domain/make-refresh-token'
+import { makeUserData } from '@tests/factories/domain/make-user'
 
 describe('DeleteAccountUseCase', () => {
   let sut: DeleteAccountUseCase

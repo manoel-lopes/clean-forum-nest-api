@@ -1,10 +1,10 @@
-import { makeUserData } from 'tests/factories/domain/make-user'
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import type { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import { CreateQuestionUseCase } from './create-question.usecase'
 import { QuestionWithTitleAlreadyRegisteredError } from './errors/question-with-title-already-registered.error'
+import { makeUserData } from '@tests/factories/domain/make-user'
 
 describe('CreateQuestionUseCase', () => {
   let sut: CreateQuestionUseCase

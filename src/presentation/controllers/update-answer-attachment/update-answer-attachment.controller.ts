@@ -5,23 +5,28 @@ import {
   Param,
   Put,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { UpdateAnswerAttachmentUseCase } from '@/domain/application/usecases/update-answer-attachment/update-answer-attachment.usecase'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  type UpdateAnswerAttachmentBody,
+  updateAnswerAttachmentBodySchema,
+  type UpdateAnswerAttachmentParams,
+  updateAnswerAttachmentParamsSchema,
+} from '@/infra/validation/schemas/presentation/attachments/update-answer-attachment.schema'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
-type UpdateAnswerAttachmentBody = {
-  title: string
-  url: string
-}
-
+@ApiTags('Attachments')
 @Controller('answer-attachments/:attachmentId')
 export class UpdateAnswerAttachmentController {
   constructor (private readonly updateAnswerAttachmentUseCase: UpdateAnswerAttachmentUseCase) {}
 
   @Put()
   async handle (
-    @Param('attachmentId') attachmentId: string,
-    @Body() body: UpdateAnswerAttachmentBody
+    @Param(new ZodValidationPipe(updateAnswerAttachmentParamsSchema)) params: UpdateAnswerAttachmentParams,
+    @Body(new ZodValidationPipe(updateAnswerAttachmentBodySchema)) body: UpdateAnswerAttachmentBody
   ) {
+    const { attachmentId } = params
     try {
       const { title, url } = body
       const attachment = await this.updateAnswerAttachmentUseCase.execute({

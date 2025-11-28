@@ -41,6 +41,20 @@ describe('DeleteAnswer', () => {
     })
   })
 
+  it('should return 422 when answerId is not a valid UUID', async () => {
+    const userData = aUser().build()
+    await createUser(app, userData)
+    const authResponse = await authenticateUser(app, {
+      email: userData.email,
+      password: userData.password,
+    })
+    const token = authResponse.body.token
+
+    const response = await deleteAnswer(app, token, { answerId: 'invalid-uuid' })
+
+    expect(response.statusCode).toBe(422)
+  })
+
   it('should return 404 when answer does not exist', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -50,13 +64,44 @@ describe('DeleteAnswer', () => {
     })
     const token = authResponse.body.token
 
-    const response = await deleteAnswer(app, token, { answerId: 'non-existent-id' })
+    const response = await deleteAnswer(app, token, { answerId: '123e4567-e89b-12d3-a456-426614174000' })
 
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
       statusCode: 404,
       error: 'Not Found',
       message: 'Answer not found',
+    })
+  })
+
+  it('should return 403 when user is not the author of the answer', async () => {
+    const authorData = aUser().build()
+    await createUser(app, authorData)
+    const authorAuthResponse = await authenticateUser(app, {
+      email: authorData.email,
+      password: authorData.password,
+    })
+    const authorToken = authorAuthResponse.body.token
+    const questionData = aQuestion().build()
+    const createQuestionResponse = await createQuestion(app, authorToken, questionData)
+    const questionId = createQuestionResponse.body.id
+    const createAnswerResponse = await createAnswer(app, authorToken, { questionId, content: 'Answer content' })
+    const answerId = createAnswerResponse.body.id
+    const otherUserData = aUser().build()
+    await createUser(app, otherUserData)
+    const otherUserAuthResponse = await authenticateUser(app, {
+      email: otherUserData.email,
+      password: otherUserData.password,
+    })
+    const otherUserToken = otherUserAuthResponse.body.token
+
+    const response = await deleteAnswer(app, otherUserToken, { answerId })
+
+    expect(response.statusCode).toBe(403)
+    expect(response.body).toEqual({
+      statusCode: 403,
+      error: 'Forbidden',
+      message: 'The user is not the author of the answer',
     })
   })
 

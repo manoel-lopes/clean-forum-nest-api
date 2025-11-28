@@ -6,16 +6,21 @@ import {
   Param,
   Put,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { UpdateAnswerUseCase } from '@/domain/application/usecases/update-answer/update-answer.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  type UpdateAnswerBody,
+  updateAnswerBodySchema,
+  type UpdateAnswerParams,
+  updateAnswerParamsSchema,
+} from '@/infra/validation/schemas/presentation/answers/update-answer.schema'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
-type UpdateAnswerBody = {
-  content: string
-}
-
+@ApiTags('Answers')
 @Controller('answers/:answerId')
 export class UpdateAnswerController {
   constructor (private readonly updateAnswerUseCase: UpdateAnswerUseCase) {}
@@ -23,9 +28,10 @@ export class UpdateAnswerController {
   @Put()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param('answerId') answerId: string,
-    @Body() body: UpdateAnswerBody
+    @Param(new ZodValidationPipe(updateAnswerParamsSchema)) params: UpdateAnswerParams,
+    @Body(new ZodValidationPipe(updateAnswerBodySchema)) body: UpdateAnswerBody
   ) {
+    const { answerId } = params
     try {
       const { content } = body
       const answer = await this.updateAnswerUseCase.execute({

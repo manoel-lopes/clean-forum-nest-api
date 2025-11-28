@@ -13,7 +13,7 @@ export default [
     ignores: resolveIgnoresFromGitignore(),
   }),
   {
-    ignores: ['**/*', '!src/**', '!tests/**', '**/*.e2e-spec.ts'],
+    ignores: ['**/*', '!src/**', '!tests/**', '**/*.e2e-spec.ts', 'clean-forum-node-api/**'],
   },
   {
     files: ['**/*.ts', '**/*.tsx'],
@@ -29,6 +29,7 @@ export default [
       },
       parserOptions: {
         project: ['./tsconfig.json'],
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     rules: {
@@ -156,8 +157,6 @@ export default [
         { blankLine: 'never', prev: 'expression', next: 'if' },
         { blankLine: 'never', prev: 'if', next: 'expression' },
         { blankLine: 'never', prev: 'if', next: ['const', 'let', 'var'] },
-
-        // Try-catch - no blank lines
         { blankLine: 'never', prev: ['const', 'let', 'var'], next: 'try' },
         { blankLine: 'never', prev: 'expression', next: 'try' },
         { blankLine: 'never', prev: 'try', next: 'expression' },

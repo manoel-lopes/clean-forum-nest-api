@@ -5,12 +5,19 @@ import {
   Param,
   Patch,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { ChooseQuestionBestAnswerUseCase } from '@/domain/application/usecases/choose-question-best-answer/choose-question-best-answer.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  type ChooseQuestionBestAnswerParams,
+  chooseQuestionBestAnswerParamsSchema,
+} from '@/infra/validation/schemas/presentation/questions/choose-question-best-answer.schema'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
+@ApiTags('Questions')
 @Controller('answers/:answerId/best')
 export class ChooseQuestionBestAnswerController {
   constructor (private readonly chooseQuestionBestAnswerUseCase: ChooseQuestionBestAnswerUseCase) {}
@@ -18,8 +25,9 @@ export class ChooseQuestionBestAnswerController {
   @Patch()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param('answerId') answerId: string
+    @Param(new ZodValidationPipe(chooseQuestionBestAnswerParamsSchema)) params: ChooseQuestionBestAnswerParams
   ) {
+    const { answerId } = params
     try {
       const question = await this.chooseQuestionBestAnswerUseCase.execute({
         answerId,

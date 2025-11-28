@@ -41,6 +41,20 @@ describe('DeleteQuestionAttachment', () => {
     })
   })
 
+  it('should return 422 when attachmentId is not a valid UUID', async () => {
+    const userData = aUser().build()
+    await createUser(app, userData)
+    const authResponse = await authenticateUser(app, {
+      email: userData.email,
+      password: userData.password,
+    })
+    const token = authResponse.body.token
+
+    const response = await deleteQuestionAttachment(app, token, 'invalid-uuid')
+
+    expect(response.statusCode).toBe(422)
+  })
+
   it('should delete question attachment and return 204', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -73,7 +87,7 @@ describe('DeleteQuestionAttachment', () => {
     })
     const token = authResponse.body.token
 
-    const response = await deleteQuestionAttachment(app, token, 'non-existent-id')
+    const response = await deleteQuestionAttachment(app, token, '123e4567-e89b-12d3-a456-426614174000')
 
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({

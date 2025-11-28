@@ -1,8 +1,8 @@
-import { makeQuestionData } from 'tests/factories/domain/make-question'
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { UpdateQuestionUseCase } from './update-question.usecase'
+import { makeQuestionData } from '@tests/factories/domain/make-question'
 
 describe('UpdateQuestionUseCase', () => {
   let sut: UpdateQuestionUseCase
@@ -17,6 +17,7 @@ describe('UpdateQuestionUseCase', () => {
     await expect(
       sut.execute({
         questionId: 'any_inexistent_id',
+        authorId: 'any-author-id',
       })
     ).rejects.toThrowError(new ResourceNotFoundError('Question'))
   })
@@ -26,6 +27,7 @@ describe('UpdateQuestionUseCase', () => {
 
     const response = await sut.execute({
       questionId: question.id,
+      authorId: question.authorId,
       title: 'new_title',
     })
 
@@ -38,6 +40,7 @@ describe('UpdateQuestionUseCase', () => {
 
     const response = await sut.execute({
       questionId: question.id,
+      authorId: question.authorId,
       content: 'new_content',
     })
 
@@ -50,6 +53,7 @@ describe('UpdateQuestionUseCase', () => {
 
     const response = await sut.execute({
       questionId: question.id,
+      authorId: question.authorId,
       title: 'new_title',
       content: 'new_content',
     })

@@ -57,7 +57,7 @@ describe('AnswerQuestion', () => {
     const token = authResponse.body.token
 
     const response = await request(app.getHttpServer())
-      .post('/questions/non-existent-id/answers')
+      .post('/questions/123e4567-e89b-12d3-a456-426614174000/answers')
       .set('Authorization', `Bearer ${token}`)
       .send({ content: 'Some content' })
 

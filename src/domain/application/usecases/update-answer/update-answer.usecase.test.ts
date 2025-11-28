@@ -1,7 +1,7 @@
-import { makeAnswerData } from 'tests/factories/domain/make-answer'
 import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { UpdateAnswerUseCase } from './update-answer.usecase'
+import { makeAnswerData } from '@tests/factories/domain/make-answer'
 
 describe('UpdateAnswerUseCase', () => {
   let sut: UpdateAnswerUseCase
@@ -15,6 +15,7 @@ describe('UpdateAnswerUseCase', () => {
   it('should not update a nonexistent answer', async () => {
     const request = {
       answerId: 'nonexistent-answer-id',
+      authorId: 'any-author-id',
     }
 
     await expect(sut.execute(request)).rejects.toThrow('Answer not found')
@@ -25,6 +26,7 @@ describe('UpdateAnswerUseCase', () => {
 
     const request = {
       answerId: answer.id,
+      authorId: answer.authorId,
       content: 'Updated content',
     }
 

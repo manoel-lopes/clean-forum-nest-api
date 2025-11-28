@@ -1,5 +1,3 @@
-import { makeQuestionData } from 'tests/factories/domain/make-question'
-import { makeUserData } from 'tests/factories/domain/make-user'
 import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import type { UsersRepository } from '@/domain/application/repositories/users.repository'
@@ -7,6 +5,8 @@ import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-m
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import { AnswerQuestionUseCase } from './answer-question.usecase'
+import { makeQuestionData } from '@tests/factories/domain/make-question'
+import { makeUserData } from '@tests/factories/domain/make-user'
 
 describe('AnswerQuestionUseCase', () => {
   let sut: AnswerQuestionUseCase

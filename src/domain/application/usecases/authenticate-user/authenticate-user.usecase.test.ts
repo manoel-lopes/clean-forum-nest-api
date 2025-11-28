@@ -1,4 +1,3 @@
-import { makeUserData } from 'tests/factories/domain/make-user'
 import { JwtService } from '@nestjs/jwt'
 import type { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { PasswordHasherStub } from '@/infra/adapters/security/stubs/password-hasher.stub'
@@ -6,6 +5,7 @@ import { InMemoryRefreshTokensRepository } from '@/infra/persistence/repositorie
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import type { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
 import { AuthenticateUserUseCase } from './authenticate-user.usecase'
+import { makeUserData } from '@tests/factories/domain/make-user'
 
 vi.mock('@/infra/env/env', () => ({
   env: {

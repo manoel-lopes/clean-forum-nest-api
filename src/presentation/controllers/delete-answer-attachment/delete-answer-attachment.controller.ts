@@ -5,16 +5,26 @@ import {
   NotFoundException,
   Param,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { DeleteAnswerAttachmentUseCase } from '@/domain/application/usecases/delete-answer-attachment/delete-answer-attachment.usecase'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  type DeleteAnswerAttachmentParams,
+  deleteAnswerAttachmentParamsSchema,
+} from '@/infra/validation/schemas/presentation/attachments/delete-answer-attachment.schema'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
+@ApiTags('Attachments')
 @Controller('answer-attachments/:attachmentId')
 export class DeleteAnswerAttachmentController {
   constructor (private readonly deleteAnswerAttachmentUseCase: DeleteAnswerAttachmentUseCase) {}
 
   @Delete()
   @HttpCode(204)
-  async handle (@Param('attachmentId') attachmentId: string) {
+  async handle (
+    @Param(new ZodValidationPipe(deleteAnswerAttachmentParamsSchema)) params: DeleteAnswerAttachmentParams
+  ) {
+    const { attachmentId } = params
     try {
       await this.deleteAnswerAttachmentUseCase.execute({
         attachmentId,
