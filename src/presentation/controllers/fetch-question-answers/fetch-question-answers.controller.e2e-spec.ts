@@ -23,6 +23,11 @@ describe('FetchQuestionAnswers', () => {
     const response = await fetchQuestionAnswers(app, 'invalid-uuid')
 
     expect(response.statusCode).toBe(422)
+    expect(response.body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: "The 'questionId' must be a valid UUID",
+    })
   })
 
   it('should return 404 when question does not exist', async () => {
