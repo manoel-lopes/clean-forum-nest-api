@@ -1,7 +1,9 @@
 import { INestApplication } from '@nestjs/common'
 import request from 'supertest'
 
+import { CommentOnAnswerUseCase } from '@/domain/application/usecases/comment-on-answer/comment-on-answer.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
+import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
 import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
@@ -47,6 +49,64 @@ describe('CommentOnAnswer', () => {
     })
   })
 
+  it('should return 404 when answer does not exist', async () => {
+    const userData = aUser().build()
+    await createUser(app, userData)
+    const authResponse = await authenticateUser(app, {
+      email: userData.email,
+      password: userData.password,
+    })
+    const token = authResponse.body.token
+
+    const response = await request(app.getHttpServer())
+      .post('/comments/answers')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        answerId: '123e4567-e89b-12d3-a456-426614174000',
+        content: 'This is a comment',
+      })
+
+    expect(response.statusCode).toBe(404)
+    expect(response.body).toEqual({
+      statusCode: 404,
+      error: 'Not Found',
+      message: 'Answer not found',
+    })
+  })
+
+  it('should return 500 when an unexpected error occurs', async () => {
+    const appWithError = await makeAppWithErrorStub({
+      useCaseClass: CommentOnAnswerUseCase,
+    })
+    const userData = aUser().build()
+    await createUser(appWithError, userData)
+    const authResponse = await authenticateUser(appWithError, {
+      email: userData.email,
+      password: userData.password,
+    })
+    const token = authResponse.body.token
+    const questionData = aQuestion().build()
+    const createQuestionResponse = await createQuestion(appWithError, token, questionData)
+    const questionId = createQuestionResponse.body.id
+    const createAnswerResponse = await createAnswer(appWithError, token, { questionId, content: 'Answer content' })
+    const answerId = createAnswerResponse.body.id
+
+    const response = await request(appWithError.getHttpServer())
+      .post('/comments/answers')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        answerId,
+        content: 'This is a comment',
+      })
+
+    expect(response.statusCode).toBe(500)
+    expect(response.body).toEqual({
+      statusCode: 500,
+      message: 'Internal server error',
+    })
+    await appWithError.close()
+  })
+
   it('should create comment on answer and return 201', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -73,30 +133,5 @@ describe('CommentOnAnswer', () => {
     expect(response.body).toHaveProperty('id')
     expect(response.body).toHaveProperty('content')
     expect(response.body.content).toBe('This is a comment')
-  })
-
-  it('should return 404 when answer does not exist', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-
-    const response = await request(app.getHttpServer())
-      .post('/comments/answers')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        answerId: '123e4567-e89b-12d3-a456-426614174000',
-        content: 'This is a comment',
-      })
-
-    expect(response.statusCode).toBe(404)
-    expect(response.body).toEqual({
-      statusCode: 404,
-      error: 'Not Found',
-      message: 'Answer not found',
-    })
   })
 })

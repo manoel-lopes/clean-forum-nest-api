@@ -1,6 +1,7 @@
 import { INestApplication } from '@nestjs/common'
-
+import { CreateAccountUseCase } from '@/domain/application/usecases/create-account/create-account.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
+import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
 import { aUser } from '@tests/builders/user.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 
@@ -120,6 +121,22 @@ describe('CreateAccount', () => {
       error: 'Conflict',
       message: 'User with email already registered',
     })
+  })
+
+  it('should return 500 when an unexpected error occurs', async () => {
+    const appWithError = await makeAppWithErrorStub({
+      useCaseClass: CreateAccountUseCase,
+    })
+    const userData = aUser().build()
+
+    const response = await createUser(appWithError, userData)
+
+    expect(response.statusCode).toBe(500)
+    expect(response.body).toEqual({
+      statusCode: 500,
+      message: 'Internal server error',
+    })
+    await appWithError.close()
   })
 
   it('should return 201 and create a new account', async () => {

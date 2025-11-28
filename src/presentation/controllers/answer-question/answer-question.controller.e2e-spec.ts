@@ -1,7 +1,9 @@
 import { INestApplication } from '@nestjs/common'
 import request from 'supertest'
 
+import { AnswerQuestionUseCase } from '@/domain/application/usecases/answer-question/answer-question.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
+import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
 import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { anAnswer } from '@tests/builders/answer.builder'
@@ -67,6 +69,35 @@ describe('AnswerQuestion', () => {
       error: 'Not Found',
       message: 'Question not found',
     })
+  })
+
+  it('should return 500 when an unexpected error occurs', async () => {
+    const appWithError = await makeAppWithErrorStub({
+      useCaseClass: AnswerQuestionUseCase,
+    })
+    const userData = aUser().build()
+    await createUser(appWithError, userData)
+    const authResponse = await authenticateUser(appWithError, {
+      email: userData.email,
+      password: userData.password,
+    })
+    const token = authResponse.body.token
+    const questionData = aQuestion().build()
+    const createQuestionResponse = await createQuestion(appWithError, token, questionData)
+    const questionId = createQuestionResponse.body.id
+    const answerData = anAnswer().build()
+
+    const response = await request(appWithError.getHttpServer())
+      .post(`/questions/${questionId}/answers`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ content: answerData.content })
+
+    expect(response.statusCode).toBe(500)
+    expect(response.body).toEqual({
+      statusCode: 500,
+      message: 'Internal server error',
+    })
+    await appWithError.close()
   })
 
   it('should return 201 and create answer for question', async () => {

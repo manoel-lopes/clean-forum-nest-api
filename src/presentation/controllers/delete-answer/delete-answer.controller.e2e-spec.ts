@@ -1,6 +1,8 @@
 import { INestApplication } from '@nestjs/common'
 
+import { DeleteAnswerUseCase } from '@/domain/application/usecases/delete-answer/delete-answer.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
+import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
 import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
@@ -108,6 +110,33 @@ describe('DeleteAnswer', () => {
       error: 'Forbidden',
       message: 'The user is not the author of the answer',
     })
+  })
+
+  it('should return 500 when an unexpected error occurs', async () => {
+    const appWithError = await makeAppWithErrorStub({
+      useCaseClass: DeleteAnswerUseCase,
+    })
+    const userData = aUser().build()
+    await createUser(appWithError, userData)
+    const authResponse = await authenticateUser(appWithError, {
+      email: userData.email,
+      password: userData.password,
+    })
+    const token = authResponse.body.token
+    const questionData = aQuestion().build()
+    const createQuestionResponse = await createQuestion(appWithError, token, questionData)
+    const questionId = createQuestionResponse.body.id
+    const createAnswerResponse = await createAnswer(appWithError, token, { questionId, content: 'Answer content' })
+    const answerId = createAnswerResponse.body.id
+
+    const response = await deleteAnswer(appWithError, token, { answerId })
+
+    expect(response.statusCode).toBe(500)
+    expect(response.body).toEqual({
+      statusCode: 500,
+      message: 'Internal server error',
+    })
+    await appWithError.close()
   })
 
   it('should return 204 and delete answer', async () => {

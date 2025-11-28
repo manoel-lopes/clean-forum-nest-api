@@ -1,6 +1,8 @@
 import { INestApplication } from '@nestjs/common'
 
+import { AuthenticateUserUseCase } from '@/domain/application/usecases/authenticate-user/authenticate-user.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
+import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
 import { aUser } from '@tests/builders/user.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
@@ -45,6 +47,24 @@ describe('AuthenticateUser', () => {
       error: 'Not Found',
       message: 'User not found',
     })
+  })
+
+  it('should return 500 when an unexpected error occurs', async () => {
+    const appWithError = await makeAppWithErrorStub({
+      useCaseClass: AuthenticateUserUseCase,
+    })
+
+    const response = await authenticateUser(appWithError, {
+      email: 'test@example.com',
+      password: 'Test@123',
+    })
+
+    expect(response.statusCode).toBe(500)
+    expect(response.body).toEqual({
+      statusCode: 500,
+      message: 'Internal server error',
+    })
+    await appWithError.close()
   })
 
   it('should return 201 and authenticate user with token and refreshToken', async () => {

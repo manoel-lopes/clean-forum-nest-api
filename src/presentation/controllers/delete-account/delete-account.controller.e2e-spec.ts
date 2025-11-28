@@ -1,6 +1,8 @@
 import { INestApplication } from '@nestjs/common'
 
+import { DeleteAccountUseCase } from '@/domain/application/usecases/delete-account/delete-account.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
+import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
 import { aUser } from '@tests/builders/user.builder'
 import { createUser, deleteUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
@@ -56,6 +58,28 @@ describe('DeleteAccount', () => {
       error: 'Not Found',
       message: 'User not found',
     })
+  })
+
+  it('should return 500 when an unexpected error occurs', async () => {
+    const appWithError = await makeAppWithErrorStub({
+      useCaseClass: DeleteAccountUseCase,
+    })
+    const userData = aUser().build()
+    await createUser(appWithError, userData)
+    const authResponse = await authenticateUser(appWithError, {
+      email: userData.email,
+      password: userData.password,
+    })
+    const token = authResponse.body.token
+
+    const response = await deleteUser(appWithError, token)
+
+    expect(response.statusCode).toBe(500)
+    expect(response.body).toEqual({
+      statusCode: 500,
+      message: 'Internal server error',
+    })
+    await appWithError.close()
   })
 
   it('should return 204 and delete account', async () => {

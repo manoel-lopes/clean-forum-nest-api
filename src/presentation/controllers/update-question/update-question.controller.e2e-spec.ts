@@ -1,6 +1,8 @@
 import { INestApplication } from '@nestjs/common'
 
+import { UpdateQuestionUseCase } from '@/domain/application/usecases/update-question/update-question.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
+import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
 import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
@@ -102,6 +104,35 @@ describe('UpdateQuestion', () => {
       error: 'Forbidden',
       message: 'The user is not the author of the question',
     })
+  })
+
+  it('should return 500 when an unexpected error occurs', async () => {
+    const appWithError = await makeAppWithErrorStub({
+      useCaseClass: UpdateQuestionUseCase,
+    })
+    const userData = aUser().build()
+    await createUser(appWithError, userData)
+    const authResponse = await authenticateUser(appWithError, {
+      email: userData.email,
+      password: userData.password,
+    })
+    const token = authResponse.body.token
+    const questionData = aQuestion().build()
+    const createResponse = await createQuestion(appWithError, token, questionData)
+    const questionId = createResponse.body.id
+
+    const response = await updateQuestion(appWithError, token, {
+      questionId,
+      title: 'Updated Title',
+      content: 'Updated Content',
+    })
+
+    expect(response.statusCode).toBe(500)
+    expect(response.body).toEqual({
+      statusCode: 500,
+      message: 'Internal server error',
+    })
+    await appWithError.close()
   })
 
   it('should return 200 and update question', async () => {
