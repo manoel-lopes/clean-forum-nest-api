@@ -106,7 +106,7 @@ describe('UpdateQuestion', () => {
     })
   })
 
-  it('should return 500 when an unexpected error occurs', async () => {
+  it('should return 500 if an unexpected error occurs', async () => {
     const appWithError = await makeAppWithErrorStub({
       useCaseClass: UpdateQuestionUseCase,
     })
