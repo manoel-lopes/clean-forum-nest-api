@@ -6,6 +6,4 @@ export const authenticateUserBodySchema = z.object({
   password: z.string().min(1),
 })
 
-export type AuthenticateUserBody = z.infer<typeof authenticateUserBodySchema>
-
 export class AuthenticateUserBodyDto extends createZodDto(authenticateUserBodySchema) {}

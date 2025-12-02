@@ -15,6 +15,4 @@ export const createAccountBodySchema = z.object({
     ),
 })
 
-export type CreateAccountBody = z.infer<typeof createAccountBodySchema>
-
 export class CreateAccountBodyDto extends createZodDto(createAccountBodySchema) {}

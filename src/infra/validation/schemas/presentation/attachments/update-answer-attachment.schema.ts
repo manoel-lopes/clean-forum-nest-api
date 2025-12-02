@@ -10,10 +10,6 @@ export const updateAnswerAttachmentBodySchema = z.object({
   url: z.string().url(),
 })
 
-export type UpdateAnswerAttachmentParams = z.infer<typeof updateAnswerAttachmentParamsSchema>
-
-export type UpdateAnswerAttachmentBody = z.infer<typeof updateAnswerAttachmentBodySchema>
-
 export class UpdateAnswerAttachmentParamsDto extends createZodDto(updateAnswerAttachmentParamsSchema) {}
 
 export class UpdateAnswerAttachmentBodyDto extends createZodDto(updateAnswerAttachmentBodySchema) {}

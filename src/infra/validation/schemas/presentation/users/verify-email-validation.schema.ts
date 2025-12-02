@@ -6,6 +6,4 @@ export const verifyEmailValidationBodySchema = z.object({
   code: z.string().min(1),
 })
 
-export type VerifyEmailValidationBody = z.infer<typeof verifyEmailValidationBodySchema>
-
 export class VerifyEmailValidationBodyDto extends createZodDto(verifyEmailValidationBodySchema) {}
