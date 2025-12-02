@@ -3,15 +3,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { EnvModule } from '@/infra/env/env.module'
 import { EnvService } from '@/infra/env/env.service'
 import { BcryptPasswordHasher } from './implementations/bcrypt-password-hasher'
-import { PasswordHasherStub } from './stubs/password-hasher.stub'
-
-export const PASSWORD_HASHER = Symbol('PasswordHasher')
-
-const passwordHasherProviders: Record<string, new () => BcryptPasswordHasher | PasswordHasherStub> = {
-  test: PasswordHasherStub,
-  development: BcryptPasswordHasher,
-  production: BcryptPasswordHasher,
-}
+import { PasswordHasher } from './ports/password-hasher'
 
 @Global()
 @Module({
@@ -28,15 +20,10 @@ const passwordHasherProviders: Record<string, new () => BcryptPasswordHasher | P
   ],
   providers: [
     {
-      provide: PASSWORD_HASHER,
-      useFactory: (envService: EnvService) => {
-        const env = envService.get('NODE_ENV')
-        const PasswordHasherClass = passwordHasherProviders[env] || BcryptPasswordHasher
-        return new PasswordHasherClass()
-      },
-      inject: [EnvService],
+      provide: PasswordHasher,
+      useClass: BcryptPasswordHasher,
     },
   ],
-  exports: [PASSWORD_HASHER, JwtModule],
+  exports: [PasswordHasher, JwtModule],
 })
 export class SecurityModule {}
