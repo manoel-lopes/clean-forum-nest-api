@@ -6,7 +6,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AttachToAnswerUseCase } from '@/domain/application/usecases/attach-to-answer/attach-to-answer.usecase'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
@@ -15,6 +15,14 @@ import {
   AttachToAnswerParamsDto,
   attachToAnswerParamsSchema,
 } from '@/infra/validation/schemas/presentation/attachments/attach-to-answer.schema'
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Attachments')
@@ -24,6 +32,13 @@ export class AttachToAnswerController {
 
   @Post()
   @HttpCode(201)
+  @ApiOperation({ summary: 'Attach file to an answer' })
+  @ApiCreatedResponse('Attachment created successfully')
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
+  @ApiNotFoundResponse('Answer not found')
+  @ApiUnprocessableEntityResponse()
+  @ApiInternalServerErrorResponse()
   async handle (
     @Param(new ZodValidationPipe(attachToAnswerParamsSchema)) params: AttachToAnswerParamsDto,
     @Body(new ZodValidationPipe(attachToAnswerBodySchema)) body: AttachToAnswerBodyDto

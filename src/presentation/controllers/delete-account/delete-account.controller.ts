@@ -4,10 +4,16 @@ import {
   HttpCode,
   NotFoundException,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { DeleteAccountUseCase } from '@/domain/application/usecases/delete-account/delete-account.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
+import {
+  ApiInternalServerErrorResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { Prisma } from '@prisma/client'
 
@@ -18,6 +24,11 @@ export class DeleteAccountController {
 
   @Delete()
   @HttpCode(204)
+  @ApiOperation({ summary: 'Delete user account' })
+  @ApiNoContentResponse('Account deleted successfully')
+  @ApiUnauthorizedResponse()
+  @ApiNotFoundResponse('User not found')
+  @ApiInternalServerErrorResponse()
   async handle (@CurrentUser() user: AuthUser) {
     try {
       await this.deleteAccountUseCase.execute({ userId: user.id })
