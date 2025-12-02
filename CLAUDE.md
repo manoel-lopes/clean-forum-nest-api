@@ -74,22 +74,60 @@ src/
 
 ### Key Patterns
 
-**Repository Injection** - Use abstract classes as injection tokens:
+**Interface Adapter Pattern** - All repositories and adapters (PasswordHasher, EmailService, etc.) follow the same pattern:
+
+1. Define interface + Symbol with the same name in a port file:
+```typescript
+// src/domain/application/repositories/users.repository.ts
+export type UsersRepository = {
+  create(user: UserProps): Promise<User>
+  findByEmail(email: string): Promise<User | null>
+}
+export const UsersRepository = Symbol('UsersRepository')
+
+// src/infra/adapters/security/ports/password-hasher.ts
+export interface PasswordHasher {
+  hash(password: string): Promise<string>
+  compare(password: string, hashedPassword: string): Promise<boolean>
+}
+export const PasswordHasher = Symbol('PasswordHasher')
+```
+
+2. Register in the module using the Symbol as provider token:
+```typescript
+// repositories.module.ts or security.module.ts
+@Global()
+@Module({
+  providers: [
+    { provide: UsersRepository, useClass: PrismaUsersRepository },
+    { provide: PasswordHasher, useClass: BcryptPasswordHasher },
+  ],
+  exports: [UsersRepository, PasswordHasher],
+})
+```
+
+3. Inject using the Symbol (import provides both type and Symbol):
 ```typescript
 @Injectable()
 export class MyUseCase implements UseCase {
   constructor(
-    @Inject(UsersRepository) private readonly usersRepository: IUsersRepository,
+    @Inject(UsersRepository) private readonly usersRepository: UsersRepository,
+    @Inject(PasswordHasher) private readonly passwordHasher: PasswordHasher,
   ) {}
 }
 ```
 
-**Global Modules** - No need to import these: `PrismaModule`, `RepositoriesModule`, `UseCasesModule`, `EnvModule`
+**Global Modules** - No need to import these: `PrismaModule`, `RepositoriesModule`, `UseCasesModule`, `EnvModule`, `SecurityModule`
 
 **Error Handling Flow**:
-1. Domain/Use Cases: Throw domain errors (`ResourceNotFoundError`, `NotAuthorError`)
+1. Domain/Use Cases: Throw domain exceptions (`ResourceNotFoundException`, `NotAuthorException`)
 2. Repositories: Let errors bubble up (no try-catch)
-3. Controllers: Catch domain errors → map to HTTP exceptions
+3. Controllers: Catch domain exceptions → map to HTTP exceptions
+
+**Exception Naming Convention**: All custom exceptions use the `*Exception` suffix and `.exception.ts` file extension:
+- `src/shared/application/exceptions/` - Shared exceptions (ResourceNotFoundException, NotAuthorException)
+- `src/domain/application/usecases/<name>/exceptions/` - Use-case-specific exceptions
+- `src/presentation/helpers/errors/` - HTTP exceptions (HttpException)
 
 ## Code Style Rules
 
@@ -121,13 +159,16 @@ const level = logLevels[env] || 'error'
 ## Testing
 
 **Test File Conventions**:
-- `*.test.ts` - Unit tests (co-located with source)
-- `*.spec.ts` - Integration tests
-- `*.e2e-spec.ts` - E2E tests (in `src/presentation/controllers/*/`)
+- `*.test.ts` - Unit tests (co-located with source, run via `pnpm test:unit`)
+- `*.e2e-spec.ts` - E2E tests (in `src/presentation/controllers/*/`, run via `pnpm test:e2e`)
 
 **Path Aliases**:
 - `@/` - src imports
-- `@tests/` - test helpers (`@tests/helpers/`, `@tests/builders/`)
+- `@tests/` - test utilities (`@tests/factories/`, `@tests/builders/`)
+
+**Test Data Generation**:
+- `tests/factories/` - Factory functions (`makeQuestionData()`, `makeUserData()`) for domain data
+- `tests/builders/` - Fluent builders (`aQuestion().withTitle().build()`) for HTTP request bodies
 
 **Test Pattern (AAA)**:
 ```typescript
@@ -160,6 +201,13 @@ pnpm run db:up:test && pnpm run migrate:test
 8. **Controller**: `src/presentation/controllers/<name>/`
 9. **Register Controller**: Add to `AppModule` controllers
 10. **Tests**: Unit test for use case, E2E test for controller
+
+## Git Commit Rules
+
+**Critical Rules**:
+- **NEVER use `--no-verify`** - Always let pre-commit hooks run to ensure code quality
+- If hooks fail, fix the underlying issues instead of bypassing them
+- Commits should pass lint and type-check before being created
 
 ## Troubleshooting
 
