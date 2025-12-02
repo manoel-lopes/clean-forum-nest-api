@@ -3,8 +3,8 @@ import { UseCase } from '@/core/domain/application/use-case'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import type { Question } from '@/domain/enterprise/entities/question.entity'
-import { NotAuthorError } from '@/shared/application/errors/not-author.error'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 type ChooseQuestionBestAnswerRequest = {
   authorId: string
@@ -23,14 +23,14 @@ export class ChooseQuestionBestAnswerUseCase implements UseCase {
   async execute ({ answerId, authorId }: ChooseQuestionBestAnswerRequest): Promise<ChooseQuestionBestAnswerResponse> {
     const answer = await this.answersRepository.findById(answerId)
     if (!answer) {
-      throw new ResourceNotFoundError('Answer')
+      throw new ResourceNotFoundException('Answer')
     }
     const question = await this.questionsRepository.findById(answer.questionId)
     if (!question) {
-      throw new ResourceNotFoundError('Question')
+      throw new ResourceNotFoundException('Question')
     }
     if (authorId !== question.authorId) {
-      throw new NotAuthorError('question')
+      throw new NotAuthorException('question')
     }
     const editedQuestion = await this.questionsRepository.update({
       where: { id: question.id },

@@ -5,8 +5,8 @@ import { QuestionCommentsRepository } from '@/domain/application/repositories/qu
 import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 import type { Comment } from '@/domain/enterprise/entities/base/comment.entity'
 import type { QuestionComment } from '@/domain/enterprise/entities/question-comment.entity'
-import { NotAuthorError } from '@/shared/application/errors/not-author.error'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 type UpdateCommentRequest = {
   commentId: string
@@ -30,10 +30,10 @@ export class UpdateCommentUseCase implements UseCase {
       repository = this.answerCommentsRepository
     }
     if (!comment) {
-      throw new ResourceNotFoundError('Comment')
+      throw new ResourceNotFoundException('Comment')
     }
     if (comment.authorId !== authorId) {
-      throw new NotAuthorError('comment')
+      throw new NotAuthorException('comment')
     }
     const updatedComment = await repository.update({
       where: { id: commentId },

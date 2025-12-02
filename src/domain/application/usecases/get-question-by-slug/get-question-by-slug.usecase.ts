@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
 import { type FindQuestionBySlugParams, QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import type { Question } from '@/domain/enterprise/entities/question.entity'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 type GetQuestionBySlugRequest = FindQuestionBySlugParams
 
@@ -15,7 +15,7 @@ export class GetQuestionBySlugUseCase implements UseCase {
   async execute (request: GetQuestionBySlugRequest): Promise<Question> {
     const question = await this.questionsRepository.findBySlug(request)
     if (!question) {
-      throw new ResourceNotFoundError('Question')
+      throw new ResourceNotFoundException('Question')
     }
     return question
   }

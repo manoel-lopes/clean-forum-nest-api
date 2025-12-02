@@ -1,10 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
-import { PASSWORD_HASHER } from '@/infra/adapters/security/security.module'
-import type { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
+import { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
 import type { UserProps } from '@/domain/enterprise/entities/user.entity'
-import { UserWithEmailAlreadyRegisteredError } from './errors/user-with-email-already-registered.error'
+import { UserWithEmailAlreadyRegisteredException } from './exceptions/user-with-email-already-registered.exception'
 
 type CreateAccountRequest = UserProps
 
@@ -12,14 +11,14 @@ type CreateAccountRequest = UserProps
 export class CreateAccountUseCase implements UseCase {
   constructor (
     @Inject(UsersRepository) private readonly usersRepository: UsersRepository,
-    @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher
+    @Inject(PasswordHasher) private readonly passwordHasher: PasswordHasher
   ) {}
 
   async execute (req: CreateAccountRequest) {
     const { name, email, password } = req
     const userAlreadyExists = await this.usersRepository.findByEmail(email)
     if (userAlreadyExists) {
-      throw new UserWithEmailAlreadyRegisteredError()
+      throw new UserWithEmailAlreadyRegisteredException()
     }
     const hashedPassword = await this.passwordHasher.hash(password)
     await this.usersRepository.create({

@@ -4,7 +4,7 @@ import { AnswersRepository } from '@/domain/application/repositories/answers.rep
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 type AnswerQuestionRequest = Omit<AnswerProps, 'excerpt'>
 
@@ -20,11 +20,11 @@ export class AnswerQuestionUseCase implements UseCase {
     const { content, authorId, questionId } = req
     const author = await this.userRepository.findById(authorId)
     if (!author) {
-      throw new ResourceNotFoundError('User')
+      throw new ResourceNotFoundException('User')
     }
     const question = await this.questionsRepository.findById(questionId)
     if (!question) {
-      throw new ResourceNotFoundError('Question')
+      throw new ResourceNotFoundException('Question')
     }
     const answer = await this.answersRepository.create({
       content,

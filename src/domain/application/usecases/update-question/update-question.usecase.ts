@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
 import { QuestionsRepository, type UpdateQuestionData } from '@/domain/application/repositories/questions.repository'
 import type { Question } from '@/domain/enterprise/entities/question.entity'
-import { NotAuthorError } from '@/shared/application/errors/not-author.error'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 type UpdateQuestionRequest = UpdateQuestionData['data'] & {
   questionId: string
@@ -20,10 +20,10 @@ export class UpdateQuestionUseCase implements UseCase {
     const { questionId, authorId, title, content } = req
     const question = await this.questionsRepository.findById(questionId)
     if (!question) {
-      throw new ResourceNotFoundError('Question')
+      throw new ResourceNotFoundException('Question')
     }
     if (question.authorId !== authorId) {
-      throw new NotAuthorError('question')
+      throw new NotAuthorException('question')
     }
     const updatedQuestion = await this.questionsRepository.update({
       where: { id: questionId },

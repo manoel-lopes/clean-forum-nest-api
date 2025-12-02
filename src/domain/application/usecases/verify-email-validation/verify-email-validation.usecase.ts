@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
 import { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
-import { EmailValidationCode } from '@/domain/enterprise/entities/value-objects/email-validation-code/email-validation-code.vo'
-import { EmailAlreadyVerifiedError } from './errors/email-already-verified.error'
-import { EmailValidationNotFoundError } from './errors/email-validation-not-found.error'
-import { ExpiredValidationCodeError } from './errors/expired-validation-code.error'
-import { InvalidCodeError } from './errors/invalid-validation-code.error'
+import { EmailValidationCode } from '@/domain/enterprise/value-objects/email-validation-code/email-validation-code.vo'
+import { EmailAlreadyVerifiedError } from './errors/email-already-verified.exception'
+import { EmailValidationNotFoundError } from './errors/email-validation-not-found.exception'
+import { ExpiredValidationCodeError } from './errors/expired-validation-code.exception'
+import { InvalidCodeError } from './errors/invalid-validation-code.exception'
 
 type VerifyEmailValidationRequest = {
   email: string

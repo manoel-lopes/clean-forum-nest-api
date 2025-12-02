@@ -3,11 +3,10 @@ import { JwtService } from '@nestjs/jwt'
 import { UseCase } from '@/core/domain/application/use-case'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
-import { PASSWORD_HASHER } from '@/infra/adapters/security/security.module'
-import type { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
+import { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
 import type { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
-import { InvalidPasswordError } from './errors/invalid-password.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { InvalidPasswordException } from './exceptions/invalid-password.exception'
 
 type AuthenticateUserRequest = {
   email: string
@@ -23,7 +22,7 @@ export type AuthenticateUserResponse = {
 export class AuthenticateUserUseCase implements UseCase {
   constructor (
     @Inject(UsersRepository) private readonly usersRepository: UsersRepository,
-    @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
+    @Inject(PasswordHasher) private readonly passwordHasher: PasswordHasher,
     @Inject(RefreshTokensRepository) private readonly refreshTokensRepository: RefreshTokensRepository,
     private readonly jwtService: JwtService
   ) {}
@@ -32,11 +31,11 @@ export class AuthenticateUserUseCase implements UseCase {
     const { email, password } = req
     const user = await this.usersRepository.findByEmail(email)
     if (!user) {
-      throw new ResourceNotFoundError('User')
+      throw new ResourceNotFoundException('User')
     }
     const doesPasswordMatch = await this.passwordHasher.compare(password, user.password)
     if (!doesPasswordMatch) {
-      throw new InvalidPasswordError()
+      throw new InvalidPasswordException()
     }
     const token = this.jwtService.sign({ sub: user.id })
     const expiresAt = new Date()

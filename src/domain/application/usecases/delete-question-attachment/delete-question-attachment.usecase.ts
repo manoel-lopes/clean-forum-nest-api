@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
 import { QuestionAttachmentsRepository } from '@/domain/application/repositories/question-attachments.repository'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 type DeleteQuestionAttachmentRequest = {
   attachmentId: string
@@ -17,7 +17,7 @@ export class DeleteQuestionAttachmentUseCase implements UseCase {
     const { attachmentId } = request
     const attachment = await this.questionAttachmentsRepository.findById(attachmentId)
     if (!attachment) {
-      throw new ResourceNotFoundError('Attachment')
+      throw new ResourceNotFoundException('Attachment')
     }
     await this.questionAttachmentsRepository.delete(attachmentId)
   }

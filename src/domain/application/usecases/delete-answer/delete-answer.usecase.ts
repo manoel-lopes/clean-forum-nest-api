@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
-import { NotAuthorError } from '@/shared/application/errors/not-author.error'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 type DeleteAnswerRequest = {
   answerId: string
@@ -19,10 +19,10 @@ export class DeleteAnswerUseCase implements UseCase {
     const { answerId, authorId } = req
     const answer = await this.answersRepository.findById(answerId)
     if (!answer) {
-      throw new ResourceNotFoundError('Answer')
+      throw new ResourceNotFoundException('Answer')
     }
     if (answer.authorId !== authorId) {
-      throw new NotAuthorError('answer')
+      throw new NotAuthorException('answer')
     }
     await this.answersRepository.delete(answerId)
   }

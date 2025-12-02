@@ -6,7 +6,7 @@ import type {
   QuestionAttachment,
   QuestionAttachmentProps,
 } from '@/domain/enterprise/entities/question-attachment.entity'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 type AttachToQuestionRequest = QuestionAttachmentProps
 
@@ -21,7 +21,7 @@ export class AttachToQuestionUseCase implements UseCase {
     const { questionId, title, url } = request
     const question = await this.questionsRepository.findById(questionId)
     if (!question) {
-      throw new ResourceNotFoundError('Question')
+      throw new ResourceNotFoundException('Question')
     }
     const attachment = await this.questionAttachmentsRepository.create({ questionId, title, url })
     return attachment

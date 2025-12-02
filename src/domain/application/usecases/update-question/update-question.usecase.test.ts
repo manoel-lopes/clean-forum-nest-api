@@ -1,6 +1,6 @@
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { UpdateQuestionUseCase } from './update-question.usecase'
 import { makeQuestionData } from '@tests/factories/domain/make-question'
 
@@ -19,7 +19,7 @@ describe('UpdateQuestionUseCase', () => {
         questionId: 'any_inexistent_id',
         authorId: 'any-author-id',
       })
-    ).rejects.toThrowError(new ResourceNotFoundError('Question'))
+    ).rejects.toThrowError(new ResourceNotFoundException('Question'))
   })
 
   it('should update the question title', async () => {

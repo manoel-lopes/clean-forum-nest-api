@@ -1,8 +1,8 @@
 import { JwtService } from '@nestjs/jwt'
 import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { InMemoryRefreshTokensRepository } from '@/infra/persistence/repositories/in-memory/in-memory-refresh-tokens.repository'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
-import { ExpiredRefreshTokenError } from './errors/expired-refresh-token.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ExpiredRefreshTokenException } from './errors/expired-refresh-token.exception'
 import { RefreshAccessTokenUseCase } from './refresh-token.usecase'
 import { makeRefreshTokenData } from '@tests/factories/domain/make-refresh-token'
 
@@ -32,7 +32,7 @@ describe('RefreshAccessTokenUseCase', () => {
         sut.execute({
           refreshTokenId: 'non-existent-refresh-token-id',
         })
-      ).rejects.toThrow(ResourceNotFoundError)
+      ).rejects.toThrow(ResourceNotFoundException)
     })
 
     it('should throw an error when the refresh token is expired', async () => {
@@ -46,7 +46,7 @@ describe('RefreshAccessTokenUseCase', () => {
         })
       )
 
-      await expect(sut.execute({ refreshTokenId })).rejects.toThrow(ExpiredRefreshTokenError)
+      await expect(sut.execute({ refreshTokenId })).rejects.toThrow(ExpiredRefreshTokenException)
     })
 
     it('should refresh the access token successfully when the refresh token is valid', async () => {
@@ -81,7 +81,7 @@ describe('RefreshAccessTokenUseCase', () => {
       )
       const deleteSpy = vi.spyOn(refreshTokensRepository, 'deleteManyByUserId')
 
-      await expect(sut.execute({ refreshTokenId })).rejects.toThrow(ExpiredRefreshTokenError)
+      await expect(sut.execute({ refreshTokenId })).rejects.toThrow(ExpiredRefreshTokenException)
 
       expect(deleteSpy).toHaveBeenCalledWith(userId)
     })
