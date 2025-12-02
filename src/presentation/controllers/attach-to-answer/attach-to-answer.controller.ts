@@ -10,9 +10,9 @@ import { ApiTags } from '@nestjs/swagger'
 import { AttachToAnswerUseCase } from '@/domain/application/usecases/attach-to-answer/attach-to-answer.usecase'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type AttachToAnswerBody,
+  AttachToAnswerBodyDto,
   attachToAnswerBodySchema,
-  type AttachToAnswerParams,
+  AttachToAnswerParamsDto,
   attachToAnswerParamsSchema,
 } from '@/infra/validation/schemas/presentation/attachments/attach-to-answer.schema'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
@@ -25,8 +25,8 @@ export class AttachToAnswerController {
   @Post()
   @HttpCode(201)
   async handle (
-    @Param(new ZodValidationPipe(attachToAnswerParamsSchema)) params: AttachToAnswerParams,
-    @Body(new ZodValidationPipe(attachToAnswerBodySchema)) body: AttachToAnswerBody
+    @Param(new ZodValidationPipe(attachToAnswerParamsSchema)) params: AttachToAnswerParamsDto,
+    @Body(new ZodValidationPipe(attachToAnswerBodySchema)) body: AttachToAnswerBodyDto
   ) {
     const { answerId } = params
     try {

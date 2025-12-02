@@ -11,7 +11,6 @@ import { UserWithEmailAlreadyRegisteredException } from '@/domain/application/us
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type CreateAccountBody,
   CreateAccountBodyDto,
   createAccountBodySchema,
 } from '@/infra/validation/schemas/presentation/users/create-account.schema'
@@ -30,7 +29,7 @@ export class CreateAccountController {
   @ApiResponse({ status: 400, description: 'Bad request - validation error' })
   @ApiResponse({ status: 409, description: 'Conflict - email already registered' })
   @ApiResponse({ status: 422, description: 'Unprocessable entity - validation error' })
-  async handle (@Body(new ZodValidationPipe(createAccountBodySchema)) body: CreateAccountBody) {
+  async handle (@Body(new ZodValidationPipe(createAccountBodySchema)) body: CreateAccountBodyDto) {
     try {
       const { name, email, password } = body
       await this.createAccountUseCase.execute({ name, email, password })

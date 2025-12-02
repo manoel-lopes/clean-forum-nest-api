@@ -11,7 +11,7 @@ import { SendEmailValidationUseCase } from '@/domain/application/usecases/send-e
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type SendEmailValidationBody,
+  SendEmailValidationBodyDto,
   sendEmailValidationBodySchema,
 } from '@/infra/validation/schemas/presentation/users/send-email-validation.schema'
 
@@ -23,7 +23,7 @@ export class SendEmailValidationController {
   @Public()
   @Post()
   @HttpCode(204)
-  async handle (@Body(new ZodValidationPipe(sendEmailValidationBodySchema)) body: SendEmailValidationBody) {
+  async handle (@Body(new ZodValidationPipe(sendEmailValidationBodySchema)) body: SendEmailValidationBodyDto) {
     try {
       await this.sendEmailValidationUseCase.execute({ email: body.email })
     } catch (error) {

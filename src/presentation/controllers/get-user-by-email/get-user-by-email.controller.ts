@@ -9,7 +9,7 @@ import { GetUserByEmailUseCase } from '@/domain/application/usecases/get-user-by
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type GetUserByEmailParams,
+  GetUserByEmailParamsDto,
   getUserByEmailParamsSchema,
 } from '@/infra/validation/schemas/presentation/users/get-user-by-email.schema'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
@@ -21,7 +21,7 @@ export class GetUserByEmailController {
   constructor (private readonly getUserByEmailUseCase: GetUserByEmailUseCase) {}
 
   @Get()
-  async handle (@Param(new ZodValidationPipe(getUserByEmailParamsSchema)) params: GetUserByEmailParams) {
+  async handle (@Param(new ZodValidationPipe(getUserByEmailParamsSchema)) params: GetUserByEmailParamsDto) {
     const { email } = params
     try {
       const user = await this.getUserByEmailUseCase.execute({

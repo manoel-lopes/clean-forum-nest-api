@@ -15,7 +15,7 @@ import { VerifyEmailValidationUseCase } from '@/domain/application/usecases/veri
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type VerifyEmailValidationBody,
+  VerifyEmailValidationBodyDto,
   verifyEmailValidationBodySchema,
 } from '@/infra/validation/schemas/presentation/users/verify-email-validation.schema'
 
@@ -27,7 +27,7 @@ export class VerifyEmailValidationController {
   @Public()
   @Post()
   @HttpCode(204)
-  async handle (@Body(new ZodValidationPipe(verifyEmailValidationBodySchema)) body: VerifyEmailValidationBody) {
+  async handle (@Body(new ZodValidationPipe(verifyEmailValidationBodySchema)) body: VerifyEmailValidationBodyDto) {
     try {
       const { email, code } = body
       await this.verifyEmailValidationUseCase.execute({ email, code })

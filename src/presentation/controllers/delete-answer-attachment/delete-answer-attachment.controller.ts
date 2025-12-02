@@ -9,7 +9,7 @@ import { ApiTags } from '@nestjs/swagger'
 import { DeleteAnswerAttachmentUseCase } from '@/domain/application/usecases/delete-answer-attachment/delete-answer-attachment.usecase'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type DeleteAnswerAttachmentParams,
+  DeleteAnswerAttachmentParamsDto,
   deleteAnswerAttachmentParamsSchema,
 } from '@/infra/validation/schemas/presentation/attachments/delete-answer-attachment.schema'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
@@ -22,7 +22,7 @@ export class DeleteAnswerAttachmentController {
   @Delete()
   @HttpCode(204)
   async handle (
-    @Param(new ZodValidationPipe(deleteAnswerAttachmentParamsSchema)) params: DeleteAnswerAttachmentParams
+    @Param(new ZodValidationPipe(deleteAnswerAttachmentParamsSchema)) params: DeleteAnswerAttachmentParamsDto
   ) {
     const { attachmentId } = params
     try {
