@@ -5,7 +5,7 @@ import {
   Param,
   Query,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import type { AnswerIncludeOption } from '@/domain/application/repositories/answers.repository'
 import type { QuestionIncludeOption } from '@/domain/application/repositories/questions.repository'
 import { GetQuestionBySlugUseCase } from '@/domain/application/usecases/get-question-by-slug/get-question-by-slug.usecase'
@@ -17,6 +17,11 @@ import {
   type GetQuestionBySlugQuery,
   getQuestionBySlugQuerySchema,
 } from '@/infra/validation/schemas/presentation/questions/get-question-by-slug.schema'
+import {
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Questions')
@@ -26,6 +31,10 @@ export class GetQuestionBySlugController {
   constructor (private readonly getQuestionBySlugUseCase: GetQuestionBySlugUseCase) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get a question by slug' })
+  @ApiOkResponse('Question found')
+  @ApiNotFoundResponse('Question not found')
+  @ApiInternalServerErrorResponse()
   async handle (
     @Param(new ZodValidationPipe(getQuestionBySlugParamsSchema)) params: GetQuestionBySlugParams,
     @Query(new ZodValidationPipe(getQuestionBySlugQuerySchema)) query: GetQuestionBySlugQuery
