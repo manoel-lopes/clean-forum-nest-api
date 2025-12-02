@@ -16,7 +16,7 @@ import {
   type FetchQuestionAnswersQuery,
   fetchQuestionAnswersQuerySchema,
 } from '@/infra/validation/schemas/presentation/answers/fetch-question-answers.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Answers')
 @Public()
@@ -51,7 +51,7 @@ export class FetchQuestionAnswersController {
       })
       return answers
     } catch (error) {
-      if (error instanceof ResourceNotFoundError) {
+      if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
       }
       throw error

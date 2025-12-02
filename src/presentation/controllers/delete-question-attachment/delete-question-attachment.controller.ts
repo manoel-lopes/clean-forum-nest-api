@@ -12,7 +12,7 @@ import {
   type DeleteQuestionAttachmentParams,
   deleteQuestionAttachmentParamsSchema,
 } from '@/infra/validation/schemas/presentation/attachments/delete-question-attachment.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Attachments')
 @Controller('question-attachments/:attachmentId')
@@ -30,7 +30,7 @@ export class DeleteQuestionAttachmentController {
         attachmentId,
       })
     } catch (error) {
-      if (error instanceof ResourceNotFoundError) {
+      if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
       }
       throw error

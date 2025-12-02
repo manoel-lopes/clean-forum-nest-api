@@ -17,7 +17,7 @@ import {
   type AnswerQuestionParams,
   answerQuestionParamsSchema,
 } from '@/infra/validation/schemas/presentation/answers/answer-question.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Answers')
 @Controller('questions/:questionId/answers')
@@ -41,7 +41,7 @@ export class AnswerQuestionController {
       })
       return answer
     } catch (error) {
-      if (error instanceof ResourceNotFoundError) {
+      if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
       }
       throw error

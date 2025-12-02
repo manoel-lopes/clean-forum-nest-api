@@ -12,7 +12,7 @@ import {
   type GetUserByEmailParams,
   getUserByEmailParamsSchema,
 } from '@/infra/validation/schemas/presentation/users/get-user-by-email.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Users')
 @Public()
@@ -29,7 +29,7 @@ export class GetUserByEmailController {
       })
       return user
     } catch (error) {
-      if (error instanceof ResourceNotFoundError) {
+      if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
       }
       throw error

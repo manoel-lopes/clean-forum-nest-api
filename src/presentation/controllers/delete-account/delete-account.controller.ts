@@ -8,7 +8,7 @@ import { ApiTags } from '@nestjs/swagger'
 import { DeleteAccountUseCase } from '@/domain/application/usecases/delete-account/delete-account.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { Prisma } from '@prisma/client'
 
 @ApiTags('Users')
@@ -22,7 +22,7 @@ export class DeleteAccountController {
     try {
       await this.deleteAccountUseCase.execute({ userId: user.id })
     } catch (error) {
-      if (error instanceof ResourceNotFoundError) {
+      if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
       }
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {

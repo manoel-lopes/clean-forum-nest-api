@@ -10,13 +10,13 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type UpdateCommentBody,
+  UpdateCommentBodyDto,
   updateCommentBodySchema,
-  type UpdateCommentParams,
+  UpdateCommentParamsDto,
   updateCommentParamsSchema,
 } from '@/infra/validation/schemas/presentation/comments/update-comment.schema'
-import { NotAuthorError } from '@/shared/application/errors/not-author.error'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 export abstract class BaseUpdateCommentController {
   constructor (
@@ -26,8 +26,8 @@ export abstract class BaseUpdateCommentController {
   @Put()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(updateCommentParamsSchema)) params: UpdateCommentParams,
-    @Body(new ZodValidationPipe(updateCommentBodySchema)) body: UpdateCommentBody
+    @Param(new ZodValidationPipe(updateCommentParamsSchema)) params: UpdateCommentParamsDto,
+    @Body(new ZodValidationPipe(updateCommentBodySchema)) body: UpdateCommentBodyDto
   ) {
     const { commentId } = params
     try {
@@ -39,10 +39,10 @@ export abstract class BaseUpdateCommentController {
       })
       return response
     } catch (error) {
-      if (error instanceof ResourceNotFoundError) {
+      if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
       }
-      if (error instanceof NotAuthorError) {
+      if (error instanceof NotAuthorException) {
         throw new ForbiddenException(error.message)
       }
       throw error

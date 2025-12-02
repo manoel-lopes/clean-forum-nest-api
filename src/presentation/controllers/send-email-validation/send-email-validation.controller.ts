@@ -6,7 +6,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { SendEmailValidationError } from '@/domain/application/usecases/send-email-validation/errors/send-email-validation.error'
+import { SendEmailValidationError } from '@/domain/application/usecases/send-email-validation/errors/send-email-validation.exception'
 import { SendEmailValidationUseCase } from '@/domain/application/usecases/send-email-validation/send-email-validation.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'

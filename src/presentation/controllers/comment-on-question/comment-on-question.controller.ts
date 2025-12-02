@@ -14,7 +14,7 @@ import {
   type CommentOnQuestionBody,
   commentOnQuestionBodySchema,
 } from '@/infra/validation/schemas/presentation/comments/comment-on-question.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Comments')
 @Controller('comments/questions')
@@ -36,7 +36,7 @@ export class CommentOnQuestionController {
       })
       return response
     } catch (error) {
-      if (error instanceof ResourceNotFoundError) {
+      if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
       }
       throw error

@@ -13,8 +13,8 @@ import {
   type DeleteCommentParams,
   deleteCommentParamsSchema,
 } from '@/infra/validation/schemas/presentation/comments/delete-comment.schema'
-import { NotAuthorError } from '@/shared/application/errors/not-author.error'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 export abstract class BaseDeleteCommentController {
   constructor (
@@ -34,10 +34,10 @@ export abstract class BaseDeleteCommentController {
         authorId: user.id,
       })
     } catch (error) {
-      if (error instanceof ResourceNotFoundError) {
+      if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
       }
-      if (error instanceof NotAuthorError) {
+      if (error instanceof NotAuthorException) {
         throw new ForbiddenException(error.message)
       }
       throw error

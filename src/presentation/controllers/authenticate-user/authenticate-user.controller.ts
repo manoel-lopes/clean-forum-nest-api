@@ -5,16 +5,16 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { AuthenticateUserUseCase } from '@/domain/application/usecases/authenticate-user/authenticate-user.usecase'
-import { InvalidPasswordError } from '@/domain/application/usecases/authenticate-user/errors/invalid-password.error'
+import { InvalidPasswordException } from '@/domain/application/usecases/authenticate-user/exceptions/invalid-password.exception'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type AuthenticateUserBody,
+  AuthenticateUserBodyDto,
   authenticateUserBodySchema,
 } from '@/infra/validation/schemas/presentation/auth/authenticate-user.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Session')
 @Controller('auth')
@@ -23,7 +23,13 @@ export class AuthenticateUserController {
 
   @Public()
   @Post()
-  async handle (@Body(new ZodValidationPipe(authenticateUserBodySchema)) body: AuthenticateUserBody) {
+  @ApiOperation({ summary: 'Authenticate user' })
+  @ApiBody({ type: AuthenticateUserBodyDto })
+  @ApiResponse({ status: 201, description: 'User authenticated successfully' })
+  @ApiResponse({ status: 401, description: 'Invalid password' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  async handle (@Body(new ZodValidationPipe(authenticateUserBodySchema)) body: AuthenticateUserBodyDto) {
     try {
       const { email, password } = body
       const response = await this.authenticateUserUseCase.execute({
@@ -32,10 +38,10 @@ export class AuthenticateUserController {
       })
       return response
     } catch (error) {
-      if (error instanceof InvalidPasswordError) {
+      if (error instanceof InvalidPasswordException) {
         throw new UnauthorizedException(error.message)
       }
-      if (error instanceof ResourceNotFoundError) {
+      if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
       }
       throw error

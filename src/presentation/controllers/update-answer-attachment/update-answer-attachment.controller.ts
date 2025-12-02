@@ -14,7 +14,7 @@ import {
   type UpdateAnswerAttachmentParams,
   updateAnswerAttachmentParamsSchema,
 } from '@/infra/validation/schemas/presentation/attachments/update-answer-attachment.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Attachments')
 @Controller('answer-attachments/:attachmentId')
@@ -36,7 +36,7 @@ export class UpdateAnswerAttachmentController {
       })
       return attachment
     } catch (error) {
-      if (error instanceof ResourceNotFoundError) {
+      if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
       }
       throw error

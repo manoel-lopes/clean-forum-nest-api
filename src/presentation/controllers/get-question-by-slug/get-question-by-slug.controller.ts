@@ -17,7 +17,7 @@ import {
   type GetQuestionBySlugQuery,
   getQuestionBySlugQuerySchema,
 } from '@/infra/validation/schemas/presentation/questions/get-question-by-slug.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Questions')
 @Public()
@@ -65,7 +65,7 @@ export class GetQuestionBySlugController {
       })
       return question
     } catch (error) {
-      if (error instanceof ResourceNotFoundError) {
+      if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
       }
       throw error
