@@ -18,7 +18,8 @@ export async function makeAppWithErrorStub (
     .overrideProvider(useCaseClass)
     .useClass(ThrowingUseCaseStub)
     .compile()
-  const app = moduleRef.createNestApplication()
+  const app = moduleRef.createNestApplication({ logger: false })
+  app.enableShutdownHooks()
   await app.init()
   return app
 }
