@@ -4,7 +4,7 @@ import {
   Inject,
   Query,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { type QuestionIncludeOption, QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
@@ -12,6 +12,7 @@ import {
   type FetchQuestionsQuery,
   fetchQuestionsQuerySchema,
 } from '@/infra/validation/schemas/presentation/questions/fetch-questions.schema'
+import { ApiOkResponse } from '@/presentation/decorators/api-responses.decorator'
 
 @ApiTags('Questions')
 @Controller('questions')
@@ -20,6 +21,8 @@ export class FetchQuestionsController {
 
   @Public()
   @Get()
+  @ApiOperation({ summary: 'Fetch questions with pagination' })
+  @ApiOkResponse('Questions fetched successfully')
   async handle (@Query(new ZodValidationPipe(fetchQuestionsQuerySchema)) query: FetchQuestionsQuery) {
     const { page, pageSize, order, include } = query
     let processedInclude: QuestionIncludeOption[] = []
