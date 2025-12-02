@@ -1,5 +1,5 @@
 import type { HttpResponse, HttpStatusCode } from '@/core/presentation/http-protocol'
-import type { HttpError, HttpErrorType } from './errors/http.error'
+import type { HttpError, HttpErrorType } from './errors/http.exception'
 
 export const ok = <T>(data: T): HttpResponse<T> => ({
   statusCode: 200,
