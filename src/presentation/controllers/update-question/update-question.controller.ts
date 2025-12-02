@@ -6,7 +6,7 @@ import {
   Param,
   Put,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UpdateQuestionUseCase } from '@/domain/application/usecases/update-question/update-question.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
@@ -17,6 +17,13 @@ import {
   type UpdateQuestionParams,
   updateQuestionParamsSchema,
 } from '@/infra/validation/schemas/presentation/questions/update-question.schema'
+import {
+  ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
@@ -26,6 +33,12 @@ export class UpdateQuestionController {
   constructor (private readonly updateQuestionUseCase: UpdateQuestionUseCase) {}
 
   @Put()
+  @ApiOperation({ summary: 'Update a question' })
+  @ApiOkResponse('Question updated successfully')
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse('Question not found')
+  @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
     @Param(new ZodValidationPipe(updateQuestionParamsSchema)) params: UpdateQuestionParams,

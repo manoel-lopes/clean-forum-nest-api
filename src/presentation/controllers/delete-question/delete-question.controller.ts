@@ -6,7 +6,7 @@ import {
   NotFoundException,
   Param,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { DeleteQuestionUseCase } from '@/domain/application/usecases/delete-question/delete-question.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
@@ -15,6 +15,14 @@ import {
   type DeleteQuestionParams,
   deleteQuestionParamsSchema,
 } from '@/infra/validation/schemas/presentation/questions/delete-question.schema'
+import {
+  ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
@@ -25,6 +33,13 @@ export class DeleteQuestionController {
 
   @Delete()
   @HttpCode(204)
+  @ApiOperation({ summary: 'Delete a question' })
+  @ApiNoContentResponse('Question deleted successfully')
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse('Question not found')
+  @ApiUnprocessableEntityResponse()
+  @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
     @Param(new ZodValidationPipe(deleteQuestionParamsSchema)) params: DeleteQuestionParams
