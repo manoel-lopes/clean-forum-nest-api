@@ -25,9 +25,8 @@ export default defineConfig({
   },
   test: {
     exclude: [...configDefaults.exclude, '**/05-nest-clean/**', '**/clean-forum-node-api/**'],
-    include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)', '**/*.e2e-spec.ts'],
+    include: ['**/*.test.ts', '**/*.e2e-spec.ts'],
     globals: true,
-    setupFiles: ['./tests/setup-e2e.ts'],
     pool: 'forks',
     poolOptions: {
       forks: {
@@ -52,5 +51,6 @@ export default defineConfig({
         'src/infra/providers/cache/redis',
       ],
     },
+    globalSetup: [],
   },
 })
