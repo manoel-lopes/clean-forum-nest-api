@@ -7,6 +7,13 @@ import { PrismaClient } from '@prisma/client'
 config({ path: '.env', override: true })
 config({ path: '.env.test', override: true })
 
+process.on('unhandledRejection', (reason) => {
+  if (reason instanceof Error && reason.message === 'Connection is closed.') {
+    return
+  }
+  throw reason
+})
+
 function generateUniqueDatabaseURL (schemaId: string) {
   const databaseURL = process.env.DATABASE_URL
   if (!databaseURL) {
