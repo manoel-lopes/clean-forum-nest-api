@@ -117,6 +117,14 @@ export class MyUseCase implements UseCase {
 }
 ```
 
+**Use Case Injection** - Use cases are registered as classes (not Symbols), so controllers can inject them directly:
+```typescript
+@Controller('questions')
+export class CreateQuestionController {
+  constructor(private readonly createQuestionUseCase: CreateQuestionUseCase) {}
+}
+```
+
 **Global Modules** - No need to import these: `PrismaModule`, `RepositoriesModule`, `UseCasesModule`, `EnvModule`, `SecurityModule`
 
 **Error Handling Flow**:
@@ -167,8 +175,9 @@ const level = logLevels[env] || 'error'
 - `@tests/` - test utilities (`@tests/factories/`, `@tests/builders/`)
 
 **Test Data Generation**:
-- `tests/factories/` - Factory functions (`makeQuestionData()`, `makeUserData()`) for domain data
-- `tests/builders/` - Fluent builders (`aQuestion().withTitle().build()`) for HTTP request bodies
+- `tests/factories/domain/` - Factory functions (`makeQuestionData()`, `makeUserData()`) for domain entities in unit tests
+- `tests/builders/` - Fluent builders (`aQuestion().withTitle().build()`) for HTTP request bodies in E2E tests
+- `tests/helpers/` - Request helpers (`createQuestion()`, `authenticateUser()`) for E2E tests
 
 **Test Pattern (AAA)**:
 ```typescript
@@ -208,6 +217,37 @@ pnpm run db:up:test && pnpm run migrate:test
 - **NEVER use `--no-verify`** - Always let pre-commit hooks run to ensure code quality
 - If hooks fail, fix the underlying issues instead of bypassing them
 - Commits should pass lint and type-check before being created
+- Commits must be as small and specific as possible
+
+**Conventional Commits Format**: `<type>[optional scope]: <description>`
+
+**Allowed Types**:
+- `feat`: adds, adjusts, or removes a feature
+- `fix`: fixes a bug
+- `refactor`: restructures code without changing behavior
+- `perf`: performance improvements
+- `style`: code style only (formatting, imports, whitespace)
+- `test`: adds or corrects tests
+- `docs`: documentation only
+- `build`: changes to build tools, CI/CD, dependencies, versioning
+- `chore`: config changes, dependency updates, misc
+
+**Scope**: Optional, describes context (e.g., `feat(api)`, `fix(auth)`). Do not use filenames or issue IDs.
+
+**Description**: Mandatory, short phrase in imperative, lowercase, no ending period.
+
+**Examples**:
+```
+feat: add email notifications on new direct messages
+fix(api): correct request checksum calculation
+refactor(auth): extract token validation logic
+chore: configure husky and lint-staged
+```
+
+**Splitting Commits**:
+- Same file with different changes → separate commits
+- Multiple files with identical diff → may group
+- Only formatting changes → may group by directory
 
 ## Troubleshooting
 
