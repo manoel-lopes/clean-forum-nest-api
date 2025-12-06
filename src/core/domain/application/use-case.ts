@@ -1,5 +1,4 @@
 export type Request = Record<string, unknown>
-
 export type Response = unknown
 
 export type UseCase = {
