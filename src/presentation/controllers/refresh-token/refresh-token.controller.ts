@@ -5,7 +5,7 @@ import {
   NotFoundException,
   Post,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { ExpiredRefreshTokenException } from '@/domain/application/usecases/refresh-token/errors/expired-refresh-token.exception'
 import { RefreshAccessTokenUseCase } from '@/domain/application/usecases/refresh-token/refresh-token.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
@@ -23,6 +23,7 @@ export class RefreshAccessTokenController {
 
   @Public()
   @Post()
+  @ApiOperation({ summary: 'Refresh access token' })
   async handle (@Body(new ZodValidationPipe(refreshTokenBodySchema)) body: RefreshTokenBodyDto) {
     try {
       const { refreshTokenId } = body

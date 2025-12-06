@@ -5,7 +5,7 @@ import {
   Post,
   ServiceUnavailableException,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { SendEmailValidationError } from '@/domain/application/usecases/send-email-validation/errors/send-email-validation.exception'
 import { SendEmailValidationUseCase } from '@/domain/application/usecases/send-email-validation/send-email-validation.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
@@ -23,6 +23,7 @@ export class SendEmailValidationController {
   @Public()
   @Post()
   @HttpCode(204)
+  @ApiOperation({ summary: 'Send email validation code' })
   async handle (@Body(new ZodValidationPipe(sendEmailValidationBodySchema)) body: SendEmailValidationBodyDto) {
     try {
       await this.sendEmailValidationUseCase.execute({ email: body.email })

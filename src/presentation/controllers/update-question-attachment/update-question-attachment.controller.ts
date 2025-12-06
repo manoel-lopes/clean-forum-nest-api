@@ -5,7 +5,7 @@ import {
   Param,
   Put,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UpdateQuestionAttachmentUseCase } from '@/domain/application/usecases/update-question-attachment/update-question-attachment.usecase'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
@@ -22,6 +22,7 @@ export class UpdateQuestionAttachmentController {
   constructor (private readonly updateQuestionAttachmentUseCase: UpdateQuestionAttachmentUseCase) {}
 
   @Put()
+  @ApiOperation({ summary: 'Update a question attachment' })
   async handle (
     @Param(new ZodValidationPipe(updateQuestionAttachmentParamsSchema)) params: UpdateQuestionAttachmentParamsDto,
     @Body(new ZodValidationPipe(updateQuestionAttachmentBodySchema)) body: UpdateQuestionAttachmentBodyDto

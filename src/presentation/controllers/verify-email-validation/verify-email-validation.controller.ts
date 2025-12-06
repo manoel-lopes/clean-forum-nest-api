@@ -6,7 +6,7 @@ import {
   NotFoundException,
   Post,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { EmailAlreadyVerifiedError } from '@/domain/application/usecases/verify-email-validation/errors/email-already-verified.exception'
 import { EmailValidationNotFoundError } from '@/domain/application/usecases/verify-email-validation/errors/email-validation-not-found.exception'
 import { ExpiredValidationCodeError } from '@/domain/application/usecases/verify-email-validation/errors/expired-validation-code.exception'
@@ -27,6 +27,7 @@ export class VerifyEmailValidationController {
   @Public()
   @Post()
   @HttpCode(204)
+  @ApiOperation({ summary: 'Verify email validation code' })
   async handle (@Body(new ZodValidationPipe(verifyEmailValidationBodySchema)) body: VerifyEmailValidationBodyDto) {
     try {
       const { email, code } = body

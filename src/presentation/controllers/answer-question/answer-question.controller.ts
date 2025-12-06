@@ -6,7 +6,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AnswerQuestionUseCase } from '@/domain/application/usecases/answer-question/answer-question.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
@@ -26,6 +26,7 @@ export class AnswerQuestionController {
 
   @Post()
   @HttpCode(201)
+  @ApiOperation({ summary: 'Answer a question' })
   async handle (
     @CurrentUser() user: AuthUser,
     @Param(new ZodValidationPipe(answerQuestionParamsSchema)) params: AnswerQuestionParams,

@@ -4,7 +4,7 @@ import {
   NotFoundException,
   Param,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { GetUserByEmailUseCase } from '@/domain/application/usecases/get-user-by-email/get-user-by-email.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
@@ -21,6 +21,7 @@ export class GetUserByEmailController {
   constructor (private readonly getUserByEmailUseCase: GetUserByEmailUseCase) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get user by email' })
   async handle (@Param(new ZodValidationPipe(getUserByEmailParamsSchema)) params: GetUserByEmailParamsDto) {
     const { email } = params
     try {

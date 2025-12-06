@@ -5,7 +5,7 @@ import {
   NotFoundException,
   Param,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { DeleteQuestionAttachmentUseCase } from '@/domain/application/usecases/delete-question-attachment/delete-question-attachment.usecase'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
@@ -21,6 +21,7 @@ export class DeleteQuestionAttachmentController {
 
   @Delete()
   @HttpCode(204)
+  @ApiOperation({ summary: 'Delete a question attachment' })
   async handle (
     @Param(new ZodValidationPipe(deleteQuestionAttachmentParamsSchema)) params: DeleteQuestionAttachmentParamsDto
   ) {
