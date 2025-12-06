@@ -6,7 +6,7 @@ import type { Env } from './env'
 export class EnvService {
   constructor (private configService: ConfigService<Env, true>) {}
 
-  get<T extends keyof Env> (key: T) {
+  get<T extends keyof Env> (key: T): Env[T] {
     if (key === 'DATABASE_URL') {
       const value = this.configService.get(key, { infer: true })
       if (!value) {
@@ -15,7 +15,7 @@ export class EnvService {
         const dbHost = this.configService.get('DB_HOST', { infer: true })
         const dbPort = this.configService.get('DB_PORT', { infer: true })
         const dbName = this.configService.get('DB_NAME', { infer: true })
-        return `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}?schema=public`
+        return `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}?schema=public` as Env[T]
       }
       return value
     }
