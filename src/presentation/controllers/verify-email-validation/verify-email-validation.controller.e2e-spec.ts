@@ -17,6 +17,10 @@ describe('VerifyEmailValidation', () => {
     await app.close()
   })
 
+  beforeEach(async () => {
+    await prisma.emailValidation.deleteMany()
+  })
+
   it('should return 204 when email validation is verified successfully', async () => {
     const email = 'test@example.com'
     const code = '123456'
