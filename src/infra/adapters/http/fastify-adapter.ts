@@ -1,6 +1,9 @@
 import type { INestApplication } from '@nestjs/common'
 import { FastifyAdapter as NestFastifyAdapter } from '@nestjs/platform-fastify'
+import { Env } from '@/infra/env/env'
 import { EnvService } from '@/infra/env/env.service'
+
+type LogLevels = 'silent' | 'info' | 'error'
 
 export class FastifyAdapter extends NestFastifyAdapter {
   constructor () {
@@ -13,11 +16,11 @@ export class FastifyAdapter extends NestFastifyAdapter {
     if (nodeEnv !== 'development') {
       app.useLogger(false)
     }
-    const logLevels: Record<string, string> = {
+    const logLevels: Record<Env['NODE_ENV'], LogLevels> = {
       test: 'silent',
       development: 'info',
       production: 'error',
     }
-    this.getInstance().log.level = logLevels[nodeEnv] || 'error'
+    this.getInstance().log.level = logLevels[nodeEnv]
   }
 }
