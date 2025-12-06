@@ -6,10 +6,6 @@ import { configDefaults, defineConfig } from 'vitest/config'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const coverageExclude = [
-  ...configDefaults.exclude,
-  '**/05-nest-clean/**',
-]
 
 export default defineConfig({
   plugins: [
@@ -35,7 +31,7 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
       exclude: [
-        ...coverageExclude,
+        ...configDefaults.exclude,
         '**/*.e2e-spec.ts',
         '**/prisma/**',
         'test/**',
