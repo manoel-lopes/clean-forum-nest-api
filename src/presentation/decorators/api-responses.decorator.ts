@@ -19,9 +19,9 @@ export function ApiNoContentResponse (description = 'Request successful, no cont
   )
 }
 
-export function ApiBadRequestResponse (description = 'Bad request - validation error') {
+export function ApiBadRequestResponse () {
   return applyDecorators(
-    ApiResponse({ status: 400, description })
+    ApiResponse({ status: 400, description: 'Bad request - validation error' })
   )
 }
 
