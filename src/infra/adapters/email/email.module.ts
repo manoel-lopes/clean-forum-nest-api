@@ -1,18 +1,17 @@
 import { Global, Module } from '@nestjs/common'
 import { EmailQueueModule } from '@/infra/queues/email/email.queue.module'
+import { EmailService } from './ports/email-service'
 import { QueuedEmailService } from './queued-email-service'
-
-export const EMAIL_SERVICE = Symbol('EmailService')
 
 @Global()
 @Module({
   imports: [EmailQueueModule],
   providers: [
     {
-      provide: EMAIL_SERVICE,
+      provide: EmailService,
       useClass: QueuedEmailService,
     },
   ],
-  exports: [EMAIL_SERVICE],
+  exports: [EmailService],
 })
 export class EmailModule {}
