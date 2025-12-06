@@ -4,10 +4,11 @@ import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.en
 import type { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
 import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 import type { User } from '@/domain/enterprise/entities/user.entity'
+import type { ForumIncludeOption } from '@/shared/types/forum/include-option'
 
 export type FindManyByQuestionIdParams = PaginationParams & {
   questionId: string
-  include?: AnswerIncludeOption[]
+  include?: ForumIncludeOption[]
 }
 
 export type UpdateAnswerData = {
@@ -22,8 +23,6 @@ export type AnswerWithRelations = Answer & {
 }
 
 export type PaginatedAnswers = Required<PaginatedItems<AnswerWithRelations>>
-
-export type AnswerIncludeOption = 'comments' | 'attachments' | 'author'
 
 export type AnswersRepository = {
   create(answer: AnswerProps): Promise<Answer>
