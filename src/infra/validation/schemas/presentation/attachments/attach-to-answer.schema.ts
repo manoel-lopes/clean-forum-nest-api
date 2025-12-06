@@ -2,7 +2,7 @@ import { createZodDto } from 'nestjs-zod'
 import { z } from 'zod'
 
 export const attachToAnswerParamsSchema = z.object({
-  answerId: z.string().uuid(),
+  answerId: z.uuid(),
 })
 
 export const attachToAnswerBodySchema = z.object({

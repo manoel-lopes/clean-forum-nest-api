@@ -13,10 +13,6 @@ export const getQuestionBySlugQuerySchema = z.object({
   answerIncludes: z.string().optional(),
 })
 
-export type GetQuestionBySlugParams = z.infer<typeof getQuestionBySlugParamsSchema>
-
-export type GetQuestionBySlugQuery = z.infer<typeof getQuestionBySlugQuerySchema>
-
 export class GetQuestionBySlugParamsDto extends createZodDto(getQuestionBySlugParamsSchema) {}
 
 export class GetQuestionBySlugQueryDto extends createZodDto(getQuestionBySlugQuerySchema) {}

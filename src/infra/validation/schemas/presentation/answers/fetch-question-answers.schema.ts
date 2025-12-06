@@ -2,7 +2,7 @@ import { createZodDto } from 'nestjs-zod'
 import { z } from 'zod'
 
 export const fetchQuestionAnswersParamsSchema = z.object({
-  questionId: z.string().uuid(),
+  questionId: z.uuid(),
 })
 
 export const fetchQuestionAnswersQuerySchema = z.object({
@@ -11,10 +11,6 @@ export const fetchQuestionAnswersQuerySchema = z.object({
   order: z.enum(['asc', 'desc']).default('desc'),
   include: z.string().optional(),
 })
-
-export type FetchQuestionAnswersParams = z.infer<typeof fetchQuestionAnswersParamsSchema>
-
-export type FetchQuestionAnswersQuery = z.infer<typeof fetchQuestionAnswersQuerySchema>
 
 export class FetchQuestionAnswersParamsDto extends createZodDto(fetchQuestionAnswersParamsSchema) {}
 

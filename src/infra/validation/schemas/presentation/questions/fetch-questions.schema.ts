@@ -8,6 +8,4 @@ export const fetchQuestionsQuerySchema = z.object({
   include: z.string().optional(),
 })
 
-export type FetchQuestionsQuery = z.infer<typeof fetchQuestionsQuerySchema>
-
 export class FetchQuestionsQueryDto extends createZodDto(fetchQuestionsQuerySchema) {}
