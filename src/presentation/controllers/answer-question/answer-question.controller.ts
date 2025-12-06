@@ -6,17 +6,24 @@ import {
   Param,
   Post,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AnswerQuestionUseCase } from '@/domain/application/usecases/answer-question/answer-question.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type AnswerQuestionBody,
+  AnswerQuestionBodyDto,
   answerQuestionBodySchema,
-  type AnswerQuestionParams,
+  AnswerQuestionParamsDto,
   answerQuestionParamsSchema,
 } from '@/infra/validation/schemas/presentation/answers/answer-question.schema'
+import {
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Answers')
@@ -26,10 +33,16 @@ export class AnswerQuestionController {
 
   @Post()
   @HttpCode(201)
+  @ApiOperation({ summary: 'Answer a question' })
+  @ApiCreatedResponse('Answer created successfully')
+  @ApiUnauthorizedResponse()
+  @ApiNotFoundResponse('Question not found')
+  @ApiUnprocessableEntityResponse()
+  @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(answerQuestionParamsSchema)) params: AnswerQuestionParams,
-    @Body(new ZodValidationPipe(answerQuestionBodySchema)) body: AnswerQuestionBody
+    @Param(new ZodValidationPipe(answerQuestionParamsSchema)) params: AnswerQuestionParamsDto,
+    @Body(new ZodValidationPipe(answerQuestionBodySchema)) body: AnswerQuestionBodyDto
   ) {
     const { questionId } = params
     try {

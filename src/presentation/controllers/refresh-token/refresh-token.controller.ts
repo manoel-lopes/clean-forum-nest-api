@@ -5,7 +5,7 @@ import {
   NotFoundException,
   Post,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { ExpiredRefreshTokenException } from '@/domain/application/usecases/refresh-token/errors/expired-refresh-token.exception'
 import { RefreshAccessTokenUseCase } from '@/domain/application/usecases/refresh-token/refresh-token.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
@@ -14,6 +14,13 @@ import {
   RefreshTokenBodyDto,
   refreshTokenBodySchema,
 } from '@/infra/validation/schemas/presentation/auth/refresh-token.schema'
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiUnprocessableEntityResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Session')
@@ -23,6 +30,12 @@ export class RefreshAccessTokenController {
 
   @Public()
   @Post()
+  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiCreatedResponse('Token refreshed successfully')
+  @ApiBadRequestResponse('Token expired')
+  @ApiNotFoundResponse('Refresh token not found')
+  @ApiUnprocessableEntityResponse()
+  @ApiInternalServerErrorResponse()
   async handle (@Body(new ZodValidationPipe(refreshTokenBodySchema)) body: RefreshTokenBodyDto) {
     try {
       const { refreshTokenId } = body

@@ -12,9 +12,9 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type UpdateAnswerBody,
+  UpdateAnswerBodyDto,
   updateAnswerBodySchema,
-  type UpdateAnswerParams,
+  UpdateAnswerParamsDto,
   updateAnswerParamsSchema,
 } from '@/infra/validation/schemas/presentation/answers/update-answer.schema'
 import {
@@ -45,8 +45,8 @@ export class UpdateAnswerController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(updateAnswerParamsSchema)) params: UpdateAnswerParams,
-    @Body(new ZodValidationPipe(updateAnswerBodySchema)) body: UpdateAnswerBody
+    @Param(new ZodValidationPipe(updateAnswerParamsSchema)) params: UpdateAnswerParamsDto,
+    @Body(new ZodValidationPipe(updateAnswerBodySchema)) body: UpdateAnswerBodyDto
   ) {
     const { answerId } = params
     try {

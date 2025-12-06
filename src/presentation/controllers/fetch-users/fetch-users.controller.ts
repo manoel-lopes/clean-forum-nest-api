@@ -4,9 +4,12 @@ import {
   Inject,
   Query,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
-import { Public } from '@/infra/auth/decorators/public.decorator'
+import {
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 
 type FetchUsersQuery = {
   page?: number
@@ -15,12 +18,14 @@ type FetchUsersQuery = {
 }
 
 @ApiTags('Users')
-@Public()
 @Controller('users')
 export class FetchUsersController {
   constructor (@Inject(UsersRepository) private readonly usersRepository: UsersRepository) {}
 
   @Get()
+  @ApiOperation({ summary: 'Fetch users with pagination' })
+  @ApiOkResponse('Users fetched successfully')
+  @ApiInternalServerErrorResponse()
   async handle (@Query() query: FetchUsersQuery) {
     const { page, pageSize, order } = query
     const users = await this.usersRepository.findMany({ page, pageSize, order })

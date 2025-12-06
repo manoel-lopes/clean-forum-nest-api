@@ -11,7 +11,7 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type CommentOnQuestionBody,
+  CommentOnQuestionBodyDto,
   commentOnQuestionBodySchema,
 } from '@/infra/validation/schemas/presentation/comments/comment-on-question.schema'
 import {
@@ -36,7 +36,7 @@ export class CommentOnQuestionController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Body(new ZodValidationPipe(commentOnQuestionBodySchema)) body: CommentOnQuestionBody
+    @Body(new ZodValidationPipe(commentOnQuestionBodySchema)) body: CommentOnQuestionBodyDto
   ) {
     try {
       const { questionId, content } = body

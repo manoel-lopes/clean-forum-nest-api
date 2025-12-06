@@ -5,13 +5,20 @@ import {
   NotFoundException,
   Param,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { DeleteAnswerAttachmentUseCase } from '@/domain/application/usecases/delete-answer-attachment/delete-answer-attachment.usecase'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
   DeleteAnswerAttachmentParamsDto,
   deleteAnswerAttachmentParamsSchema,
 } from '@/infra/validation/schemas/presentation/attachments/delete-answer-attachment.schema'
+import {
+  ApiInternalServerErrorResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Attachments')
@@ -21,6 +28,12 @@ export class DeleteAnswerAttachmentController {
 
   @Delete()
   @HttpCode(204)
+  @ApiOperation({ summary: 'Delete an answer attachment' })
+  @ApiNoContentResponse('Attachment deleted successfully')
+  @ApiUnauthorizedResponse()
+  @ApiNotFoundResponse('Attachment not found')
+  @ApiUnprocessableEntityResponse()
+  @ApiInternalServerErrorResponse()
   async handle (
     @Param(new ZodValidationPipe(deleteAnswerAttachmentParamsSchema)) params: DeleteAnswerAttachmentParamsDto
   ) {

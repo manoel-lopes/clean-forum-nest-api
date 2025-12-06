@@ -5,7 +5,7 @@ import {
   HttpCode,
   Post,
 } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CreateAccountUseCase } from '@/domain/application/usecases/create-account/create-account.usecase'
 import { UserWithEmailAlreadyRegisteredException } from '@/domain/application/usecases/create-account/exceptions/user-with-email-already-registered.exception'
 import { Public } from '@/infra/auth/decorators/public.decorator'
@@ -14,6 +14,13 @@ import {
   CreateAccountBodyDto,
   createAccountBodySchema,
 } from '@/infra/validation/schemas/presentation/users/create-account.schema'
+import {
+  ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiUnprocessableEntityResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 
 @ApiTags('Users')
 @Controller('users')
@@ -25,10 +32,11 @@ export class CreateAccountController {
   @HttpCode(201)
   @ApiOperation({ summary: 'Create a new user account' })
   @ApiBody({ type: CreateAccountBodyDto })
-  @ApiResponse({ status: 201, description: 'Account created successfully' })
-  @ApiResponse({ status: 400, description: 'Bad request - validation error' })
-  @ApiResponse({ status: 409, description: 'Conflict - email already registered' })
-  @ApiResponse({ status: 422, description: 'Unprocessable entity - validation error' })
+  @ApiCreatedResponse('Account created successfully')
+  @ApiBadRequestResponse()
+  @ApiConflictResponse('Email already registered')
+  @ApiUnprocessableEntityResponse()
+  @ApiInternalServerErrorResponse()
   async handle (@Body(new ZodValidationPipe(createAccountBodySchema)) body: CreateAccountBodyDto) {
     try {
       const { name, email, password } = body

@@ -12,7 +12,7 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type DeleteAnswerParams,
+  DeleteAnswerParamsDto,
   deleteAnswerParamsSchema,
 } from '@/infra/validation/schemas/presentation/answers/delete-answer.schema'
 import {
@@ -42,7 +42,7 @@ export class DeleteAnswerController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(deleteAnswerParamsSchema)) params: DeleteAnswerParams
+    @Param(new ZodValidationPipe(deleteAnswerParamsSchema)) params: DeleteAnswerParamsDto
   ) {
     const { answerId } = params
     try {

@@ -5,7 +5,7 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { AuthenticateUserUseCase } from '@/domain/application/usecases/authenticate-user/authenticate-user.usecase'
 import { InvalidPasswordException } from '@/domain/application/usecases/authenticate-user/exceptions/invalid-password.exception'
 import { Public } from '@/infra/auth/decorators/public.decorator'
@@ -14,6 +14,12 @@ import {
   AuthenticateUserBodyDto,
   authenticateUserBodySchema,
 } from '@/infra/validation/schemas/presentation/auth/authenticate-user.schema'
+import {
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Session')
@@ -23,12 +29,11 @@ export class AuthenticateUserController {
 
   @Public()
   @Post()
-  @ApiOperation({ summary: 'Authenticate user' })
   @ApiBody({ type: AuthenticateUserBodyDto })
-  @ApiResponse({ status: 201, description: 'User authenticated successfully' })
-  @ApiResponse({ status: 401, description: 'Invalid password' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiCreatedResponse('User authenticated successfully')
+  @ApiUnauthorizedResponse('Invalid password')
+  @ApiNotFoundResponse('User not found')
+  @ApiInternalServerErrorResponse()
   async handle (@Body(new ZodValidationPipe(authenticateUserBodySchema)) body: AuthenticateUserBodyDto) {
     try {
       const { email, password } = body

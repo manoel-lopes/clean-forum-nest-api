@@ -10,7 +10,7 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type DeleteCommentParams,
+  DeleteCommentParamsDto,
   deleteCommentParamsSchema,
 } from '@/infra/validation/schemas/presentation/comments/delete-comment.schema'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
@@ -25,7 +25,7 @@ export abstract class BaseDeleteCommentController {
   @HttpCode(204)
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(deleteCommentParamsSchema)) params: DeleteCommentParams
+    @Param(new ZodValidationPipe(deleteCommentParamsSchema)) params: DeleteCommentParamsDto
   ) {
     const { commentId } = params
     try {

@@ -9,9 +9,9 @@ import { FetchUserQuestionsUseCase } from '@/domain/application/usecases/fetch-u
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type FetchUserQuestionsParams,
+  FetchUserQuestionsParamsDto,
   fetchUserQuestionsParamsSchema,
-  type FetchUserQuestionsQuery,
+  FetchUserQuestionsQueryDto,
   fetchUserQuestionsQuerySchema,
 } from '@/infra/validation/schemas/presentation/questions/fetch-user-questions.schema'
 
@@ -23,8 +23,8 @@ export class FetchUserQuestionsController {
 
   @Get()
   async handle (
-    @Param(new ZodValidationPipe(fetchUserQuestionsParamsSchema)) params: FetchUserQuestionsParams,
-    @Query(new ZodValidationPipe(fetchUserQuestionsQuerySchema)) query: FetchUserQuestionsQuery
+    @Param(new ZodValidationPipe(fetchUserQuestionsParamsSchema)) params: FetchUserQuestionsParamsDto,
+    @Query(new ZodValidationPipe(fetchUserQuestionsQuerySchema)) query: FetchUserQuestionsQueryDto
   ) {
     const { userId } = params
     const { page, pageSize, order } = query

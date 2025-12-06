@@ -5,17 +5,23 @@ import {
   Param,
   Query,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import type { AnswerIncludeOption } from '@/domain/application/repositories/answers.repository'
 import { FetchQuestionAnswersUseCase } from '@/domain/application/usecases/fetch-question-answers/fetch-question-answers.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
 import {
-  type FetchQuestionAnswersParams,
+  FetchQuestionAnswersParamsDto,
   fetchQuestionAnswersParamsSchema,
-  type FetchQuestionAnswersQuery,
+  FetchQuestionAnswersQueryDto,
   fetchQuestionAnswersQuerySchema,
 } from '@/infra/validation/schemas/presentation/answers/fetch-question-answers.schema'
+import {
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiUnprocessableEntityResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Answers')
@@ -25,9 +31,14 @@ export class FetchQuestionAnswersController {
   constructor (private readonly fetchQuestionAnswersUseCase: FetchQuestionAnswersUseCase) {}
 
   @Get()
+  @ApiOperation({ summary: 'Fetch answers for a question' })
+  @ApiOkResponse('Answers fetched successfully')
+  @ApiNotFoundResponse('Question not found')
+  @ApiUnprocessableEntityResponse()
+  @ApiInternalServerErrorResponse()
   async handle (
-    @Param(new ZodValidationPipe(fetchQuestionAnswersParamsSchema)) params: FetchQuestionAnswersParams,
-    @Query(new ZodValidationPipe(fetchQuestionAnswersQuerySchema)) query: FetchQuestionAnswersQuery
+    @Param(new ZodValidationPipe(fetchQuestionAnswersParamsSchema)) params: FetchQuestionAnswersParamsDto,
+    @Query(new ZodValidationPipe(fetchQuestionAnswersQuerySchema)) query: FetchQuestionAnswersQueryDto
   ) {
     const { questionId } = params
     try {
