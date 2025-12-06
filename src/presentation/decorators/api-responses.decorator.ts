@@ -49,14 +49,14 @@ export function ApiConflictResponse (description = 'Conflict - resource already 
   )
 }
 
-export function ApiUnprocessableEntityResponse (description = 'Unprocessable entity - validation error') {
+export function ApiUnprocessableEntityResponse () {
   return applyDecorators(
-    ApiResponse({ status: 422, description })
+    ApiResponse({ status: 422, description: 'Unprocessable entity - validation error' })
   )
 }
 
-export function ApiInternalServerErrorResponse (description = 'Internal server error') {
+export function ApiInternalServerErrorResponse () {
   return applyDecorators(
-    ApiResponse({ status: 500, description })
+    ApiResponse({ status: 500, description: 'Internal server error' })
   )
 }
