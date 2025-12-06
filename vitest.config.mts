@@ -11,8 +11,6 @@ const coverageExclude = [
   '**/05-nest-clean/**',
 ]
 
-const isE2E = process.env.TEST_TYPE === 'e2e'
-
 export default defineConfig({
   plugins: [
     swc.vite({
@@ -26,19 +24,14 @@ export default defineConfig({
     },
   },
   test: {
-    exclude: [...configDefaults.exclude, '**/05-nest-clean/**', '**/clean-forum-node-api/**'],
-    include: isE2E ? ['**/*.e2e-spec.ts'] : ['**/*.test.ts'],
+    exclude: [...configDefaults.exclude],
+    include: ['**/*.test.ts'],
     globals: true,
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        isolate: true,
-      },
-    },
+    isolate: true,
     fileParallelism: true,
     silent: true,
     hideSkippedTests: true,
-    setupFiles: isE2E ? ['./tests/setup-e2e.ts'] : [],
     coverage: {
       provider: 'istanbul',
       exclude: [
@@ -54,6 +47,5 @@ export default defineConfig({
         'src/infra/providers/cache/redis',
       ],
     },
-    globalSetup: [],
   },
 })
