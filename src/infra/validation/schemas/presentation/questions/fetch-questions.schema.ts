@@ -1,11 +1,15 @@
 import { createZodDto } from 'nestjs-zod'
 import { z } from 'zod'
+import { parseIncludeOptions } from '@/infra/validation/helpers/parse-include-options'
+import { paginationQuerySchema } from '@/infra/validation/schemas/core/pagination.schema'
+import type { ForumIncludeOption } from '@/shared/types/forum/include-option'
 
-export const fetchQuestionsQuerySchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(50).default(20),
-  order: z.enum(['asc', 'desc']).default('desc'),
-  include: z.string().optional(),
+const includeOptions: ForumIncludeOption[] = ['author', 'comments', 'attachments']
+
+export const fetchQuestionsQuerySchema = paginationQuerySchema.extend({
+  include: paginationQuerySchema.shape.include.transform(value => {
+    return parseIncludeOptions(value, includeOptions)
+  }),
 })
 
 export type FetchQuestionsQuery = z.infer<typeof fetchQuestionsQuerySchema>
