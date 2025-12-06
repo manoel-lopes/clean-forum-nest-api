@@ -26,7 +26,6 @@ export default defineConfig({
     isolate: true,
     fileParallelism: true,
     silent: true,
-    hideSkippedTests: true,
     coverage: {
       provider: 'istanbul',
       exclude: [
