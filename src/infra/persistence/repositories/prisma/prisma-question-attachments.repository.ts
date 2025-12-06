@@ -51,7 +51,9 @@ export class PrismaQuestionAttachmentsRepository implements QuestionAttachmentsR
       pageSize,
       totalItems,
       totalPages: Math.ceil(totalItems / pageSize),
-      items: attachments.map((attachment) => PrismaQuestionAttachmentMapper.toDomain(attachment)),
+      items: attachments.map((attachment) => {
+        return PrismaQuestionAttachmentMapper.toDomain(attachment)
+      }),
       order,
     }
   }
