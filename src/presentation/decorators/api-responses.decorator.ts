@@ -60,18 +60,3 @@ export function ApiInternalServerErrorResponse (description = 'Internal server e
     ApiResponse({ status: 500, description })
   )
 }
-
-export function ApiCommonResponses () {
-  return applyDecorators(
-    ApiUnauthorizedResponse(),
-    ApiInternalServerErrorResponse()
-  )
-}
-
-export function ApiAuthResponses () {
-  return applyDecorators(
-    ApiBadRequestResponse(),
-    ApiUnprocessableEntityResponse(),
-    ApiInternalServerErrorResponse()
-  )
-}
