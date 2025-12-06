@@ -1,10 +1,9 @@
 import { INestApplication } from '@nestjs/common'
-
 import { aQuestion } from '@tests/builders/question.builder'
 import { aUser } from '@tests/builders/user.builder'
 import { makeApp } from '@tests/helpers/app/make-app'
-import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { commentOnAnswer } from '@tests/helpers/domain/enterprise/answers/answer-comment-requests'
+import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { deleteAnswerComment } from '@tests/helpers/domain/enterprise/comments/comment-requests'
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
@@ -12,18 +11,14 @@ import { authenticateUser } from '@tests/helpers/infra/auth/authentication-reque
 
 describe('DeleteAnswerComment', () => {
   let app: INestApplication
-
   beforeAll(async () => {
     app = await makeApp()
   })
-
   afterAll(async () => {
     await app.close()
   })
-
   it('should return 401 when no token is provided', async () => {
     const response = await deleteAnswerComment(app, undefined, { commentId: 'any-id' })
-
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -31,10 +26,8 @@ describe('DeleteAnswerComment', () => {
       error: 'Unauthorized',
     })
   })
-
   it('should return 401 when invalid token is provided', async () => {
     const response = await deleteAnswerComment(app, 'invalid-token', { commentId: 'any-id' })
-
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -42,7 +35,6 @@ describe('DeleteAnswerComment', () => {
       error: 'Unauthorized',
     })
   })
-
   it('should return 404 when comment does not exist', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -51,11 +43,9 @@ describe('DeleteAnswerComment', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
-
     const response = await deleteAnswerComment(app, token, {
       commentId: '123e4567-e89b-12d3-a456-426614174000',
     })
-
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
       statusCode: 404,
@@ -63,7 +53,6 @@ describe('DeleteAnswerComment', () => {
       message: 'Comment not found',
     })
   })
-
   it('should return 403 when user is not the author of the comment', async () => {
     const authorData = aUser().build()
     await createUser(app, authorData)
@@ -89,9 +78,7 @@ describe('DeleteAnswerComment', () => {
       password: otherUserData.password,
     })
     const otherUserToken = otherUserAuthResponse.body.token
-
     const response = await deleteAnswerComment(app, otherUserToken, { commentId })
-
     expect(response.statusCode).toBe(403)
     expect(response.body).toEqual({
       statusCode: 403,
@@ -99,7 +86,6 @@ describe('DeleteAnswerComment', () => {
       message: 'The user is not the author of the comment',
     })
   })
-
   it('should return 204 and delete answer comment', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -118,9 +104,7 @@ describe('DeleteAnswerComment', () => {
       content: 'Comment content',
     })
     const commentId = createCommentResponse.body.id
-
     const response = await deleteAnswerComment(app, token, { commentId })
-
     expect(response.statusCode).toBe(204)
   })
 })
