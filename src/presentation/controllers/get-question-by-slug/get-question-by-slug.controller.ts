@@ -5,23 +5,22 @@ import {
   Param,
   Query,
 } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import type { AnswerIncludeOption } from '@/domain/application/repositories/answers.repository'
-import type { QuestionIncludeOption } from '@/domain/application/repositories/questions.repository'
-import { GetQuestionBySlugUseCase } from '@/domain/application/usecases/get-question-by-slug/get-question-by-slug.usecase'
-import { Public } from '@/infra/auth/decorators/public.decorator'
-import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
-import {
-  type GetQuestionBySlugParams,
-  getQuestionBySlugParamsSchema,
-  type GetQuestionBySlugQuery,
-  getQuestionBySlugQuerySchema,
-} from '@/infra/validation/schemas/presentation/questions/get-question-by-slug.schema'
 import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-} from '@/presentation/decorators/api-responses.decorator'
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger'
+import { GetQuestionBySlugUseCase } from '@/domain/application/usecases/get-question-by-slug/get-question-by-slug.usecase'
+import { Public } from '@/infra/auth/decorators/public.decorator'
+import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
+import {
+  GetQuestionBySlugParamsDto,
+  getQuestionBySlugParamsSchema,
+  GetQuestionBySlugQueryDto,
+  getQuestionBySlugQuerySchema,
+} from '@/infra/validation/schemas/presentation/questions/get-question-by-slug.schema'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Questions')
@@ -32,45 +31,23 @@ export class GetQuestionBySlugController {
 
   @Get()
   @ApiOperation({ summary: 'Get a question by slug' })
-  @ApiOkResponse('Question found')
-  @ApiNotFoundResponse('Question not found')
+  @ApiOkResponse({ description: 'Question found' })
+  @ApiNotFoundResponse({ description: 'Question not found' })
   @ApiInternalServerErrorResponse()
   async handle (
-    @Param(new ZodValidationPipe(getQuestionBySlugParamsSchema)) params: GetQuestionBySlugParams,
-    @Query(new ZodValidationPipe(getQuestionBySlugQuerySchema)) query: GetQuestionBySlugQuery
+    @Param(new ZodValidationPipe(getQuestionBySlugParamsSchema)) params: GetQuestionBySlugParamsDto,
+    @Query(new ZodValidationPipe(getQuestionBySlugQuerySchema)) query: GetQuestionBySlugQueryDto
   ) {
     const { slug } = params
+    const { page, pageSize, order, include, answerIncludes } = query
     try {
-      const { page, pageSize, order, include, answerIncludes } = query
-      let processedInclude: QuestionIncludeOption[] | undefined
-      let processedAnswerIncludes: AnswerIncludeOption[] | undefined
-      if (include) {
-        const validQuestionOptions: QuestionIncludeOption[] = ['author', 'comments', 'attachments']
-        const items = include.includes(',') ? include.split(',').map(item => item.trim()) : [include]
-        const isValidQuestionOption = (item: string): item is QuestionIncludeOption => {
-          return validQuestionOptions.some(option => option === item)
-        }
-        const filtered = items.filter(isValidQuestionOption)
-        processedInclude = filtered.length > 0 ? filtered : undefined
-      }
-      if (answerIncludes) {
-        const validAnswerOptions: AnswerIncludeOption[] = ['author', 'comments', 'attachments']
-        const items = answerIncludes.includes(',')
-          ? answerIncludes.split(',').map(item => item.trim())
-          : [answerIncludes]
-        const isValidAnswerOption = (item: string): item is AnswerIncludeOption => {
-          return validAnswerOptions.some(option => option === item)
-        }
-        const filtered = items.filter(isValidAnswerOption)
-        processedAnswerIncludes = filtered.length > 0 ? filtered : undefined
-      }
       const question = await this.getQuestionBySlugUseCase.execute({
         slug,
         page,
         pageSize,
         order,
-        include: processedInclude,
-        answerIncludes: processedAnswerIncludes,
+        include,
+        answerIncludes,
       })
       return question
     } catch (error) {
