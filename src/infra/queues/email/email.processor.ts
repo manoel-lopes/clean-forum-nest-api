@@ -2,7 +2,7 @@ import { Job } from 'bullmq'
 import { createTransport, type Transporter } from 'nodemailer'
 import type SMTPTransport from 'nodemailer/lib/smtp-transport'
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq'
-import { Logger } from '@nestjs/common'
+import { Logger, OnModuleDestroy } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import type { Env } from '@/infra/env/env'
 
@@ -20,7 +20,7 @@ export type EmailJob = {
     duration: 60000,
   },
 })
-export class EmailProcessor extends WorkerHost {
+export class EmailProcessor extends WorkerHost implements OnModuleDestroy {
   private readonly logger = new Logger(EmailProcessor.name)
   private readonly transporter: Transporter
 
@@ -88,5 +88,9 @@ export class EmailProcessor extends WorkerHost {
   @OnWorkerEvent('error')
   onError (error: Error) {
     this.logger.error(`Worker error: ${error.message}`)
+  }
+
+  async onModuleDestroy () {
+    await this.worker.close()
   }
 }
