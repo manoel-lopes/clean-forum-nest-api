@@ -14,13 +14,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       context.getHandler(),
       context.getClass(),
     ])
-    if (isPublic) {
-      return true
-    }
-    return super.canActivate(context)
+    return isPublic || super.canActivate(context)
   }
 
-  handleRequest<TUser> (err: Error | null, user: TUser, _info: Error | null): TUser {
+  handleRequest<TUser> (err: Error | null, user: TUser): TUser {
     if (err || !user) {
       throw err || new UnauthorizedException('Invalid or missing authentication token')
     }
