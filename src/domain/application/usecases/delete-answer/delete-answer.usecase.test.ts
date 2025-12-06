@@ -6,12 +6,10 @@ import { makeAnswerData } from '@tests/factories/domain/make-answer'
 describe('DeleteAnswerUseCase', () => {
   let sut: DeleteAnswerUseCase
   let answersRepository: AnswersRepository
-
   beforeEach(() => {
     answersRepository = new InMemoryAnswersRepository()
     sut = new DeleteAnswerUseCase(answersRepository)
   })
-
   it('should not delete a nonexistent answer', async () => {
     await expect(
       sut.execute({
@@ -20,10 +18,8 @@ describe('DeleteAnswerUseCase', () => {
       })
     ).rejects.toThrow('Answer not found')
   })
-
   it('should not delete an answer if the user is not the author', async () => {
     const answer = await answersRepository.create(makeAnswerData())
-
     await expect(
       sut.execute({
         answerId: answer.id,
@@ -31,12 +27,9 @@ describe('DeleteAnswerUseCase', () => {
       })
     ).rejects.toThrow('The user is not the author of the answer')
   })
-
   it('should delete an answer', async () => {
     const answer = await answersRepository.create(makeAnswerData())
-
     await sut.execute({ answerId: answer.id, authorId: answer.authorId })
-
     const deletedAnswer = await answersRepository.findById(answer.id)
     expect(deletedAnswer).toBeNull()
   })

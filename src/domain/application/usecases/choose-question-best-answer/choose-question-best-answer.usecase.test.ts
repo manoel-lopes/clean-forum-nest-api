@@ -12,13 +12,11 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
   let sut: ChooseQuestionBestAnswerUseCase
   let questionsRepository: QuestionsRepository
   let answersRepository: AnswersRepository
-
   beforeEach(() => {
     questionsRepository = new InMemoryQuestionsRepository()
     answersRepository = new InMemoryAnswersRepository()
     sut = new ChooseQuestionBestAnswerUseCase(questionsRepository, answersRepository)
   })
-
   it('should not choose a nonexistent answer as the best answer', async () => {
     await expect(
       sut.execute({
@@ -27,10 +25,8 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
       })
     ).rejects.toThrow(new ResourceNotFoundException('Answer'))
   })
-
   it('should not choose the best answer for a nonexistent question', async () => {
     const answer = await answersRepository.create(makeAnswerData({ questionId: 'non_existent_question_id' }))
-
     await expect(
       sut.execute({
         answerId: answer.id,
@@ -38,11 +34,9 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
       })
     ).rejects.toThrow(new ResourceNotFoundException('Question'))
   })
-
   it('should not choose the best answer for a question not owned by the author', async () => {
     const question = await questionsRepository.create(makeQuestionData())
     const answer = await answersRepository.create(makeAnswerData({ questionId: question.id }))
-
     await expect(
       sut.execute({
         answerId: answer.id,
@@ -50,10 +44,8 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
       })
     ).rejects.toThrow(new NotAuthorException('question'))
   })
-
   it('should not choose the best answer for a question with no answers', async () => {
     const question = await questionsRepository.create(makeQuestionData())
-
     await expect(
       sut.execute({
         answerId: 'non_existent_answer_id',
@@ -61,16 +53,13 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
       })
     ).rejects.toThrow(new ResourceNotFoundException('Answer'))
   })
-
   it('should be able to choose the best answer for a question', async () => {
     const question = await questionsRepository.create(makeQuestionData())
     const answer = await answersRepository.create(makeAnswerData({ questionId: question.id }))
-
     const response = await sut.execute({
       answerId: answer.id,
       authorId: question.authorId,
     })
-
     expect(response.id).toBe(question.id)
     expect(response.content).toBe(question.content)
     expect(response.title).toBe(question.title)

@@ -17,14 +17,12 @@ describe('AnswerQuestionUseCase', () => {
     questionId: 'any_question_id',
     content: 'any long answer, with more than 45 characters for an question',
   }
-
   beforeEach(() => {
     answersRepository = new InMemoryAnswersRepository()
     usersRepository = new InMemoryUsersRepository()
     questionsRepository = new InMemoryQuestionsRepository()
     sut = new AnswerQuestionUseCase(answersRepository, usersRepository, questionsRepository)
   })
-
   it('should not answer a question using an inexistent author', async () => {
     await expect(
       sut.execute({
@@ -33,14 +31,11 @@ describe('AnswerQuestionUseCase', () => {
       })
     ).rejects.toThrow('User not found')
   })
-
   it('should correctly answer a question', async () => {
     const author = await usersRepository.create(makeUserData())
     const question = makeQuestionData({ id: request.questionId })
     await questionsRepository.create(question)
-
     const response = await sut.execute({ ...request, authorId: author.id })
-
     const answer = await answersRepository.findById(response.id)
     expect(response.id).toEqual(answer?.id)
     expect(response.content).toEqual(answer?.content)

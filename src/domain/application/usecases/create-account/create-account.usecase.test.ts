@@ -14,22 +14,17 @@ describe('CreateAccountUseCase', () => {
     email: 'any_user_email',
     password: 'any_user_password',
   }
-
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository()
     passwordHasherStub = new PasswordHasherStub()
     sut = new CreateAccountUseCase(usersRepository, passwordHasherStub)
   })
-
   it('should not create a user account if the email is already registered', async () => {
     await sut.execute(request)
-
     await expect(sut.execute(request)).rejects.toThrowError(new UserWithEmailAlreadyRegisteredException())
   })
-
   it('should correctly create a user account', async () => {
     await sut.execute(request)
-
     const user = await usersRepository.findByEmail(request.email)
     expect(user?.id).toBeDefined()
     expect(user?.name).toBe(request.name)

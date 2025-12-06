@@ -10,12 +10,10 @@ describe('GetQuestionBySlugUseCase', () => {
   const request = {
     slug: 'any-slug',
   }
-
   beforeEach(() => {
     questionRepository = new InMemoryQuestionsRepository()
     sut = new GetQuestionBySlugUseCase(questionRepository)
   })
-
   it('should not get a nonexistent question', async () => {
     await expect(
       sut.execute({
@@ -23,12 +21,9 @@ describe('GetQuestionBySlugUseCase', () => {
       })
     ).rejects.toThrowError(new ResourceNotFoundException('Question'))
   })
-
   it('should get a question using the slug', async () => {
     const question = await questionRepository.create(makeQuestionData({ slug: request.slug }))
-
     const response = await sut.execute(request)
-
     expect(response.id).toBe(question.id)
     expect(response.content).toBe(question.content)
     expect(response.title).toBe(question.title)

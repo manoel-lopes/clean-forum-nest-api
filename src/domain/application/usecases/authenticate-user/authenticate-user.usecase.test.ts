@@ -14,14 +14,12 @@ vi.mock('@/infra/env/env', () => ({
     REFRESH_TOKEN_SECRET: 'any_refresh_secret',
   },
 }))
-
 describe('AuthenticateUserUseCase', () => {
   let usersRepository: UsersRepository
   let passwordHasherStub: PasswordHasher
   let refreshTokensRepository: InMemoryRefreshTokensRepository
   let jwtService: JwtService
   let sut: AuthenticateUserUseCase
-
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository()
     passwordHasherStub = new PasswordHasherStub()
@@ -30,45 +28,36 @@ describe('AuthenticateUserUseCase', () => {
     jwtService.sign = vi.fn().mockReturnValue('mocked-jwt-token')
     sut = new AuthenticateUserUseCase(usersRepository, passwordHasherStub, refreshTokensRepository, jwtService)
   })
-
   it('should not authenticate a inexistent user', async () => {
     const request = {
       email: 'nonexistent@example.com',
       password: 'any-password',
     }
-
     await expect(sut.execute(request)).rejects.toThrow('User not found')
   })
-
   it('should not authenticate a user passing the wrong password', async () => {
     const email = 'user@example.com'
     await usersRepository.create({
       ...makeUserData({ email }),
       password: await passwordHasherStub.hash('correct-password'),
     })
-
     const request = {
       email,
       password: 'wrong-password',
     }
-
     await expect(sut.execute(request)).rejects.toThrow('Invalid password')
   })
-
   it('should authenticate the user', async () => {
     const password = 'user-password'
     const user = await usersRepository.create({
       ...makeUserData({ email: 'user@example.com' }),
       password: await passwordHasherStub.hash(password),
     })
-
     const request = {
       email: user.email,
       password,
     }
-
     const response = await sut.execute(request)
-
     expect(response.token).toBeDefined()
     const sevenDaysFromNow = new Date()
     sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7)

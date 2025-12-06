@@ -10,28 +10,21 @@ describe('DeleteAccountUseCase', () => {
   let sut: DeleteAccountUseCase
   let usersRepository: UsersRepository
   let refreshTokensRepository: RefreshTokensRepository
-
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository()
     refreshTokensRepository = new InMemoryRefreshTokensRepository()
     sut = new DeleteAccountUseCase(usersRepository, refreshTokensRepository)
   })
-
   it('should delete a user account', async () => {
     const user = await usersRepository.create(makeUserData())
-
     await sut.execute({ userId: user.id })
-
     const deletedAccount = await usersRepository.findById(user.id)
     expect(deletedAccount).toBeNull()
   })
-
   it('should delete the refresh token when deleting a user account', async () => {
     const user = await usersRepository.create(makeUserData())
     await refreshTokensRepository.create(makeRefreshTokenData({ userId: user.id }))
-
     await sut.execute({ userId: user.id })
-
     const deletedAccount = await usersRepository.findById(user.id)
     const deletedRefreshToken = await refreshTokensRepository.findByUserId(user.id)
     expect(deletedAccount).toBeNull()

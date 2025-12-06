@@ -9,39 +9,31 @@ describe('CommentOnQuestionUseCase', () => {
   let sut: CommentOnQuestionUseCase
   let questionsRepository: QuestionsRepository
   let questionCommentsRepository: QuestionCommentsRepository
-
   beforeEach(() => {
     questionsRepository = new InMemoryQuestionsRepository()
     questionCommentsRepository = new InMemoryQuestionCommentsRepository()
     sut = new CommentOnQuestionUseCase(questionsRepository, questionCommentsRepository)
   })
-
   it('should not comment on a inexistent question', async () => {
     const request = {
       questionId: 'nonexistent-question-id',
       content: 'Test comment content',
       authorId: 'author-id',
     }
-
     await expect(sut.execute(request)).rejects.toThrow('Question not found')
   })
-
   it('should comment on a question', async () => {
     const question = await questionsRepository.create(makeQuestionData())
-
     const request = {
       questionId: question.id,
       content: 'Test comment content',
       authorId: 'author-id',
     }
-
     await sut.execute(request)
-
     const comments = await questionCommentsRepository.findManyByQuestionId(question.id, {
       page: 1,
       pageSize: 10,
     })
-
     expect(comments.items).toHaveLength(1)
     expect(comments.items[0].content).toBe('Test comment content')
     expect(comments.items[0].authorId).toBe('author-id')
