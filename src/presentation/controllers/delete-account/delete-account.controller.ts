@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { Prisma } from '@prisma/client'
 import { DeleteAccountUseCase } from '@/domain/application/usecases/delete-account/delete-account.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
@@ -15,7 +16,6 @@ import {
   ApiUnauthorizedResponse,
 } from '@/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
-import { Prisma } from '@prisma/client'
 
 @ApiTags('Users')
 @Controller('users')

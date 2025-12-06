@@ -1,5 +1,5 @@
-import type { User as DomainUser } from '@/domain/enterprise/entities/user.entity'
 import type { User as PrismaUser } from '@prisma/client'
+import type { User as DomainUser } from '@/domain/enterprise/entities/user.entity'
 
 export class PrismaUserMapper {
   static toDomain (raw: PrismaUser): Omit<DomainUser, 'password'> {

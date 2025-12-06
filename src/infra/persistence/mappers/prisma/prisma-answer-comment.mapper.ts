@@ -1,5 +1,5 @@
-import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 import type { Comment } from '@prisma/client'
+import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 
 export class PrismaAnswerCommentMapper {
   static toDomain (raw: Comment): AnswerComment {
