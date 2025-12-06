@@ -15,8 +15,10 @@ describe('DeleteQuestionAttachment', () => {
   afterAll(async () => {
     await app.close()
   })
+
   it('should return 401 when no token is provided', async () => {
     const response = await deleteQuestionAttachment(app, undefined, 'any-id')
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -24,8 +26,10 @@ describe('DeleteQuestionAttachment', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 401 when invalid token is provided', async () => {
     const response = await deleteQuestionAttachment(app, 'invalid-token', 'any-id')
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -33,6 +37,7 @@ describe('DeleteQuestionAttachment', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 422 when attachmentId is not a valid UUID', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -41,7 +46,9 @@ describe('DeleteQuestionAttachment', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await deleteQuestionAttachment(app, token, 'invalid-uuid')
+
     expect(response.statusCode).toBe(422)
     expect(response.body).toEqual({
       statusCode: 422,
@@ -49,6 +56,7 @@ describe('DeleteQuestionAttachment', () => {
       message: "The 'attachmentId' must be a valid UUID",
     })
   })
+
   it('should delete question attachment and return 204', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -57,6 +65,7 @@ describe('DeleteQuestionAttachment', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, token, questionData)
     const questionId = createQuestionResponse.body.id
@@ -67,8 +76,10 @@ describe('DeleteQuestionAttachment', () => {
     })
     const attachmentId = createAttachmentResponse.body.id
     const response = await deleteQuestionAttachment(app, token, attachmentId)
+
     expect(response.statusCode).toBe(204)
   })
+
   it('should return 404 when attachment does not exist', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -77,7 +88,9 @@ describe('DeleteQuestionAttachment', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await deleteQuestionAttachment(app, token, '123e4567-e89b-12d3-a456-426614174000')
+
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
       statusCode: 404,

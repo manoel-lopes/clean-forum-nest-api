@@ -18,11 +18,13 @@ describe('UpdateAnswer', () => {
   afterAll(async () => {
     await app.close()
   })
+
   it('should return 401 when no token is provided', async () => {
     const response = await updateAnswer(app, undefined, {
       answerId: 'any-id',
       content: 'Content',
     })
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -30,11 +32,13 @@ describe('UpdateAnswer', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 401 when invalid token is provided', async () => {
     const response = await updateAnswer(app, 'invalid-token', {
       answerId: 'any-id',
       content: 'Content',
     })
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -42,6 +46,7 @@ describe('UpdateAnswer', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 400 when content is missing', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -50,10 +55,12 @@ describe('UpdateAnswer', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await updateAnswer(app, token, {
       answerId: '123e4567-e89b-12d3-a456-426614174000',
       content: undefined,
     })
+
     expect(response.statusCode).toBe(400)
     expect(response.body).toEqual({
       statusCode: 400,
@@ -61,6 +68,7 @@ describe('UpdateAnswer', () => {
       message: 'The content is required',
     })
   })
+
   it('should return 422 when answerId is not a valid UUID', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -69,10 +77,12 @@ describe('UpdateAnswer', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await updateAnswer(app, token, {
       answerId: 'invalid-uuid',
       content: 'Updated content',
     })
+
     expect(response.statusCode).toBe(422)
     expect(response.body).toEqual({
       statusCode: 422,
@@ -80,6 +90,7 @@ describe('UpdateAnswer', () => {
       message: "The 'answerId' must be a valid UUID",
     })
   })
+
   it('should return 404 when answer does not exist', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -88,10 +99,12 @@ describe('UpdateAnswer', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await updateAnswer(app, token, {
       answerId: '123e4567-e89b-12d3-a456-426614174000',
       content: 'Updated content',
     })
+
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
       statusCode: 404,
@@ -99,6 +112,7 @@ describe('UpdateAnswer', () => {
       message: 'Answer not found',
     })
   })
+
   it('should return 403 when user is not the author of the answer', async () => {
     const authorData = aUser().build()
     await createUser(app, authorData)
@@ -107,6 +121,7 @@ describe('UpdateAnswer', () => {
       password: authorData.password,
     })
     const authorToken = authorAuthResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, authorToken, questionData)
     const questionId = createQuestionResponse.body.id
@@ -119,10 +134,12 @@ describe('UpdateAnswer', () => {
       password: otherUserData.password,
     })
     const otherUserToken = otherUserAuthResponse.body.token
+
     const response = await updateAnswer(app, otherUserToken, {
       answerId,
       content: 'Updated content',
     })
+
     expect(response.statusCode).toBe(403)
     expect(response.body).toEqual({
       statusCode: 403,
@@ -130,6 +147,7 @@ describe('UpdateAnswer', () => {
       message: 'The user is not the author of the answer',
     })
   })
+
   it('should return 500 if an unexpected error occurs', async () => {
     const appWithError = await makeAppWithErrorStub({
       useCaseClass: UpdateAnswerUseCase,
@@ -141,6 +159,7 @@ describe('UpdateAnswer', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(appWithError, token, questionData)
     const questionId = createQuestionResponse.body.id
@@ -150,6 +169,7 @@ describe('UpdateAnswer', () => {
       answerId,
       content: 'Updated content',
     })
+
     expect(response.statusCode).toBe(500)
     expect(response.body).toEqual({
       statusCode: 500,
@@ -157,6 +177,7 @@ describe('UpdateAnswer', () => {
     })
     await appWithError.close()
   })
+
   it('should return 200 and update answer', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -165,6 +186,7 @@ describe('UpdateAnswer', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, token, questionData)
     const questionId = createQuestionResponse.body.id
@@ -174,6 +196,7 @@ describe('UpdateAnswer', () => {
       answerId,
       content: 'Updated content',
     })
+
     expect(response.statusCode).toBe(200)
     expect(response.body).toHaveProperty('answer')
     expect(response.body.answer.content).toBe('Updated content')

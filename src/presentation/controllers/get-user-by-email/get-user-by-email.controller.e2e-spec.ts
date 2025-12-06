@@ -12,6 +12,7 @@ describe('GetUserByEmail', () => {
   afterAll(async () => {
     await app.close()
   })
+
   it('should return 422 when email is not a valid email format', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -20,7 +21,9 @@ describe('GetUserByEmail', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await getUserByEmail(app, token, { email: 'invalid-email' })
+
     expect(response.statusCode).toBe(422)
     expect(response.body).toEqual({
       statusCode: 422,
@@ -28,6 +31,7 @@ describe('GetUserByEmail', () => {
       message: "The 'email' must be a valid email address",
     })
   })
+
   it('should return 404 when user with email does not exist', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -36,7 +40,9 @@ describe('GetUserByEmail', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await getUserByEmail(app, token, { email: 'nonexistent@example.com' })
+
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
       statusCode: 404,
@@ -44,6 +50,7 @@ describe('GetUserByEmail', () => {
       message: 'User not found',
     })
   })
+
   it('should return 200 and get user by email', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -52,7 +59,9 @@ describe('GetUserByEmail', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await getUserByEmail(app, token, { email: userData.email })
+
     expect(response.statusCode).toBe(200)
     expect(response.body).toHaveProperty('id')
     expect(response.body).toHaveProperty('name')

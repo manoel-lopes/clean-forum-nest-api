@@ -17,9 +17,11 @@ describe('CreateQuestion', () => {
   afterAll(async () => {
     await app.close()
   })
+
   it('should return 401 when no token is provided', async () => {
     const questionData = aQuestion().build()
     const response = await createQuestion(app, undefined, questionData)
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -27,9 +29,11 @@ describe('CreateQuestion', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 401 when invalid token is provided', async () => {
     const questionData = aQuestion().build()
     const response = await createQuestion(app, 'invalid-token', questionData)
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -37,6 +41,7 @@ describe('CreateQuestion', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 409 when question with same title already exists', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -45,9 +50,11 @@ describe('CreateQuestion', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     await createQuestion(app, token, questionData)
     const response = await createQuestion(app, token, questionData)
+
     expect(response.statusCode).toBe(409)
     expect(response.body).toEqual({
       statusCode: 409,
@@ -55,6 +62,7 @@ describe('CreateQuestion', () => {
       message: 'Question with title already registered',
     })
   })
+
   it('should return 500 if an unexpected error occurs', async () => {
     const appWithError = await makeAppWithErrorStub({
       useCaseClass: CreateQuestionUseCase,
@@ -66,8 +74,10 @@ describe('CreateQuestion', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const response = await createQuestion(appWithError, token, questionData)
+
     expect(response.statusCode).toBe(500)
     expect(response.body).toEqual({
       statusCode: 500,
@@ -75,6 +85,7 @@ describe('CreateQuestion', () => {
     })
     await appWithError.close()
   })
+
   it('should return 201 and create a new question', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -83,8 +94,10 @@ describe('CreateQuestion', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const response = await createQuestion(app, token, questionData)
+
     expect(response.statusCode).toBe(201)
     expect(response.body).toHaveProperty('id')
     expect(response.body).toHaveProperty('title')

@@ -18,10 +18,12 @@ describe('CommentOnQuestion', () => {
   afterAll(async () => {
     await app.close()
   })
+
   it('should return 401 when no token is provided', async () => {
     const response = await request(app.getHttpServer())
       .post('/comments/questions')
       .send({ questionId: 'any-id', content: 'Content' })
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -29,11 +31,13 @@ describe('CommentOnQuestion', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 401 when invalid token is provided', async () => {
     const response = await request(app.getHttpServer())
       .post('/comments/questions')
       .set('Authorization', 'Bearer invalid-token')
       .send({ questionId: 'any-id', content: 'Content' })
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -41,6 +45,7 @@ describe('CommentOnQuestion', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 404 when question does not exist', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -49,6 +54,7 @@ describe('CommentOnQuestion', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await request(app.getHttpServer())
       .post('/comments/questions')
       .set('Authorization', `Bearer ${token}`)
@@ -56,6 +62,7 @@ describe('CommentOnQuestion', () => {
         questionId: '123e4567-e89b-12d3-a456-426614174000',
         content: 'This is a comment',
       })
+
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
       statusCode: 404,
@@ -63,6 +70,7 @@ describe('CommentOnQuestion', () => {
       message: 'Question not found',
     })
   })
+
   it('should return 500 if an unexpected error occurs', async () => {
     const appWithError = await makeAppWithErrorStub({
       useCaseClass: CommentOnQuestionUseCase,
@@ -84,6 +92,7 @@ describe('CommentOnQuestion', () => {
         questionId,
         content: 'This is a comment',
       })
+
     expect(response.statusCode).toBe(500)
     expect(response.body).toEqual({
       statusCode: 500,
@@ -91,6 +100,7 @@ describe('CommentOnQuestion', () => {
     })
     await appWithError.close()
   })
+
   it('should create comment on question and return 201', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -109,6 +119,7 @@ describe('CommentOnQuestion', () => {
         questionId,
         content: 'This is a comment',
       })
+
     expect(response.statusCode).toBe(201)
     expect(response.body).toHaveProperty('id')
     expect(response.body).toHaveProperty('content')

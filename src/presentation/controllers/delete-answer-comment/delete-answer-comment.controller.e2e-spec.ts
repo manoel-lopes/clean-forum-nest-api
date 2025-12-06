@@ -17,8 +17,10 @@ describe('DeleteAnswerComment', () => {
   afterAll(async () => {
     await app.close()
   })
+
   it('should return 401 when no token is provided', async () => {
     const response = await deleteAnswerComment(app, undefined, { commentId: 'any-id' })
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -26,8 +28,10 @@ describe('DeleteAnswerComment', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 401 when invalid token is provided', async () => {
     const response = await deleteAnswerComment(app, 'invalid-token', { commentId: 'any-id' })
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -35,6 +39,7 @@ describe('DeleteAnswerComment', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 404 when comment does not exist', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -43,9 +48,11 @@ describe('DeleteAnswerComment', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await deleteAnswerComment(app, token, {
       commentId: '123e4567-e89b-12d3-a456-426614174000',
     })
+
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
       statusCode: 404,
@@ -53,6 +60,7 @@ describe('DeleteAnswerComment', () => {
       message: 'Comment not found',
     })
   })
+
   it('should return 403 when user is not the author of the comment', async () => {
     const authorData = aUser().build()
     await createUser(app, authorData)
@@ -61,6 +69,7 @@ describe('DeleteAnswerComment', () => {
       password: authorData.password,
     })
     const authorToken = authorAuthResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, authorToken, questionData)
     const questionId = createQuestionResponse.body.id
@@ -78,7 +87,9 @@ describe('DeleteAnswerComment', () => {
       password: otherUserData.password,
     })
     const otherUserToken = otherUserAuthResponse.body.token
+
     const response = await deleteAnswerComment(app, otherUserToken, { commentId })
+
     expect(response.statusCode).toBe(403)
     expect(response.body).toEqual({
       statusCode: 403,
@@ -86,6 +97,7 @@ describe('DeleteAnswerComment', () => {
       message: 'The user is not the author of the comment',
     })
   })
+
   it('should return 204 and delete answer comment', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -94,6 +106,7 @@ describe('DeleteAnswerComment', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, token, questionData)
     const questionId = createQuestionResponse.body.id
@@ -105,6 +118,7 @@ describe('DeleteAnswerComment', () => {
     })
     const commentId = createCommentResponse.body.id
     const response = await deleteAnswerComment(app, token, { commentId })
+
     expect(response.statusCode).toBe(204)
   })
 })

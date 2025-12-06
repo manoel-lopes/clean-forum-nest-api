@@ -15,12 +15,14 @@ describe('AttachToQuestion', () => {
   afterAll(async () => {
     await app.close()
   })
+
   it('should return 401 when no token is provided', async () => {
     const response = await attachToQuestion(app, undefined, {
       questionId: 'any-id',
       title: 'Title',
       url: 'https://example.com/file.pdf',
     })
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -28,12 +30,14 @@ describe('AttachToQuestion', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 401 when invalid token is provided', async () => {
     const response = await attachToQuestion(app, 'invalid-token', {
       questionId: 'any-id',
       title: 'Title',
       url: 'https://example.com/file.pdf',
     })
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -41,6 +45,7 @@ describe('AttachToQuestion', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 400 when title is missing', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -49,11 +54,13 @@ describe('AttachToQuestion', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await attachToQuestion(app, token, {
       questionId: '123e4567-e89b-12d3-a456-426614174000',
       title: undefined,
       url: 'https://example.com/file.pdf',
     })
+
     expect(response.statusCode).toBe(400)
     expect(response.body).toEqual({
       statusCode: 400,
@@ -61,6 +68,7 @@ describe('AttachToQuestion', () => {
       message: 'The title is required',
     })
   })
+
   it('should return 400 when url is missing', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -69,11 +77,13 @@ describe('AttachToQuestion', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await attachToQuestion(app, token, {
       questionId: '123e4567-e89b-12d3-a456-426614174000',
       title: 'Title',
       url: undefined,
     })
+
     expect(response.statusCode).toBe(400)
     expect(response.body).toEqual({
       statusCode: 400,
@@ -81,6 +91,7 @@ describe('AttachToQuestion', () => {
       message: 'The url is required',
     })
   })
+
   it('should return 422 when questionId is not a valid UUID', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -89,11 +100,13 @@ describe('AttachToQuestion', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await attachToQuestion(app, token, {
       questionId: 'invalid-uuid',
       title: 'Title',
       url: 'https://example.com/file.pdf',
     })
+
     expect(response.statusCode).toBe(422)
     expect(response.body).toEqual({
       statusCode: 422,
@@ -101,6 +114,7 @@ describe('AttachToQuestion', () => {
       message: "The 'questionId' must be a valid UUID",
     })
   })
+
   it('should return 422 when url is not a valid URL', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -109,11 +123,13 @@ describe('AttachToQuestion', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await attachToQuestion(app, token, {
       questionId: '123e4567-e89b-12d3-a456-426614174000',
       title: 'Title',
       url: 'invalid-url',
     })
+
     expect(response.statusCode).toBe(422)
     expect(response.body).toEqual({
       statusCode: 422,
@@ -121,6 +137,7 @@ describe('AttachToQuestion', () => {
       message: "The 'url' must be a valid URL",
     })
   })
+
   it('should attach to question and return 201', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -129,6 +146,7 @@ describe('AttachToQuestion', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, token, questionData)
     const questionId = createQuestionResponse.body.id
@@ -137,6 +155,7 @@ describe('AttachToQuestion', () => {
       title: 'Attachment title',
       url: 'https://example.com/file.pdf',
     })
+
     expect(response.statusCode).toBe(201)
     expect(response.body).toHaveProperty('id')
     expect(response.body).toHaveProperty('title')
@@ -144,6 +163,7 @@ describe('AttachToQuestion', () => {
     expect(response.body.title).toBe('Attachment title')
     expect(response.body.url).toBe('https://example.com/file.pdf')
   })
+
   it('should return 404 when question does not exist', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -152,11 +172,13 @@ describe('AttachToQuestion', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await attachToQuestion(app, token, {
       questionId: '123e4567-e89b-12d3-a456-426614174000',
       title: 'Attachment title',
       url: 'https://example.com/file.pdf',
     })
+
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
       statusCode: 404,

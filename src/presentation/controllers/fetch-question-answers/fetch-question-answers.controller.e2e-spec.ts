@@ -15,8 +15,10 @@ describe('FetchQuestionAnswers', () => {
   afterAll(async () => {
     await app.close()
   })
+
   it('should return 422 when questionId is not a valid UUID', async () => {
     const response = await fetchQuestionAnswers(app, 'invalid-uuid')
+
     expect(response.statusCode).toBe(422)
     expect(response.body).toEqual({
       statusCode: 422,
@@ -24,8 +26,10 @@ describe('FetchQuestionAnswers', () => {
       message: "The 'questionId' must be a valid UUID",
     })
   })
+
   it('should return 404 when question does not exist', async () => {
     const response = await fetchQuestionAnswers(app, '123e4567-e89b-12d3-a456-426614174000')
+
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
       statusCode: 404,
@@ -33,6 +37,7 @@ describe('FetchQuestionAnswers', () => {
       message: 'Question not found',
     })
   })
+
   it('should return 200 and fetch question answers with pagination', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -41,11 +46,13 @@ describe('FetchQuestionAnswers', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, token, questionData)
     const questionId = createQuestionResponse.body.id
     await createAnswer(app, token, { questionId, content: 'Answer content' })
     const response = await fetchQuestionAnswers(app, questionId, token)
+
     expect(response.statusCode).toBe(200)
     expect(response.body).toHaveProperty('items')
     expect(response.body).toHaveProperty('page')
@@ -54,6 +61,7 @@ describe('FetchQuestionAnswers', () => {
     expect(response.body).toHaveProperty('totalPages')
     expect(Array.isArray(response.body.items)).toBe(true)
   })
+
   it('should return 200 and fetch answers with custom page and pageSize', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -62,15 +70,18 @@ describe('FetchQuestionAnswers', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, token, questionData)
     const questionId = createQuestionResponse.body.id
     await createAnswer(app, token, { questionId, content: 'Answer content' })
     const response = await fetchQuestionAnswers(app, questionId, token, { page: 1, pageSize: 5 })
+
     expect(response.statusCode).toBe(200)
     expect(response.body.page).toBe(1)
     expect(response.body.pageSize).toBe(5)
   })
+
   it('should return 200 and fetch answers without authentication', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -79,13 +90,16 @@ describe('FetchQuestionAnswers', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, token, questionData)
     const questionId = createQuestionResponse.body.id
     const response = await fetchQuestionAnswers(app, questionId)
+
     expect(response.statusCode).toBe(200)
     expect(response.body).toHaveProperty('items')
   })
+
   it('should return 200 and fetch answers with include parameter', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -94,11 +108,13 @@ describe('FetchQuestionAnswers', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, token, questionData)
     const questionId = createQuestionResponse.body.id
     await createAnswer(app, token, { questionId, content: 'Answer content' })
     const response = await fetchQuestionAnswers(app, questionId, token, { include: 'author' })
+
     expect(response.statusCode).toBe(200)
     expect(response.body).toHaveProperty('items')
   })

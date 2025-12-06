@@ -18,8 +18,10 @@ describe('DeleteAnswer', () => {
   afterAll(async () => {
     await app.close()
   })
+
   it('should return 401 when no token is provided', async () => {
     const response = await deleteAnswer(app, undefined, { answerId: 'any-id' })
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -27,8 +29,10 @@ describe('DeleteAnswer', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 401 when invalid token is provided', async () => {
     const response = await deleteAnswer(app, 'invalid-token', { answerId: 'any-id' })
+
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
       statusCode: 401,
@@ -36,6 +40,7 @@ describe('DeleteAnswer', () => {
       error: 'Unauthorized',
     })
   })
+
   it('should return 422 when answerId is not a valid UUID', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -44,7 +49,9 @@ describe('DeleteAnswer', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await deleteAnswer(app, token, { answerId: 'invalid-uuid' })
+
     expect(response.statusCode).toBe(422)
     expect(response.body).toEqual({
       statusCode: 422,
@@ -52,6 +59,7 @@ describe('DeleteAnswer', () => {
       message: "The 'answerId' must be a valid UUID",
     })
   })
+
   it('should return 404 when answer does not exist', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -60,7 +68,9 @@ describe('DeleteAnswer', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const response = await deleteAnswer(app, token, { answerId: '123e4567-e89b-12d3-a456-426614174000' })
+
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
       statusCode: 404,
@@ -68,6 +78,7 @@ describe('DeleteAnswer', () => {
       message: 'Answer not found',
     })
   })
+
   it('should return 403 when user is not the author of the answer', async () => {
     const authorData = aUser().build()
     await createUser(app, authorData)
@@ -76,6 +87,7 @@ describe('DeleteAnswer', () => {
       password: authorData.password,
     })
     const authorToken = authorAuthResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, authorToken, questionData)
     const questionId = createQuestionResponse.body.id
@@ -88,7 +100,9 @@ describe('DeleteAnswer', () => {
       password: otherUserData.password,
     })
     const otherUserToken = otherUserAuthResponse.body.token
+
     const response = await deleteAnswer(app, otherUserToken, { answerId })
+
     expect(response.statusCode).toBe(403)
     expect(response.body).toEqual({
       statusCode: 403,
@@ -96,6 +110,7 @@ describe('DeleteAnswer', () => {
       message: 'The user is not the author of the answer',
     })
   })
+
   it('should return 500 if an unexpected error occurs', async () => {
     const appWithError = await makeAppWithErrorStub({
       useCaseClass: DeleteAnswerUseCase,
@@ -107,12 +122,14 @@ describe('DeleteAnswer', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(appWithError, token, questionData)
     const questionId = createQuestionResponse.body.id
     const createAnswerResponse = await createAnswer(appWithError, token, { questionId, content: 'Answer content' })
     const answerId = createAnswerResponse.body.id
     const response = await deleteAnswer(appWithError, token, { answerId })
+
     expect(response.statusCode).toBe(500)
     expect(response.body).toEqual({
       statusCode: 500,
@@ -120,6 +137,7 @@ describe('DeleteAnswer', () => {
     })
     await appWithError.close()
   })
+
   it('should return 204 and delete answer', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -128,12 +146,14 @@ describe('DeleteAnswer', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
+
     const questionData = aQuestion().build()
     const createQuestionResponse = await createQuestion(app, token, questionData)
     const questionId = createQuestionResponse.body.id
     const createAnswerResponse = await createAnswer(app, token, { questionId, content: 'Answer content' })
     const answerId = createAnswerResponse.body.id
     const response = await deleteAnswer(app, token, { answerId })
+
     expect(response.statusCode).toBe(204)
   })
 })
