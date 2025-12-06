@@ -1,15 +1,13 @@
 import { execSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
-import { config } from 'dotenv'
-import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient } from '@prisma/client'
 import pg from 'pg'
+import { config } from 'dotenv'
+import { PrismaClient } from '@prisma/client'
+import { createPrismaClient } from '@/infra/persistence/prisma-client.factory'
 
 config({ path: '.env', override: true })
 config({ path: '.env.test', override: true })
 
-// Suppress BullMQ/ioredis "Connection is closed" errors during test teardown
-// This is a known issue when tests close Redis connections abruptly
 process.on('unhandledRejection', (reason) => {
   if (reason instanceof Error && reason.message === 'Connection is closed.') {
     return
@@ -24,13 +22,6 @@ function generateUniqueDatabaseURL (schemaId: string) {
   const url = new URL(databaseURL)
   url.searchParams.set('schema', schemaId)
   return url.toString()
-}
-
-function createPrismaClient (connectionString: string) {
-  const pool = new pg.Pool({ connectionString })
-  const adapter = new PrismaPg(pool)
-  const client = new PrismaClient({ adapter })
-  return { client, pool }
 }
 
 const schemaId = randomUUID()
