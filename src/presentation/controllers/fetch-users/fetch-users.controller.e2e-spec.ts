@@ -16,39 +16,56 @@ describe('FetchUsers', () => {
     await app.close()
   })
 
-  it('should return 200 and fetch users with pagination', async () => {
+  it('should return 200 and fetch users with pagination metadata', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
+    await createUser(app, aUser().build())
+    await createUser(app, aUser().build())
     const authResponse = await authenticateUser(app, {
       email: userData.email,
       password: userData.password,
     })
     const token = authResponse.body.token
 
-    const response = await fetchUsers(app, token)
+    const response = await fetchUsers(app, token, { page: 1, pageSize: 2 })
 
     expect(response.statusCode).toBe(200)
-    expect(response.body).toHaveProperty('items')
-    expect(response.body).toHaveProperty('page')
-    expect(response.body).toHaveProperty('pageSize')
-    expect(response.body).toHaveProperty('totalItems')
-    expect(response.body).toHaveProperty('totalPages')
-    expect(Array.isArray(response.body.items)).toBe(true)
-  })
-
-  it('should return 200 and fetch users with custom page and pageSize', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-
-    const response = await fetchUsers(app, token, { page: 1, pageSize: 5 })
-
-    expect(response.statusCode).toBe(200)
+    expect(response.body.items).toHaveLength(2)
     expect(response.body.page).toBe(1)
-    expect(response.body.pageSize).toBe(5)
+    expect(response.body.pageSize).toBe(2)
+    expect(typeof response.body.totalItems).toBe('number')
+    expect(response.body.totalItems).toBeGreaterThanOrEqual(3)
+    expect(typeof response.body.totalPages).toBe('number')
+    expect(response.body.totalPages).toBeGreaterThanOrEqual(2)
   })
+
+  it('should return 200 and fetch different items on page change', async () => {
+    const userData = aUser().build()
+    await createUser(app, userData)
+    await createUser(app, aUser().build())
+    await createUser(app, aUser().build())
+    const authResponse = await authenticateUser(app, {
+      email: userData.email,
+      password: userData.password,
+    })
+    const token = authResponse.body.token
+
+    const page1Response = await fetchUsers(app, token, { page: 1, pageSize: 2 })
+    const page2Response = await fetchUsers(app, token, { page: 2, pageSize: 2 })
+
+    expect(page1Response.statusCode).toBe(200)
+    expect(page2Response.statusCode).toBe(200)
+    expect(page1Response.body.page).toBe(1)
+    expect(page2Response.body.page).toBe(2)
+    expect(page1Response.body.pageSize).toBe(2)
+    expect(page2Response.body.pageSize).toBe(2)
+    expect(page1Response.body.totalItems).toBe(page2Response.body.totalItems)
+    expect(page1Response.body.totalPages).toBe(page2Response.body.totalPages)
+    expect(page1Response.body.items).toHaveLength(2)
+    expect(page2Response.body.items.length).toBeGreaterThanOrEqual(1)
+    const page1Ids = page1Response.body.items.map((item: { id: string }) => item.id)
+    const page2Ids = page2Response.body.items.map((item: { id: string }) => item.id)
+    const hasOverlap = page1Ids.some((id: string) => page2Ids.includes(id))
+    expect(hasOverlap).toBe(false)
   })
+})
