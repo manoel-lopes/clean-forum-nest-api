@@ -20,7 +20,7 @@ describe('FetchQuestions', () => {
     await app.close()
   })
 
-  it('should return 200 and fetch questions with pagination', async () => {
+  it('should return 200 and fetch questions with pagination metadata', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
     const authResponse = await authenticateUser(app, {
@@ -28,21 +28,23 @@ describe('FetchQuestions', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
+    await createQuestion(app, token, aQuestion().build())
+    await createQuestion(app, token, aQuestion().build())
+    await createQuestion(app, token, aQuestion().build())
 
-    const response = await fetchQuestions(app, token)
+    const response = await fetchQuestions(app, token, { page: 1, pageSize: 2 })
 
     expect(response.statusCode).toBe(200)
-    expect(response.body).toHaveProperty('items')
-    expect(response.body).toHaveProperty('page')
-    expect(response.body).toHaveProperty('pageSize')
-    expect(response.body).toHaveProperty('totalItems')
-    expect(response.body).toHaveProperty('totalPages')
-    expect(Array.isArray(response.body.items)).toBe(true)
+    expect(response.body.items).toHaveLength(2)
+    expect(response.body.page).toBe(1)
+    expect(response.body.pageSize).toBe(2)
+    expect(typeof response.body.totalItems).toBe('number')
+    expect(response.body.totalItems).toBeGreaterThanOrEqual(3)
+    expect(typeof response.body.totalPages).toBe('number')
+    expect(response.body.totalPages).toBeGreaterThanOrEqual(2)
   })
 
-  it('should return 200 and fetch questions with custom page and pageSize', async () => {
+  it('should return 200 and fetch different items on page change', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
     const authResponse = await authenticateUser(app, {
@@ -50,21 +52,37 @@ describe('FetchQuestions', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
+    await createQuestion(app, token, aQuestion().build())
+    await createQuestion(app, token, aQuestion().build())
+    await createQuestion(app, token, aQuestion().build())
 
-    const response = await fetchQuestions(app, token, { page: 1, pageSize: 5 })
+    const page1Response = await fetchQuestions(app, token, { page: 1, pageSize: 2 })
+    const page2Response = await fetchQuestions(app, token, { page: 2, pageSize: 2 })
 
-    expect(response.statusCode).toBe(200)
-    expect(response.body.page).toBe(1)
-    expect(response.body.pageSize).toBe(5)
+    expect(page1Response.statusCode).toBe(200)
+    expect(page2Response.statusCode).toBe(200)
+    expect(page1Response.body.page).toBe(1)
+    expect(page2Response.body.page).toBe(2)
+    expect(page1Response.body.pageSize).toBe(2)
+    expect(page2Response.body.pageSize).toBe(2)
+    expect(page1Response.body.totalItems).toBe(page2Response.body.totalItems)
+    expect(page1Response.body.totalPages).toBe(page2Response.body.totalPages)
+    expect(page1Response.body.items).toHaveLength(2)
+    expect(page2Response.body.items.length).toBeGreaterThanOrEqual(1)
+    const page1Ids = page1Response.body.items.map((item: { id: string }) => item.id)
+    const page2Ids = page2Response.body.items.map((item: { id: string }) => item.id)
+    const hasOverlap = page1Ids.some((id: string) => page2Ids.includes(id))
+    expect(hasOverlap).toBe(false)
   })
 
   it('should return 200 and fetch questions without authentication', async () => {
     const response = await fetchQuestions(app)
 
     expect(response.statusCode).toBe(200)
-    expect(response.body).toHaveProperty('items')
+    expect(response.body.items.length).toBeGreaterThanOrEqual(1)
+    expect(response.body.page).toBe(1)
+    expect(typeof response.body.totalItems).toBe('number')
+    expect(typeof response.body.totalPages).toBe('number')
   })
 
   it('should return 200 and fetch questions with include=author', async () => {
@@ -75,8 +93,7 @@ describe('FetchQuestions', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
+    await createQuestion(app, token, aQuestion().build())
 
     const response = await fetchQuestions(app, token, { include: 'author' })
 
@@ -94,8 +111,7 @@ describe('FetchQuestions', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    const createResponse = await createQuestion(app, token, questionData)
+    const createResponse = await createQuestion(app, token, aQuestion().build())
     const questionId = createResponse.body.id
     await commentOnQuestion(app, token, { questionId, content: 'Test comment' })
 
@@ -104,8 +120,7 @@ describe('FetchQuestions', () => {
     const question = response.body.items.find((q: { id: string }) => q.id === questionId)
     expect(response.statusCode).toBe(200)
     expect(question).toHaveProperty('comments')
-    expect(Array.isArray(question.comments)).toBe(true)
-    expect(question.comments.length).toBeGreaterThan(0)
+    expect(question.comments).toHaveLength(1)
   })
 
   it('should return 200 and fetch questions with include=attachments', async () => {
@@ -116,8 +131,7 @@ describe('FetchQuestions', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    const createResponse = await createQuestion(app, token, questionData)
+    const createResponse = await createQuestion(app, token, aQuestion().build())
     const questionId = createResponse.body.id
     await attachToQuestion(app, token, { questionId, title: 'Test attachment', url: 'https://example.com/file.pdf' })
 
@@ -126,8 +140,7 @@ describe('FetchQuestions', () => {
     const question = response.body.items.find((q: { id: string }) => q.id === questionId)
     expect(response.statusCode).toBe(200)
     expect(question).toHaveProperty('attachments')
-    expect(Array.isArray(question.attachments)).toBe(true)
-    expect(question.attachments.length).toBeGreaterThan(0)
+    expect(question.attachments).toHaveLength(1)
   })
 
   it('should return 200 and fetch questions with multiple include options', async () => {
@@ -138,8 +151,7 @@ describe('FetchQuestions', () => {
       password: userData.password,
     })
     const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    const createResponse = await createQuestion(app, token, questionData)
+    const createResponse = await createQuestion(app, token, aQuestion().build())
     const questionId = createResponse.body.id
     await commentOnQuestion(app, token, { questionId, content: 'Test comment' })
     await attachToQuestion(app, token, { questionId, title: 'Test attachment', url: 'https://example.com/file.pdf' })
@@ -151,5 +163,7 @@ describe('FetchQuestions', () => {
     expect(question).toHaveProperty('author')
     expect(question).toHaveProperty('comments')
     expect(question).toHaveProperty('attachments')
+    expect(question.comments).toHaveLength(1)
+    expect(question.attachments).toHaveLength(1)
   })
 })
