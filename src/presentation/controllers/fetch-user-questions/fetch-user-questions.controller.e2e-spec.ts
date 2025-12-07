@@ -31,7 +31,7 @@ describe('FetchUserQuestions', () => {
     })
   })
 
-  it('should return 200 and fetch user questions with pagination', async () => {
+  it('should return 200 and fetch user questions with pagination metadata', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
     const authResponse = await authenticateUser(app, {
@@ -40,22 +40,22 @@ describe('FetchUserQuestions', () => {
     })
     const token = authResponse.body.token
     const userId = authResponse.body.refreshToken.userId
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
+    await createQuestion(app, token, aQuestion().build())
+    await createQuestion(app, token, aQuestion().build())
+    await createQuestion(app, token, aQuestion().build())
 
     const response = await request(app.getHttpServer())
-      .get(`/users/${userId}/questions`)
+      .get(`/users/${userId}/questions?page=1&pageSize=2`)
 
     expect(response.statusCode).toBe(200)
-    expect(response.body).toHaveProperty('items')
-    expect(response.body).toHaveProperty('page')
-    expect(response.body).toHaveProperty('pageSize')
-    expect(response.body).toHaveProperty('totalItems')
-    expect(response.body).toHaveProperty('totalPages')
-    expect(Array.isArray(response.body.items)).toBe(true)
+    expect(response.body.items).toHaveLength(2)
+    expect(response.body.page).toBe(1)
+    expect(response.body.pageSize).toBe(2)
+    expect(response.body.totalItems).toBe(3)
+    expect(response.body.totalPages).toBe(2)
   })
 
-  it('should return 200 and fetch user questions with custom page and pageSize', async () => {
+  it('should return 200 and fetch different items on page change', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
     const authResponse = await authenticateUser(app, {
@@ -64,15 +64,31 @@ describe('FetchUserQuestions', () => {
     })
     const token = authResponse.body.token
     const userId = authResponse.body.refreshToken.userId
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
+    await createQuestion(app, token, aQuestion().build())
+    await createQuestion(app, token, aQuestion().build())
+    await createQuestion(app, token, aQuestion().build())
 
-    const response = await request(app.getHttpServer())
-      .get(`/users/${userId}/questions?page=1&pageSize=5`)
+    const page1Response = await request(app.getHttpServer())
+      .get(`/users/${userId}/questions?page=1&pageSize=2`)
+    const page2Response = await request(app.getHttpServer())
+      .get(`/users/${userId}/questions?page=2&pageSize=2`)
 
-    expect(response.statusCode).toBe(200)
-    expect(response.body.page).toBe(1)
-    expect(response.body.pageSize).toBe(5)
+    expect(page1Response.statusCode).toBe(200)
+    expect(page2Response.statusCode).toBe(200)
+    expect(page1Response.body.page).toBe(1)
+    expect(page2Response.body.page).toBe(2)
+    expect(page1Response.body.pageSize).toBe(2)
+    expect(page2Response.body.pageSize).toBe(2)
+    expect(page1Response.body.totalItems).toBe(3)
+    expect(page2Response.body.totalItems).toBe(3)
+    expect(page1Response.body.totalPages).toBe(2)
+    expect(page2Response.body.totalPages).toBe(2)
+    expect(page1Response.body.items).toHaveLength(2)
+    expect(page2Response.body.items).toHaveLength(1)
+    const page1Ids = page1Response.body.items.map((item: { id: string }) => item.id)
+    const page2Ids = page2Response.body.items.map((item: { id: string }) => item.id)
+    const hasOverlap = page1Ids.some((id: string) => page2Ids.includes(id))
+    expect(hasOverlap).toBe(false)
   })
 
   it('should return 200 and empty array when user has no questions', async () => {
