@@ -5,6 +5,7 @@ import {
   Param,
   Put,
 } from '@nestjs/common'
+import { ApiOperation } from '@nestjs/swagger'
 import { UseCase } from '@/core/domain/application/use-case'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
@@ -15,15 +16,23 @@ import {
   UpdateCommentParamsDto,
   updateCommentParamsSchema,
 } from '@/infra/validation/schemas/presentation/comments/update-comment.schema'
+import { ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiUnauthorizedResponse, ApiUnprocessableEntityResponse } from '@/presentation/decorators/api-responses.decorator'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 export abstract class BaseUpdateCommentController {
   constructor (
-    protected readonly updateCommentUseCase: UseCase
+    private readonly updateCommentUseCase: UseCase
   ) {}
 
   @Put()
+  @ApiOperation({ summary: 'Update an comment' })
+  @ApiOkResponse('Comment updated successfully')
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse('Comment not found')
+  @ApiUnprocessableEntityResponse()
+  @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
     @Param(new ZodValidationPipe(updateCommentParamsSchema)) params: UpdateCommentParamsDto,

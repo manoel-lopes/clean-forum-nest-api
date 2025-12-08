@@ -1,17 +1,14 @@
 import { InMemoryAnswerCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-comments.repository'
-import { InMemoryQuestionCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-comments.repository'
-import { UpdateCommentUseCase } from './update-comment.usecase'
-import { makeQuestionCommentData } from '@tests/factories/domain/make-question-comment'
+import { UpdateAnswerCommentUseCase } from './update-answer-comment.usecase'
+import { makeAnswerCommentData } from '@tests/factories/domain/make-answer-comment'
 
-describe('UpdateCommentUseCase', () => {
-  let sut: UpdateCommentUseCase
-  let questionCommentsRepository: InMemoryQuestionCommentsRepository
+describe('UpdateAnswerCommentUseCase', () => {
+  let sut: UpdateAnswerCommentUseCase
   let answerCommentsRepository: InMemoryAnswerCommentsRepository
 
   beforeEach(() => {
-    questionCommentsRepository = new InMemoryQuestionCommentsRepository()
     answerCommentsRepository = new InMemoryAnswerCommentsRepository()
-    sut = new UpdateCommentUseCase(questionCommentsRepository, answerCommentsRepository)
+    sut = new UpdateAnswerCommentUseCase(answerCommentsRepository)
   })
 
   it('should not update a nonexistent comment', async () => {
@@ -25,7 +22,7 @@ describe('UpdateCommentUseCase', () => {
   })
 
   it('should not update a comment if the user is not the author', async () => {
-    const comment = await questionCommentsRepository.create(makeQuestionCommentData({ authorId: 'comment-author-id' }))
+    const comment = await answerCommentsRepository.create(makeAnswerCommentData({ authorId: 'comment-author-id' }))
 
     const request = {
       commentId: comment.id,
@@ -36,8 +33,8 @@ describe('UpdateCommentUseCase', () => {
     await expect(sut.execute(request)).rejects.toThrow('The user is not the author of the comment')
   })
 
-  it('should update a comment', async () => {
-    const comment = await questionCommentsRepository.create(makeQuestionCommentData({
+  it('should update an answer comment', async () => {
+    const comment = await answerCommentsRepository.create(makeAnswerCommentData({
       authorId: 'comment-author-id',
       content: 'Original content',
     }))

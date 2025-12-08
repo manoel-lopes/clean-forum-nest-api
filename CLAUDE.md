@@ -141,7 +141,7 @@ export class CreateQuestionController {
 
 **Critical Rules**:
 - `no-explicit-any`: ERROR (exceptions: `vitest.config.mts`, some Prisma query files)
-- `no-type-assertions`: ERROR (no `as` keyword)
+- Type assertions: Use `as` syntax when necessary (configured via `consistent-type-assertions`)
 - `no-console`: ERROR
 - `max-len`: 120 characters
 - **NEVER use `undefined` as a value** - use `null` or omit property
@@ -175,9 +175,9 @@ const level = logLevels[env] || 'error'
 - `@tests/` - test utilities (`@tests/factories/`, `@tests/builders/`)
 
 **Test Data Generation**:
-- `tests/factories/domain/` - Factory functions (`makeQuestionData()`, `makeUserData()`) for domain entities in unit tests
-- `tests/builders/` - Fluent builders (`aQuestion().withTitle().build()`) for HTTP request bodies in E2E tests
-- `tests/helpers/` - Request helpers (`createQuestion()`, `authenticateUser()`) for E2E tests
+- `tests/factories/domain/` - Factory functions (`makeQuestionData()`, `makeUserData()`) return domain entity props for unit tests
+- `tests/builders/` - Fluent builders (`aQuestion().withTitle().build()`) create HTTP request bodies for E2E tests (use `unknown` types for invalid input testing)
+- `tests/helpers/` - Request helpers (`createQuestion()`, `authenticateUser()`) encapsulate HTTP calls for E2E tests
 
 **Test Pattern (AAA)**:
 ```typescript

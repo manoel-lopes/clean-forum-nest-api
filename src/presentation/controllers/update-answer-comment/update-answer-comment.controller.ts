@@ -1,32 +1,12 @@
-import { Controller, Put } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { UpdateCommentUseCase } from '@/domain/application/usecases/update-comment/update-comment.usecase'
-import {
-  ApiForbiddenResponse,
-  ApiInternalServerErrorResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiUnauthorizedResponse,
-  ApiUnprocessableEntityResponse,
-} from '@/presentation/decorators/api-responses.decorator'
+import { Controller } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
+import { UpdateAnswerCommentUseCase } from '@/domain/application/usecases/update-answer-comment/update-answer-comment.usecase'
 import { BaseUpdateCommentController } from '../base/base-update-comment.controller'
 
 @ApiTags('Comments')
 @Controller('answers/comments/:commentId')
 export class UpdateAnswerCommentController extends BaseUpdateCommentController {
-  constructor (updateCommentUseCase: UpdateCommentUseCase) {
+  constructor (updateCommentUseCase: UpdateAnswerCommentUseCase) {
     super(updateCommentUseCase)
-  }
-
-  @Put()
-  @ApiOperation({ summary: 'Update an answer comment' })
-  @ApiOkResponse('Comment updated successfully')
-  @ApiUnauthorizedResponse()
-  @ApiForbiddenResponse()
-  @ApiNotFoundResponse('Comment not found')
-  @ApiUnprocessableEntityResponse()
-  @ApiInternalServerErrorResponse()
-  override handle (...args: Parameters<BaseUpdateCommentController['handle']>) {
-    return super.handle(...args)
   }
 }

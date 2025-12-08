@@ -10,3 +10,5 @@ export type CommentsRepository<T extends Comment = Comment> = {
   delete(commentId: string): Promise<void>
   update(commentData: UpdateCommentData): Promise<T>
 }
+
+export const CommentsRepository = Symbol('CommentsRepository')
