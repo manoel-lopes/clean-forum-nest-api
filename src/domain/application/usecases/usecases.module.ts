@@ -25,9 +25,10 @@ import { SendEmailValidationUseCase } from './send-email-validation/send-email-v
 import { UpdateAccountUseCase } from './update-account/update-account.usecase'
 import { UpdateAnswerUseCase } from './update-answer/update-answer.usecase'
 import { UpdateAnswerAttachmentUseCase } from './update-answer-attachment/update-answer-attachment.usecase'
-import { UpdateCommentUseCase } from './update-comment/update-comment.usecase'
+import { UpdateAnswerCommentUseCase } from './update-answer-comment/update-answer-comment.usecase'
 import { UpdateQuestionUseCase } from './update-question/update-question.usecase'
 import { UpdateQuestionAttachmentUseCase } from './update-question-attachment/update-question-attachment.usecase'
+import { UpdateQuestionCommentUseCase } from './update-question-comment/update-question-comment.usecase'
 import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-email-validation.usecase'
 
 @Global()
@@ -59,7 +60,8 @@ import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-e
     UpdateAccountUseCase,
     UpdateAnswerUseCase,
     UpdateAnswerAttachmentUseCase,
-    UpdateCommentUseCase,
+    UpdateAnswerCommentUseCase,
+    UpdateQuestionCommentUseCase,
     UpdateQuestionUseCase,
     UpdateQuestionAttachmentUseCase,
     VerifyEmailValidationUseCase,
@@ -90,7 +92,8 @@ import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-e
     UpdateAccountUseCase,
     UpdateAnswerUseCase,
     UpdateAnswerAttachmentUseCase,
-    UpdateCommentUseCase,
+    UpdateAnswerCommentUseCase,
+    UpdateQuestionCommentUseCase,
     UpdateQuestionUseCase,
     UpdateQuestionAttachmentUseCase,
     VerifyEmailValidationUseCase,
