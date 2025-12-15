@@ -53,11 +53,7 @@ export class PrismaAnswersRepository extends BasePrismaRepository implements Ans
         skip: pagination.skip,
         take: pagination.take,
         orderBy: { createdAt: order },
-        include: {
-          comments: include.includes('comments') ? { orderBy: { createdAt: 'desc' } } : false,
-          attachments: include.includes('attachments') ? { orderBy: { createdAt: 'desc' } } : false,
-          author: include.includes('author') ? { select: { id: true, name: true, email: true, createdAt: true, updatedAt: true } } : false,
-        },
+        include: this.pickIncludes(include, ['comments', 'attachments', 'author']),
       }),
       this.prisma.answer.count({ where: { questionId } }),
     ])
