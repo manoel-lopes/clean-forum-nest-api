@@ -11,7 +11,7 @@ async function bootstrap () {
     AppModule,
     fastifyAdapter
   )
-  fastifyAdapter.configure(app)
+  await fastifyAdapter.configure(app)
   const envService = app.get(EnvService)
   const nodeEnv = envService.get('NODE_ENV')
   if (nodeEnv === 'development') {
