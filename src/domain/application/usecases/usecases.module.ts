@@ -29,6 +29,7 @@ import { UpdateAnswerCommentUseCase } from './update-answer-comment/update-answe
 import { UpdateQuestionUseCase } from './update-question/update-question.usecase'
 import { UpdateQuestionAttachmentUseCase } from './update-question-attachment/update-question-attachment.usecase'
 import { UpdateQuestionCommentUseCase } from './update-question-comment/update-question-comment.usecase'
+import { UploadAttachmentUseCase } from './upload-attachment/upload-attachment.usecase'
 import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-email-validation.usecase'
 
 @Global()
@@ -64,6 +65,7 @@ import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-e
     UpdateQuestionCommentUseCase,
     UpdateQuestionUseCase,
     UpdateQuestionAttachmentUseCase,
+    UploadAttachmentUseCase,
     VerifyEmailValidationUseCase,
   ],
   exports: [
@@ -96,6 +98,7 @@ import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-e
     UpdateQuestionCommentUseCase,
     UpdateQuestionUseCase,
     UpdateQuestionAttachmentUseCase,
+    UploadAttachmentUseCase,
     VerifyEmailValidationUseCase,
   ],
 })
