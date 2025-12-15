@@ -13,10 +13,6 @@ describe('AnswerQuestionUseCase', () => {
   let answersRepository: AnswersRepository
   let usersRepository: UsersRepository
   let questionsRepository: QuestionsRepository
-  const request = {
-    questionId: 'any_question_id',
-    content: 'any long answer, with more than 45 characters for an question',
-  }
 
   beforeEach(() => {
     answersRepository = new InMemoryAnswersRepository()
@@ -26,20 +22,38 @@ describe('AnswerQuestionUseCase', () => {
   })
 
   it('should not answer a question using an inexistent author', async () => {
-    await expect(
-      sut.execute({
-        ...request,
-        authorId: 'inexistent_user_id',
-      })
-    ).rejects.toThrow('User not found')
+    const request = {
+      questionId: 'any-question-id',
+      content: 'any-content',
+      authorId: 'inexistent-user-id',
+    }
+
+    await expect(sut.execute(request)).rejects.toThrow('User not found')
+  })
+
+  it('should not answer an inexistent question', async () => {
+    const author = await usersRepository.create(makeUserData())
+
+    const request = {
+      questionId: 'inexistent-question-id',
+      content: 'any-content',
+      authorId: author.id,
+    }
+
+    await expect(sut.execute(request)).rejects.toThrow('Question not found')
   })
 
   it('should correctly answer a question', async () => {
     const author = await usersRepository.create(makeUserData())
-    const question = makeQuestionData({ id: request.questionId })
-    await questionsRepository.create(question)
+    const question = await questionsRepository.create(makeQuestionData())
 
-    const response = await sut.execute({ ...request, authorId: author.id })
+    const request = {
+      questionId: question.id,
+      content: 'any long answer, with more than 45 characters for an question',
+      authorId: author.id,
+    }
+
+    const response = await sut.execute(request)
 
     const answer = await answersRepository.findById(response.id)
     expect(response.id).toEqual(answer?.id)
@@ -48,6 +62,6 @@ describe('AnswerQuestionUseCase', () => {
     expect(response.questionId).toEqual(answer?.questionId)
     expect(response.createdAt).toEqual(answer?.createdAt)
     expect(response.updatedAt).toEqual(answer?.updatedAt)
-    expect(response.excerpt).toEqual('any long answer, with more than 45 characters...')
+    expect(response.excerpt).toBe('any long answer, with more than 45 characters...')
   })
 })
