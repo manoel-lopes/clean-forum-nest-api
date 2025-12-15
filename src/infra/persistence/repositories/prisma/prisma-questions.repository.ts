@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import type { PaginatedItems } from '@/core/domain/application/paginated-items'
-import type { PaginationParams } from '@/core/domain/application/pagination-params'
+import { PaginationParams } from '@/core/domain/application/pagination-params'
 import type {
   FindManyQuestionsParams,
   FindQuestionBySlugParams,
@@ -50,26 +49,14 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
     answerIncludes = [],
   }: FindQuestionBySlugParams): Promise<FindQuestionsResult> {
     const pagination = this.sanitizePagination(page, pageSize)
-    const authorSelect = { id: true, name: true, email: true, createdAt: true, updatedAt: true }
+    const questionInclude = this.buildQuestionInclude(
+      include,
+      answerIncludes,
+      pagination,
+      order
+    )
     const [question, totalAnswers] = await this.prisma.$transaction([
-      this.prisma.question.findUnique({
-        where: { slug },
-        include: {
-          answers: {
-            take: pagination.take,
-            skip: pagination.skip,
-            orderBy: { createdAt: order },
-            include: {
-              author: { select: authorSelect },
-              comments: answerIncludes.includes('comments') ? { orderBy: { createdAt: 'desc' } } : false,
-              attachments: answerIncludes.includes('attachments') ? { orderBy: { createdAt: 'desc' } } : false,
-            },
-          },
-          comments: include.includes('comments') ? { orderBy: { createdAt: 'desc' } } : false,
-          attachments: include.includes('attachments') ? { orderBy: { createdAt: 'desc' } } : false,
-          author: include.includes('author') ? { select: authorSelect } : false,
-        },
-      }),
+      this.prisma.question.findUnique({ where: { slug }, include: questionInclude }),
       this.prisma.answer.count({ where: { question: { slug } } }),
     ])
     if (!question) return null
@@ -89,17 +76,12 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
     include = [],
   }: FindManyQuestionsParams): Promise<PaginatedQuestions> {
     const pagination = this.sanitizePagination(page, pageSize)
-    const authorSelect = { id: true, name: true, email: true, createdAt: true, updatedAt: true }
     const [questions, totalItems] = await this.prisma.$transaction([
       this.prisma.question.findMany({
         skip: pagination.skip,
         take: pagination.take,
         orderBy: { createdAt: order },
-        include: {
-          comments: include.includes('comments') ? { orderBy: { createdAt: 'desc' } } : false,
-          attachments: include.includes('attachments') ? { orderBy: { createdAt: 'desc' } } : false,
-          author: include.includes('author') ? { select: authorSelect } : false,
-        },
+        include: this.pickIncludes(include, ['comments', 'attachments', 'author']),
       }),
       this.prisma.question.count(),
     ])
@@ -132,7 +114,7 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
   async findManyByUserId (
     userId: string,
     { page = 1, pageSize = 10, order = 'desc' }: PaginationParams
-  ): Promise<PaginatedItems<Omit<Question, 'answers'>>> {
+  ): Promise<PaginatedQuestions> {
     const pagination = this.sanitizePagination(page, pageSize)
     const [questions, totalItems] = await this.prisma.$transaction([
       this.prisma.question.findMany({
@@ -152,6 +134,30 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
       items: questions,
+    }
+  }
+
+  private buildQuestionInclude (
+    include: string[],
+    answerIncludes: string[],
+    pagination: ReturnType<typeof this.sanitizePagination>,
+    order: 'asc' | 'desc'
+  ) {
+    return {
+      answers: {
+        take: pagination.take,
+        skip: pagination.skip,
+        orderBy: { createdAt: order },
+        include: this.buildAnswerInclude(answerIncludes),
+      },
+      ...this.pickIncludes(include, ['comments', 'attachments', 'author']),
+    }
+  }
+
+  private buildAnswerInclude (answerIncludes: string[]) {
+    return {
+      author: { select: BasePrismaRepository.AUTHOR_SELECT },
+      ...this.pickIncludes(answerIncludes, ['comments', 'attachments']),
     }
   }
 }
