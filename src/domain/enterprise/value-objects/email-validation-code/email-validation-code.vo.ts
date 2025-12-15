@@ -5,11 +5,7 @@ export class EmailValidationCode {
   private static readonly MIN_VALUE = 100000
   private static readonly MAX_VALUE = 999999
 
-  private constructor (readonly value: string) {
-    if (!EmailValidationCode.isValid(value)) {
-      throw new InvalidValidationCodeError(value)
-    }
-  }
+  private constructor (readonly value: string) {}
 
   static create (): EmailValidationCode {
     const code = crypto.randomInt(EmailValidationCode.MIN_VALUE, EmailValidationCode.MAX_VALUE + 1).toString()
@@ -31,8 +27,7 @@ export class EmailValidationCode {
     return (
       Boolean(code) &&
       /^\d{6}$/.test(code) &&
-      parseInt(code) >= EmailValidationCode.MIN_VALUE &&
-      parseInt(code) <= EmailValidationCode.MAX_VALUE
+      parseInt(code) >= EmailValidationCode.MIN_VALUE
     )
   }
 }
