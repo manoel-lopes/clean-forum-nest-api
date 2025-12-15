@@ -193,6 +193,40 @@ it('should do something', async () => {
 })
 ```
 
+**Test Best Practices**:
+- **Always create request objects** - Extract inline objects to named `request` variables for better readability:
+```typescript
+// ❌ Bad: inline object
+await expect(sut.execute({ questionId: question.id, authorId: 'different-author' })).rejects.toThrow()
+
+// ✅ Good: named request object
+const request = {
+  questionId: question.id,
+  authorId: 'different-author',
+}
+await expect(sut.execute(request)).rejects.toThrow()
+```
+
+- **Exception messages must start with uppercase** - All error messages should begin with a capital letter:
+```typescript
+// ❌ Bad
+super('user not found')
+
+// ✅ Good
+super('User not found')
+```
+
+- **Use explicit boolean assertions** - Always use `toBe(true)` and `toBe(false)` for boolean values:
+```typescript
+// ❌ Bad
+expect(result.isVerified).toBeTruthy()
+expect(result.isActive).toBeFalsy()
+
+// ✅ Good
+expect(result.isVerified).toBe(true)
+expect(result.isActive).toBe(false)
+```
+
 **Test Database**: Before running E2E tests, ensure test DB is running:
 ```bash
 pnpm run db:up:test && pnpm run migrate:test
