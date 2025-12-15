@@ -3,7 +3,6 @@ import type { UsersRepository } from '@/domain/application/repositories/users.re
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import { CreateQuestionUseCase } from './create-question.usecase'
-import { QuestionWithTitleAlreadyRegisteredException } from './exceptions/question-with-title-already-registered.exception'
 import { makeUserData } from '@tests/factories/domain/make-user'
 
 describe('CreateQuestionUseCase', () => {
@@ -27,7 +26,7 @@ describe('CreateQuestionUseCase', () => {
     }
     await sut.execute(request)
 
-    await expect(sut.execute(request)).rejects.toThrowError(new QuestionWithTitleAlreadyRegisteredException())
+    await expect(sut.execute(request)).rejects.toThrow('Question with title already registered')
   })
 
   it('should create an unanswered question', async () => {
