@@ -51,13 +51,15 @@ describe('RefreshAccessTokenUseCase', () => {
 
     it('should refresh the access token successfully when the refresh token is valid', async () => {
       const refreshTokenId = 'valid-refresh-token-id'
+      const userId = 'test-user-id'
       const expectedToken = 'new-jwt-token'
       vi.mocked(jwtService.sign).mockReturnValue(expectedToken)
-      await refreshTokensRepository.create(makeRefreshTokenData({ id: refreshTokenId }))
+      await refreshTokensRepository.create(makeRefreshTokenData({ id: refreshTokenId, userId }))
 
       const response = await sut.execute({ refreshTokenId })
 
       expect(response).toEqual({ token: expectedToken })
+      expect(jwtService.sign).toHaveBeenCalledWith({ sub: userId })
     })
 
     it('should not throw an error when the refresh token is not expired', async () => {
