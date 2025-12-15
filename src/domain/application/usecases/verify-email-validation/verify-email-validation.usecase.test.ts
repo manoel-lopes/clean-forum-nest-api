@@ -29,14 +29,23 @@ describe('VerifyEmailValidationUseCase', () => {
   })
 
   it('should throw an error if the code is invalid', async () => {
-    await emailValidationsRepository.create(makeEmailValidationData({ ...request, code: '12345' }))
+    await emailValidationsRepository.create(makeEmailValidationData({ ...request, code: '654321' }))
 
     await expect(sut.execute(request)).rejects.toThrowError('Invalid validation code')
   })
 
-  it('should throw an error if the code is expired', async () => {
+  it('should throw an error if the email is already verified', async () => {
     await emailValidationsRepository.create(
-      makeEmailValidationData({ ...request, expiresAt: new Date(Date.now() - 1000) })
+      makeEmailValidationData({ ...request, isVerified: true })
+    )
+
+    await expect(sut.execute(request)).rejects.toThrowError('This email has already been isVerified')
+  })
+
+  it('should throw an error when expiration is 1ms in the past', async () => {
+    const pastDate = new Date(Date.now() - 1)
+    await emailValidationsRepository.create(
+      makeEmailValidationData({ ...request, expiresAt: pastDate })
     )
 
     await expect(sut.execute(request)).rejects.toThrowError('Validation code has expired')
@@ -48,6 +57,6 @@ describe('VerifyEmailValidationUseCase', () => {
     await sut.execute(request)
 
     const emailValidation = await emailValidationsRepository.findByEmail(request.email)
-    expect(emailValidation).toBeTruthy()
+    expect(emailValidation?.isVerified).toBe(true)
   })
 })
