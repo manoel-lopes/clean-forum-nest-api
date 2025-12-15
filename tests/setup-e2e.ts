@@ -29,9 +29,10 @@ function createPrismaClient (connectionString: string): PrismaClient {
   return new PrismaClient({ adapter })
 }
 
-const schemaId = randomUUID()
+let schemaId: string
 let prisma: PrismaClient
 beforeAll(async () => {
+  schemaId = randomUUID()
   const databaseURL = generateUniqueDatabaseURL(schemaId)
   process.env.DATABASE_URL = databaseURL
   const baseDatabaseURL = process.env.DATABASE_URL?.replace(/\?schema=.*$/, '') || process.env.DATABASE_URL
