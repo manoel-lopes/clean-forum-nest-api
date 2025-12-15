@@ -8,6 +8,7 @@ import { AppModule } from '@/app.module'
 import { aUser } from '@tests/builders/user.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
+import { deleteUploadedFile } from '@tests/helpers/infra/storage/storage-cleanup'
 
 describe('UploadAttachment', () => {
   let app: INestApplication
@@ -96,6 +97,8 @@ describe('UploadAttachment', () => {
     expect(response.body).toHaveProperty('url')
     expect(response.body).toHaveProperty('key')
     expect(response.body.key).toContain('test-image.png')
+
+    await deleteUploadedFile(response.body.key)
   })
 
   it('should upload a valid PDF file and return 201', async () => {
@@ -119,5 +122,7 @@ describe('UploadAttachment', () => {
     expect(response.body).toHaveProperty('url')
     expect(response.body).toHaveProperty('key')
     expect(response.body.key).toContain('document.pdf')
+
+    await deleteUploadedFile(response.body.key)
   })
 })
