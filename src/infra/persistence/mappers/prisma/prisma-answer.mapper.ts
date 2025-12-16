@@ -1,8 +1,7 @@
 import type { Answer, Attachment, Comment } from '@prisma/client'
 import type { AnswerWithRelations } from '@/domain/application/repositories/answers.repository'
-import type { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
-import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 import type { User } from '@/domain/enterprise/entities/user.entity'
+import { BasePrismaMapper } from './base/base-prisma.mapper'
 
 type PrismaAnswerWithOptionalIncludes = Answer & {
   comments?: Comment[] | false
@@ -15,36 +14,19 @@ export class PrismaAnswerMapper {
     const { comments, attachments, author, ...answerData } = raw
     const response: AnswerWithRelations = {
       ...answerData,
-      updatedAt: answerData.updatedAt || answerData.createdAt,
+      updatedAt: BasePrismaMapper.normalizeTimestamp(answerData.updatedAt, answerData.createdAt),
     }
-    if (Array.isArray(comments)) {
-      response.comments = comments.map((comment): AnswerComment => ({
-        id: comment.id,
-        content: comment.content,
-        authorId: comment.authorId,
-        answerId: comment.answerId!,
-        createdAt: comment.createdAt,
-        updatedAt: comment.updatedAt || comment.createdAt,
-      }))
+    const mappedComments = BasePrismaMapper.mapAnswerComments(comments)
+    if (mappedComments) {
+      response.comments = mappedComments
     }
-    if (Array.isArray(attachments)) {
-      response.attachments = attachments.map((attachment): AnswerAttachment => ({
-        id: attachment.id,
-        title: attachment.title,
-        url: attachment.link,
-        answerId: attachment.answerId!,
-        createdAt: attachment.createdAt,
-        updatedAt: attachment.updatedAt || attachment.createdAt,
-      }))
+    const mappedAttachments = BasePrismaMapper.mapAnswerAttachments(attachments)
+    if (mappedAttachments) {
+      response.attachments = mappedAttachments
     }
-    if (author && typeof author === 'object') {
-      response.author = {
-        id: author.id,
-        name: author.name,
-        email: author.email,
-        createdAt: author.createdAt,
-        updatedAt: author.updatedAt,
-      }
+    const mappedAuthor = BasePrismaMapper.mapAuthor(author ?? null)
+    if (mappedAuthor) {
+      response.author = mappedAuthor
     }
     return response
   }
