@@ -1,14 +1,14 @@
+import { asc, count, desc, eq } from 'drizzle-orm'
 import { Injectable } from '@nestjs/common'
-import { eq, desc, asc, count } from 'drizzle-orm'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
 import type {
   AnswerCommentsRepository,
   PaginatedAnswerComments,
 } from '@/domain/application/repositories/answer-comments.repository'
 import type { UpdateCommentData } from '@/domain/application/repositories/base/comments.repository'
-import type { AnswerComment, AnswerCommentProps } from '@/domain/enterprise/entities/answer-comment.entity'
 import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
 import { comments } from '@/infra/persistence/drizzle/schema'
+import type { AnswerComment, AnswerCommentProps } from '@/domain/enterprise/entities/answer-comment.entity'
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()

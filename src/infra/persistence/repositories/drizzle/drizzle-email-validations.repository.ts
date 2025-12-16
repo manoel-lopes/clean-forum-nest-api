@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common'
 import { eq } from 'drizzle-orm'
+import { Injectable } from '@nestjs/common'
 import type {
   EmailValidationsRepository,
   UpdateEmailValidationData,
 } from '@/domain/application/repositories/email-validations.repository'
-import type { EmailValidation, EmailValidationProps } from '@/domain/enterprise/entities/email-validation.entity'
 import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
 import { emailValidations } from '@/infra/persistence/drizzle/schema'
+import type { EmailValidation, EmailValidationProps } from '@/domain/enterprise/entities/email-validation.entity'
 
 @Injectable()
 export class DrizzleEmailValidationsRepository implements EmailValidationsRepository {

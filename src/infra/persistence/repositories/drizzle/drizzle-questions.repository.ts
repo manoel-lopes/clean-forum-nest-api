@@ -1,5 +1,5 @@
+import { asc, count, desc, eq } from 'drizzle-orm'
 import { Injectable } from '@nestjs/common'
-import { eq, desc, asc, count } from 'drizzle-orm'
 import { PaginationParams } from '@/core/domain/application/pagination-params'
 import type {
   FindManyQuestionsParams,
@@ -10,14 +10,14 @@ import type {
   QuestionWithRelations,
   UpdateQuestionData,
 } from '@/domain/application/repositories/questions.repository'
+import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
+import { answers, attachments, comments, questions, users } from '@/infra/persistence/drizzle/schema'
 import type { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
 import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 import type { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
 import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
 import type { QuestionComment } from '@/domain/enterprise/entities/question-comment.entity'
 import type { User } from '@/domain/enterprise/entities/user.entity'
-import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
-import { questions, answers, comments, attachments, users } from '@/infra/persistence/drizzle/schema'
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()
@@ -113,12 +113,12 @@ export class DrizzleQuestionsRepository extends BaseDrizzleRepository implements
             : undefined,
           author: includeAnswerAuthor && a.author
             ? {
-              id: a.author.id,
-              name: a.author.name,
-              email: a.author.email,
-              createdAt: a.author.createdAt,
-              updatedAt: a.author.updatedAt,
-            }
+                id: a.author.id,
+                name: a.author.name,
+                email: a.author.email,
+                createdAt: a.author.createdAt,
+                updatedAt: a.author.updatedAt,
+              }
             : undefined,
         })),
       },

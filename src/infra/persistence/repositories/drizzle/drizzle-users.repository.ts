@@ -1,11 +1,11 @@
+import { asc, count, desc, eq } from 'drizzle-orm'
 import { Injectable } from '@nestjs/common'
-import { eq, desc, asc, count } from 'drizzle-orm'
 import type { PaginatedItems } from '@/core/domain/application/paginated-items'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
 import type { UpdateUserData, UsersRepository } from '@/domain/application/repositories/users.repository'
-import type { User, UserProps } from '@/domain/enterprise/entities/user.entity'
 import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
 import { users } from '@/infra/persistence/drizzle/schema'
+import type { User, UserProps } from '@/domain/enterprise/entities/user.entity'
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()

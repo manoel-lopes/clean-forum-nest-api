@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common'
 import { eq } from 'drizzle-orm'
+import { Injectable } from '@nestjs/common'
 import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
-import type { RefreshToken, RefreshTokenProps } from '@/domain/enterprise/entities/refresh-token.entity'
 import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
 import { refreshTokens } from '@/infra/persistence/drizzle/schema'
+import type { RefreshToken, RefreshTokenProps } from '@/domain/enterprise/entities/refresh-token.entity'
 
 @Injectable()
 export class DrizzleRefreshTokensRepository implements RefreshTokensRepository {

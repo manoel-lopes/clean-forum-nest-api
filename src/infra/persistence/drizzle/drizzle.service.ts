@@ -1,8 +1,8 @@
-import { Global, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
-import * as schema from './schema'
+import { Global, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { EnvService } from '@/infra/env/env.service'
+import * as schema from './schema'
 
 @Global()
 @Injectable()

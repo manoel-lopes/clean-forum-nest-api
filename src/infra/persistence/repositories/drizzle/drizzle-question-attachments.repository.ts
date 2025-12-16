@@ -1,13 +1,13 @@
+import { asc, count, desc, eq, inArray } from 'drizzle-orm'
 import { Injectable } from '@nestjs/common'
-import { eq, desc, asc, count, inArray } from 'drizzle-orm'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
 import type {
-  QuestionAttachmentsRepository,
   PaginatedQuestionAttachments,
+  QuestionAttachmentsRepository,
 } from '@/domain/application/repositories/question-attachments.repository'
-import type { QuestionAttachment, QuestionAttachmentProps } from '@/domain/enterprise/entities/question-attachment.entity'
 import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
 import { attachments } from '@/infra/persistence/drizzle/schema'
+import type { QuestionAttachment, QuestionAttachmentProps } from '@/domain/enterprise/entities/question-attachment.entity'
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()

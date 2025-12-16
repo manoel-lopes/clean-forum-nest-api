@@ -1,5 +1,5 @@
+import { asc, count, desc, eq } from 'drizzle-orm'
 import { Injectable } from '@nestjs/common'
-import { eq, desc, asc, count } from 'drizzle-orm'
 import type {
   AnswersRepository,
   AnswerWithRelations,
@@ -7,12 +7,12 @@ import type {
   PaginatedAnswers,
   UpdateAnswerData,
 } from '@/domain/application/repositories/answers.repository'
+import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
+import { answers, attachments, comments, users } from '@/infra/persistence/drizzle/schema'
 import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
 import type { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
 import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 import type { User } from '@/domain/enterprise/entities/user.entity'
-import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
-import { answers, comments, attachments, users } from '@/infra/persistence/drizzle/schema'
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()
