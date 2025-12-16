@@ -9,15 +9,15 @@ import { QuestionsRepository } from '@/domain/application/repositories/questions
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { DrizzleModule } from '@/infra/persistence/drizzle/drizzle.module'
-import { DrizzleAnswerAttachmentsRepository } from '@/infra/persistence/repositories/drizzle/drizzle-answer-attachments.repository'
-import { DrizzleAnswerCommentsRepository } from '@/infra/persistence/repositories/drizzle/drizzle-answer-comments.repository'
-import { DrizzleAnswersRepository } from '@/infra/persistence/repositories/drizzle/drizzle-answers.repository'
-import { DrizzleEmailValidationsRepository } from '@/infra/persistence/repositories/drizzle/drizzle-email-validations.repository'
-import { DrizzleQuestionAttachmentsRepository } from '@/infra/persistence/repositories/drizzle/drizzle-question-attachments.repository'
-import { DrizzleQuestionCommentsRepository } from '@/infra/persistence/repositories/drizzle/drizzle-question-comments.repository'
-import { DrizzleQuestionsRepository } from '@/infra/persistence/repositories/drizzle/drizzle-questions.repository'
-import { DrizzleRefreshTokensRepository } from '@/infra/persistence/repositories/drizzle/drizzle-refresh-tokens.repository'
-import { DrizzleUsersRepository } from '@/infra/persistence/repositories/drizzle/drizzle-users.repository'
+import { DrizzleAnswerAttachmentsRepository } from './drizzle-answer-attachments.repository'
+import { DrizzleAnswerCommentsRepository } from './drizzle-answer-comments.repository'
+import { DrizzleAnswersRepository } from './drizzle-answers.repository'
+import { DrizzleEmailValidationsRepository } from './drizzle-email-validations.repository'
+import { DrizzleQuestionAttachmentsRepository } from './drizzle-question-attachments.repository'
+import { DrizzleQuestionCommentsRepository } from './drizzle-question-comments.repository'
+import { DrizzleQuestionsRepository } from './drizzle-questions.repository'
+import { DrizzleRefreshTokensRepository } from './drizzle-refresh-tokens.repository'
+import { DrizzleUsersRepository } from './drizzle-users.repository'
 
 @Global()
 @Module({
@@ -45,4 +45,4 @@ import { DrizzleUsersRepository } from '@/infra/persistence/repositories/drizzle
     EmailValidationsRepository,
   ],
 })
-export class RepositoriesModule {}
+export class DrizzleRepositoriesModule {}
