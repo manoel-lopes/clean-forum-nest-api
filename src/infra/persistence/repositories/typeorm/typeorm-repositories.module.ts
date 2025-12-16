@@ -8,16 +8,16 @@ import { QuestionCommentsRepository } from '@/domain/application/repositories/qu
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
-import { TypeOrmAnswerAttachmentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answer-attachments.repository'
-import { TypeOrmAnswerCommentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answer-comments.repository'
-import { TypeOrmAnswersRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answers.repository'
-import { TypeOrmEmailValidationsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-email-validations.repository'
-import { TypeOrmQuestionAttachmentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-question-attachments.repository'
-import { TypeOrmQuestionCommentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-question-comments.repository'
-import { TypeOrmQuestionsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-questions.repository'
-import { TypeOrmRefreshTokensRepository } from '@/infra/persistence/repositories/typeorm/typeorm-refresh-tokens.repository'
-import { TypeOrmUsersRepository } from '@/infra/persistence/repositories/typeorm/typeorm-users.repository'
 import { TypeOrmPersistenceModule } from '@/infra/persistence/typeorm/typeorm.module'
+import { TypeOrmAnswerAttachmentsRepository } from './typeorm-answer-attachments.repository'
+import { TypeOrmAnswerCommentsRepository } from './typeorm-answer-comments.repository'
+import { TypeOrmAnswersRepository } from './typeorm-answers.repository'
+import { TypeOrmEmailValidationsRepository } from './typeorm-email-validations.repository'
+import { TypeOrmQuestionAttachmentsRepository } from './typeorm-question-attachments.repository'
+import { TypeOrmQuestionCommentsRepository } from './typeorm-question-comments.repository'
+import { TypeOrmQuestionsRepository } from './typeorm-questions.repository'
+import { TypeOrmRefreshTokensRepository } from './typeorm-refresh-tokens.repository'
+import { TypeOrmUsersRepository } from './typeorm-users.repository'
 
 @Global()
 @Module({
@@ -45,4 +45,4 @@ import { TypeOrmPersistenceModule } from '@/infra/persistence/typeorm/typeorm.mo
     EmailValidationsRepository,
   ],
 })
-export class RepositoriesModule {}
+export class TypeOrmRepositoriesModule {}

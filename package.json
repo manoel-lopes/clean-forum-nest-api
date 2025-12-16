@@ -54,6 +54,7 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-fastify": "^11.1.9",
     "@nestjs/swagger": "^11.2.3",
+    "@nestjs/typeorm": "^11.0.0",
     "@prisma/adapter-pg": "^7.1.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.65.1",
@@ -68,6 +69,7 @@
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "typeorm": "^0.3.28",
     "uuidv7": "^1.1.0",
     "zod": "^4.1.13"
   },
