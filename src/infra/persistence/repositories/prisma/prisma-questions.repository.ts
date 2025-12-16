@@ -133,7 +133,7 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: questions,
+      items: questions.map(PrismaQuestionMapper.toQuestion),
     }
   }
 
