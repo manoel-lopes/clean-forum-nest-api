@@ -31,10 +31,15 @@ export abstract class BaseTypeOrmRepository<T extends ObjectLiteral> {
   }
 
   async findOneById (id: string, relations?: string[]): Promise<T | null> {
-    return this.repository.findOne({
-      where: { id } as unknown as FindOptionsWhere<T>,
-      relations,
-    })
+    let queryBuilder = this.repository
+      .createQueryBuilder('entity')
+      .where('entity.id = :id', { id })
+    if (relations) {
+      for (const relation of relations) {
+        queryBuilder = queryBuilder.leftJoinAndSelect(`entity.${relation}`, relation)
+      }
+    }
+    return queryBuilder.getOne()
   }
 
   async findOne (options: FindOneOptions<T>): Promise<T | null> {
