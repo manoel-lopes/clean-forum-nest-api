@@ -15,12 +15,12 @@ export abstract class BaseInMemoryRepository<Item extends Entity> {
   protected items: Item[] = []
 
   async create (data: Props<Item>): Promise<Item> {
-    const item = {
+    const baseProps = {
       id: uuidv7(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      ...data,
-    } as Item
+    }
+    const item: Item = Object.assign(Object.create(null), baseProps, data)
     this.items.push(item)
     return item
   }
@@ -101,15 +101,16 @@ export abstract class BaseInMemoryRepository<Item extends Entity> {
 
   private filterItems (
     items: Item[],
-    where: {
-      [key in keyof Item]?: Item[key]
-    }
+    where: Partial<Item>
   ): Item[] {
-    return items.filter((item) =>
-      Object.entries(where).every(([key, value]) => {
-        return item[key as keyof Item] === value
-      })
-    )
+    return items.filter((item) => {
+      for (const key in where) {
+        if (Object.prototype.hasOwnProperty.call(where, key) && item[key] !== where[key]) {
+          return false
+        }
+      }
+      return true
+    })
   }
 
   private sortItems<T extends Entity>(items: T[], order: 'asc' | 'desc'): T[] {
