@@ -1,17 +1,18 @@
 import { INestApplication } from '@nestjs/common'
 import request from 'supertest'
+import { DataSource } from 'typeorm'
 
-import { PrismaService } from '@/infra/persistence/prisma.service'
+import { EmailValidationEntity } from '@/infra/persistence/typeorm/entities/email-validation.entity'
 import { makeApp } from '@tests/helpers/app/make-app'
 import { verifyEmailValidation } from '@tests/helpers/domain/enterprise/users/email-validation-requests'
 
 describe('VerifyEmailValidation', () => {
   let app: INestApplication
-  let prisma: PrismaService
+  let dataSource: DataSource
 
   beforeAll(async () => {
     app = await makeApp()
-    prisma = app.get(PrismaService)
+    dataSource = app.get(DataSource)
   })
 
   afterAll(async () => {
@@ -19,7 +20,7 @@ describe('VerifyEmailValidation', () => {
   })
 
   beforeEach(async () => {
-    await prisma.emailValidation.deleteMany()
+    await dataSource.getRepository(EmailValidationEntity).clear()
   })
 
   it('should return 422 when email is not a valid email format', async () => {
@@ -77,14 +78,14 @@ describe('VerifyEmailValidation', () => {
   it('should return 204 when email validation is verified successfully', async () => {
     const email = 'test@example.com'
     const code = '123456'
-    await prisma.emailValidation.create({
-      data: {
-        email,
-        code,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
-        isVerified: false,
-      },
+    const repository = dataSource.getRepository(EmailValidationEntity)
+    const emailValidation = repository.create({
+      email,
+      code,
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      isVerified: false,
     })
+    await repository.save(emailValidation)
 
     const response = await verifyEmailValidation(app, { email, code })
 
