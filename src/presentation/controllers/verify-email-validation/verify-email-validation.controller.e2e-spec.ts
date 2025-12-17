@@ -1,17 +1,18 @@
 import { INestApplication } from '@nestjs/common'
 import request from 'supertest'
 
-import { PrismaService } from '@/infra/persistence/prisma.service'
+import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
+import { emailValidations } from '@/infra/persistence/drizzle/schema'
 import { makeApp } from '@tests/helpers/app/make-app'
 import { verifyEmailValidation } from '@tests/helpers/domain/enterprise/users/email-validation-requests'
 
 describe('VerifyEmailValidation', () => {
   let app: INestApplication
-  let prisma: PrismaService
+  let drizzle: DrizzleService
 
   beforeAll(async () => {
     app = await makeApp()
-    prisma = app.get(PrismaService)
+    drizzle = app.get(DrizzleService)
   })
 
   afterAll(async () => {
@@ -19,7 +20,7 @@ describe('VerifyEmailValidation', () => {
   })
 
   beforeEach(async () => {
-    await prisma.emailValidation.deleteMany()
+    await drizzle.db.delete(emailValidations)
   })
 
   it('should return 422 when email is not a valid email format', async () => {
@@ -77,13 +78,11 @@ describe('VerifyEmailValidation', () => {
   it('should return 204 when email validation is verified successfully', async () => {
     const email = 'test@example.com'
     const code = '123456'
-    await prisma.emailValidation.create({
-      data: {
-        email,
-        code,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
-        isVerified: false,
-      },
+    await drizzle.db.insert(emailValidations).values({
+      email,
+      code,
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      isVerified: false,
     })
 
     const response = await verifyEmailValidation(app, { email, code })
