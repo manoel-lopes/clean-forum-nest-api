@@ -7,7 +7,6 @@ export default [
   ...node,
   {
     rules: {
-      '@typescript-eslint/consistent-type-assertions': 'off',
       'lines-between-class-members': 'off',
     },
   },
