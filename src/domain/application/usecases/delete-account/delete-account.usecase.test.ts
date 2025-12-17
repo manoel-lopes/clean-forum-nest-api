@@ -37,4 +37,12 @@ describe('DeleteAccountUseCase', () => {
     expect(deletedAccount).toBeNull()
     expect(deletedRefreshToken).toBeNull()
   })
+
+  it('should not delete a nonexistent user', async () => {
+    const request = {
+      userId: 'nonexistent-user-id',
+    }
+
+    await expect(sut.execute(request)).rejects.toThrow('User not found')
+  })
 })
