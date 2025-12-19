@@ -24,9 +24,9 @@ export async function updateAnswer (app: INestApplication, token: string | undef
   if (token) {
     req.set('Authorization', `Bearer ${token}`)
   }
-  return req.send({
-    content: updateData.content,
-  })
+  const body: Record<string, unknown> = {}
+  if (updateData.content) body.content = updateData.content
+  return req.send(body)
 }
 
 export async function deleteAnswer (

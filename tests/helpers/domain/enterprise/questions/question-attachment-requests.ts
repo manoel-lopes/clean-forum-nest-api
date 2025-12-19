@@ -36,10 +36,10 @@ export async function updateQuestionAttachment (
   if (token) {
     req.set('Authorization', `Bearer ${token}`)
   }
-  return req.send({
-    title: updateData.title,
-    url: updateData.url,
-  })
+  const body: Record<string, unknown> = {}
+  if (updateData.title) body.title = updateData.title
+  if (updateData.url) body.url = updateData.url
+  return req.send(body)
 }
 
 export async function deleteQuestionAttachment (app: INestApplication, token: string | undefined, attachmentId: unknown) {
@@ -59,8 +59,8 @@ export async function attachToQuestion (
   if (token) {
     req.set('Authorization', `Bearer ${token}`)
   }
-  return req.send({
-    title: attachmentData.title,
-    url: attachmentData.url,
-  })
+  const body: Record<string, unknown> = {}
+  if (attachmentData.title) body.title = attachmentData.title
+  if (attachmentData.url) body.url = attachmentData.url
+  return req.send(body)
 }
