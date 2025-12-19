@@ -147,6 +147,27 @@ export class CreateQuestionController {
 - **NEVER use `undefined` as a value** - use `null` or omit property
 - **NO nested ternaries** - use registry pattern (lookup object)
 - **NO if/else if chains** - use registry pattern
+- **NEVER use `!= null` or `!== null` comparisons** - use truthy/falsy checks instead
+- **Use `!` for negation** - prefer `if (!value)` over comparison operators
+
+**Truthy/Falsy Pattern**:
+```typescript
+// ❌ Bad: explicit null/undefined checks
+if (value !== null && value !== undefined) { ... }
+if (value != null) { ... }
+
+// ✅ Good: truthy/falsy checks
+if (value) { ... }
+if (!value) { ... }
+
+// ❌ Bad: conditional property with null check
+const body: Record<string, unknown> = {}
+if (data.title != null) body.title = data.title
+
+// ✅ Good: truthy check
+const body: Record<string, unknown> = {}
+if (data.title) body.title = data.title
+```
 
 **Registry Pattern Example**:
 ```typescript
