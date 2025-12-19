@@ -61,7 +61,7 @@ describe('UpdateQuestionAttachment', () => {
 
     const response = await updateQuestionAttachment(app, token, {
       attachmentId: '123e4567-e89b-12d3-a456-426614174000',
-      title: undefined,
+      title: null,
       url: 'https://example.com/file.pdf',
     })
 
@@ -85,7 +85,7 @@ describe('UpdateQuestionAttachment', () => {
     const response = await updateQuestionAttachment(app, token, {
       attachmentId: '123e4567-e89b-12d3-a456-426614174000',
       title: 'Title',
-      url: undefined,
+      url: null,
     })
 
     expect(response.statusCode).toBe(400)
