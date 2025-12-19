@@ -11,7 +11,9 @@ import type { QuestionAttachment, QuestionAttachmentProps } from '@/domain/enter
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()
-export class DrizzleQuestionAttachmentsRepository extends BaseDrizzleRepository implements QuestionAttachmentsRepository {
+export class DrizzleQuestionAttachmentsRepository
+  extends BaseDrizzleRepository
+  implements QuestionAttachmentsRepository {
   constructor (private readonly drizzle: DrizzleService) {
     super()
   }
