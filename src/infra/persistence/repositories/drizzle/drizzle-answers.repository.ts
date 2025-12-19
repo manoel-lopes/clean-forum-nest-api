@@ -2,17 +2,14 @@ import { asc, count, desc, eq } from 'drizzle-orm'
 import { Injectable } from '@nestjs/common'
 import type {
   AnswersRepository,
-  AnswerWithRelations,
   FindManyByQuestionIdParams,
   PaginatedAnswers,
   UpdateAnswerData,
 } from '@/domain/application/repositories/answers.repository'
 import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
-import { answers, attachments, comments, users } from '@/infra/persistence/drizzle/schema'
+import { answers } from '@/infra/persistence/drizzle/schema'
+import { DrizzleAnswerMapper } from '@/infra/persistence/mappers/drizzle/drizzle-answer.mapper'
 import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
-import type { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
-import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
-import type { User } from '@/domain/enterprise/entities/user.entity'
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()
@@ -57,20 +54,17 @@ export class DrizzleAnswersRepository extends BaseDrizzleRepository implements A
   }: FindManyByQuestionIdParams): Promise<PaginatedAnswers> {
     const pagination = this.sanitizePagination(page, pageSize)
     const orderFn = order === 'desc' ? desc : asc
-    const includeAuthor = include.includes('author')
-    const includeComments = include.includes('comments')
-    const includeAttachments = include.includes('attachments')
+    const withRelations: Record<string, true> = {}
+    if (include.includes('author')) withRelations.author = true
+    if (include.includes('comments')) withRelations.comments = true
+    if (include.includes('attachments')) withRelations.attachments = true
     const [answersList, [countResult]] = await Promise.all([
       this.drizzle.db.query.answers.findMany({
         where: eq(answers.questionId, questionId),
         orderBy: orderFn(answers.createdAt),
         offset: pagination.offset,
         limit: pagination.limit,
-        with: {
-          author: includeAuthor || undefined,
-          comments: includeComments || undefined,
-          attachments: includeAttachments || undefined,
-        },
+        with: withRelations,
       }),
       this.drizzle.db
         .select({ count: count() })
@@ -84,56 +78,7 @@ export class DrizzleAnswersRepository extends BaseDrizzleRepository implements A
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: answersList.map(a => this.toAnswerWithRelations(a, includeAuthor, includeComments, includeAttachments)),
+      items: answersList.map(DrizzleAnswerMapper.toAnswer),
     }
-  }
-
-  private toAnswerWithRelations (
-    a: typeof answers.$inferSelect & {
-      author?: typeof users.$inferSelect
-      comments?: (typeof comments.$inferSelect)[]
-      attachments?: (typeof attachments.$inferSelect)[]
-    },
-    includeAuthor: boolean,
-    includeComments: boolean,
-    includeAttachments: boolean
-  ): AnswerWithRelations {
-    const result: AnswerWithRelations = {
-      id: a.id,
-      content: a.content,
-      authorId: a.authorId,
-      questionId: a.questionId,
-      excerpt: a.excerpt,
-      createdAt: a.createdAt,
-      updatedAt: a.updatedAt,
-    }
-    if (includeAuthor && a.author) {
-      const author: Omit<User, 'password'> = {
-        id: a.author.id,
-        name: a.author.name,
-        email: a.author.email,
-        createdAt: a.author.createdAt,
-        updatedAt: a.author.updatedAt,
-      }
-      result.author = author
-    }
-    if (includeComments && Array.isArray(a.comments)) {
-      result.comments = a.comments.map((c): AnswerComment => ({
-        ...c,
-        answerId: c.answerId!,
-        updatedAt: c.updatedAt ?? c.createdAt,
-      }))
-    }
-    if (includeAttachments && Array.isArray(a.attachments)) {
-      result.attachments = a.attachments.map((att): AnswerAttachment => ({
-        id: att.id,
-        title: att.title,
-        url: att.link,
-        answerId: att.answerId!,
-        createdAt: att.createdAt,
-        updatedAt: att.updatedAt ?? att.createdAt,
-      }))
-    }
-    return result
   }
 }

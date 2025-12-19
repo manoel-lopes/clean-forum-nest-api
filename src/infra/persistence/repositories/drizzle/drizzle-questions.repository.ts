@@ -12,12 +12,12 @@ import type {
 } from '@/domain/application/repositories/questions.repository'
 import { DrizzleService } from '@/infra/persistence/drizzle/drizzle.service'
 import { answers, attachments, comments, questions, users } from '@/infra/persistence/drizzle/schema'
-import type { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
-import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
+import { DrizzleAnswerMapper } from '@/infra/persistence/mappers/drizzle/drizzle-answer.mapper'
+import { DrizzleAttachmentMapper } from '@/infra/persistence/mappers/drizzle/drizzle-attachment.mapper'
+import { DrizzleCommentMapper } from '@/infra/persistence/mappers/drizzle/drizzle-comment.mapper'
+import { DrizzleQuestionMapper } from '@/infra/persistence/mappers/drizzle/drizzle-question.mapper'
+import { DrizzleUserMapper } from '@/infra/persistence/mappers/drizzle/drizzle-user.mapper'
 import type { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
-import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
-import type { QuestionComment } from '@/domain/enterprise/entities/question-comment.entity'
-import type { User } from '@/domain/enterprise/entities/user.entity'
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()
@@ -70,19 +70,16 @@ export class DrizzleQuestionsRepository extends BaseDrizzleRepository implements
       .from(answers)
       .where(eq(answers.questionId, question.id))
     const totalAnswers = answersCount.count
-    const includeAnswerAuthor = answerIncludes.includes('author')
-    const includeAnswerComments = answerIncludes.includes('comments')
-    const includeAnswerAttachments = answerIncludes.includes('attachments')
+    const answerWithRelations: Record<string, true> = {}
+    if (answerIncludes.includes('author')) answerWithRelations.author = true
+    if (answerIncludes.includes('comments')) answerWithRelations.comments = true
+    if (answerIncludes.includes('attachments')) answerWithRelations.attachments = true
     const answersList = await this.drizzle.db.query.answers.findMany({
       where: eq(answers.questionId, question.id),
       orderBy: orderFn(answers.createdAt),
       offset: pagination.offset,
       limit: pagination.limit,
-      with: {
-        author: includeAnswerAuthor || undefined,
-        comments: includeAnswerComments || undefined,
-        attachments: includeAnswerAttachments || undefined,
-      },
+      with: answerWithRelations,
     })
     const result: QuestionWithRelations = {
       ...question,
@@ -92,43 +89,15 @@ export class DrizzleQuestionsRepository extends BaseDrizzleRepository implements
         totalItems: totalAnswers,
         totalPages: Math.ceil(totalAnswers / pagination.pageSize),
         order,
-        items: answersList.map(a => ({
-          ...a,
-          comments: includeAnswerComments && Array.isArray(a.comments)
-            ? a.comments.map((c): AnswerComment => ({
-              ...c,
-              answerId: c.answerId!,
-              updatedAt: c.updatedAt ?? c.createdAt,
-            }))
-            : undefined,
-          attachments: includeAnswerAttachments && Array.isArray(a.attachments)
-            ? a.attachments.map((att): AnswerAttachment => ({
-              id: att.id,
-              title: att.title,
-              url: att.link,
-              answerId: att.answerId!,
-              createdAt: att.createdAt,
-              updatedAt: att.updatedAt ?? att.createdAt,
-            }))
-            : undefined,
-          author: includeAnswerAuthor && a.author
-            ? {
-                id: a.author.id,
-                name: a.author.name,
-                email: a.author.email,
-                createdAt: a.author.createdAt,
-                updatedAt: a.author.updatedAt,
-              }
-            : undefined,
-        })),
+        items: answersList.map(DrizzleAnswerMapper.toAnswer),
       },
     }
     if (include.includes('author')) {
       const [author] = await this.drizzle.db
-        .select({ id: users.id, name: users.name, email: users.email, createdAt: users.createdAt, updatedAt: users.updatedAt })
+        .select()
         .from(users)
         .where(eq(users.id, question.authorId))
-      if (author) result.author = author
+      if (author) result.author = DrizzleUserMapper.toAuthor(author)
     }
     if (include.includes('comments')) {
       const questionComments = await this.drizzle.db
@@ -136,11 +105,7 @@ export class DrizzleQuestionsRepository extends BaseDrizzleRepository implements
         .from(comments)
         .where(eq(comments.questionId, question.id))
         .orderBy(desc(comments.createdAt))
-      result.comments = questionComments.map((c): QuestionComment => ({
-        ...c,
-        questionId: c.questionId!,
-        updatedAt: c.updatedAt ?? c.createdAt,
-      }))
+      result.comments = questionComments.map(DrizzleCommentMapper.toQuestionComment)
     }
     if (include.includes('attachments')) {
       const questionAttachments = await this.drizzle.db
@@ -148,14 +113,7 @@ export class DrizzleQuestionsRepository extends BaseDrizzleRepository implements
         .from(attachments)
         .where(eq(attachments.questionId, question.id))
         .orderBy(desc(attachments.createdAt))
-      result.attachments = questionAttachments.map((a): QuestionAttachment => ({
-        id: a.id,
-        title: a.title,
-        url: a.link,
-        questionId: a.questionId!,
-        createdAt: a.createdAt,
-        updatedAt: a.updatedAt ?? a.createdAt,
-      }))
+      result.attachments = questionAttachments.map(DrizzleAttachmentMapper.toQuestionAttachment)
     }
     return result
   }
@@ -168,19 +126,16 @@ export class DrizzleQuestionsRepository extends BaseDrizzleRepository implements
   }: FindManyQuestionsParams): Promise<PaginatedQuestions> {
     const pagination = this.sanitizePagination(page, pageSize)
     const orderFn = order === 'desc' ? desc : asc
-    const includeAuthor = include.includes('author')
-    const includeComments = include.includes('comments')
-    const includeAttachments = include.includes('attachments')
+    const withRelations: Record<string, true> = {}
+    if (include.includes('author')) withRelations.author = true
+    if (include.includes('comments')) withRelations.comments = true
+    if (include.includes('attachments')) withRelations.attachments = true
     const [questionsList, [countResult]] = await Promise.all([
       this.drizzle.db.query.questions.findMany({
         orderBy: orderFn(questions.createdAt),
         offset: pagination.offset,
         limit: pagination.limit,
-        with: {
-          author: includeAuthor || undefined,
-          comments: includeComments || undefined,
-          attachments: includeAttachments || undefined,
-        },
+        with: withRelations,
       }),
       this.drizzle.db.select({ count: count() }).from(questions),
     ])
@@ -191,7 +146,7 @@ export class DrizzleQuestionsRepository extends BaseDrizzleRepository implements
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: questionsList.map(q => this.toQuestionWithRelations(q, includeAuthor, includeComments, includeAttachments)),
+      items: questionsList.map(DrizzleQuestionMapper.toQuestion),
     }
   }
 
@@ -234,65 +189,7 @@ export class DrizzleQuestionsRepository extends BaseDrizzleRepository implements
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: questionsList.map(q => this.toQuestionWithRelations(q, false, false, false)),
+      items: questionsList.map(DrizzleQuestionMapper.toQuestion),
     }
-  }
-
-  private toQuestionWithRelations (
-    q: typeof questions.$inferSelect & {
-      author?: typeof users.$inferSelect
-      comments?: (typeof comments.$inferSelect)[]
-      attachments?: (typeof attachments.$inferSelect)[]
-    },
-    includeAuthor: boolean,
-    includeComments: boolean,
-    includeAttachments: boolean
-  ): QuestionWithRelations {
-    const result: QuestionWithRelations = {
-      id: q.id,
-      title: q.title,
-      slug: q.slug,
-      content: q.content,
-      authorId: q.authorId,
-      bestAnswerId: q.bestAnswerId,
-      createdAt: q.createdAt,
-      updatedAt: q.updatedAt,
-      answers: {
-        page: 1,
-        pageSize: 20,
-        totalItems: 0,
-        totalPages: 0,
-        items: [],
-        order: 'desc',
-      },
-    }
-    if (includeAuthor && q.author) {
-      const author: Omit<User, 'password'> = {
-        id: q.author.id,
-        name: q.author.name,
-        email: q.author.email,
-        createdAt: q.author.createdAt,
-        updatedAt: q.author.updatedAt,
-      }
-      result.author = author
-    }
-    if (includeComments && Array.isArray(q.comments)) {
-      result.comments = q.comments.map((c): QuestionComment => ({
-        ...c,
-        questionId: c.questionId!,
-        updatedAt: c.updatedAt ?? c.createdAt,
-      }))
-    }
-    if (includeAttachments && Array.isArray(q.attachments)) {
-      result.attachments = q.attachments.map((a): QuestionAttachment => ({
-        id: a.id,
-        title: a.title,
-        url: a.link,
-        questionId: a.questionId!,
-        createdAt: a.createdAt,
-        updatedAt: a.updatedAt ?? a.createdAt,
-      }))
-    }
-    return result
   }
 }
