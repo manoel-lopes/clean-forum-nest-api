@@ -1,5 +1,5 @@
-import type { answers, attachments, comments, users } from '@/infra/persistence/drizzle/schema'
 import type { AnswerWithRelations } from '@/domain/application/repositories/answers.repository'
+import type { answers, attachments, comments, users } from '@/infra/persistence/drizzle/schema'
 import type { Answer } from '@/domain/enterprise/entities/answer.entity'
 import { DrizzleAttachmentMapper } from './drizzle-attachment.mapper'
 import { DrizzleCommentMapper } from './drizzle-comment.mapper'
