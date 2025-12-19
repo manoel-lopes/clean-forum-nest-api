@@ -6,7 +6,7 @@ type SanitizedPagination = {
 }
 
 export abstract class BaseDrizzleRepository {
-  protected static readonly MAX_PAGE_SIZE = 100
+  private static readonly MAX_PAGE_SIZE = 100
 
   protected sanitizePagination (page: number, pageSize: number): SanitizedPagination {
     const safePage = Math.max(1, page)
