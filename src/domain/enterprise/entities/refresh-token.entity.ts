@@ -1,9 +1,28 @@
-import type { Entity } from '@/core/domain/entity'
-import type { Props } from '@/shared/types/custom/props'
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
+import { Props } from '@/shared/types/custom/props'
+import { BaseEntity } from './base/base.entity'
+import { User } from './user.entity'
 
 export type RefreshTokenProps = Props<RefreshToken>
 
-export interface RefreshToken extends Entity {
-  userId: string
-  expiresAt: Date
+@Entity('refresh_tokens')
+export class RefreshToken extends BaseEntity {
+  @Column({ type: 'varchar', length: 36 })
+  readonly userId: string
+
+  @Column({ type: 'timestamptz' })
+  readonly expiresAt: Date
+
+  @ManyToOne(() => User, user => user.refreshTokens)
+  @JoinColumn({ name: 'userId' })
+  readonly user: User
+
+  private constructor (props: RefreshTokenProps, id?: string) {
+    super(id)
+    Object.assign(this, props)
+  }
+
+  static create (props: RefreshTokenProps, id?: string): RefreshToken {
+    return new RefreshToken(props, id)
+  }
 }
