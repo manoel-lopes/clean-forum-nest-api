@@ -1,8 +1,16 @@
-import type { Props } from '@/shared/types/custom/props'
-import type { Comment } from './base/comment.entity'
+import { ChildEntity } from 'typeorm'
+import { Props } from '@/shared/types/custom/props'
+import { Comment } from './base/comment.entity'
 
 export type AnswerCommentProps = Props<AnswerComment>
 
-export interface AnswerComment extends Comment {
-  answerId: string
+@ChildEntity('answer')
+export class AnswerComment extends Comment {
+  private constructor (props: AnswerCommentProps, id?: string) {
+    super(props, id)
+  }
+
+  static create (props: AnswerCommentProps, id?: string): AnswerComment {
+    return new AnswerComment(props, id)
+  }
 }
