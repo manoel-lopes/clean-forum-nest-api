@@ -1,8 +1,0 @@
-export { AnswerEntity } from './answer.entity'
-export { AttachmentEntity } from './attachment.entity'
-export { BaseEntity } from './base.entity'
-export { CommentEntity } from './comment.entity'
-export { EmailValidationEntity } from './email-validation.entity'
-export { QuestionEntity } from './question.entity'
-export { RefreshTokenEntity } from './refresh-token.entity'
-export { UserEntity } from './user.entity'
