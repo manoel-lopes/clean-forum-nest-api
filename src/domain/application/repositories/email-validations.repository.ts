@@ -1,4 +1,4 @@
-import type { EmailValidation, EmailValidationProps } from '@/domain/enterprise/entities/email-validation.entity'
+import type { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
 
 export type UpdateEmailValidationData = {
   where: { id: string }
@@ -6,7 +6,7 @@ export type UpdateEmailValidationData = {
 }
 
 export type EmailValidationsRepository = {
-  create(emailValidation: EmailValidationProps): Promise<EmailValidation>
+  save(emailValidation: EmailValidation): Promise<void>
   update(emailValidation: UpdateEmailValidationData): Promise<EmailValidation>
   findByEmail(email: string): Promise<EmailValidation | null>
   findById(id: string): Promise<EmailValidation | null>
