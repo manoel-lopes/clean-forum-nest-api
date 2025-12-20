@@ -16,11 +16,10 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@/presentation/decorators/api-responses.decorator'
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
-
 @ApiTags('Attachments')
 @Controller('attachments')
 export class UploadAttachmentController {
+  private readonly MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
   constructor (private readonly uploadAttachmentUseCase: UploadAttachmentUseCase) {}
 
   @Post('upload')
@@ -48,17 +47,16 @@ export class UploadAttachmentController {
       throw new BadRequestException('No file uploaded')
     }
     const buffer = await file.toBuffer()
-    if (buffer.length > MAX_FILE_SIZE) {
+    if (buffer.length > this.MAX_FILE_SIZE) {
       throw new BadRequestException('File size exceeds 5MB limit')
     }
-
     try {
-      const result = await this.uploadAttachmentUseCase.execute({
+      const response = await this.uploadAttachmentUseCase.execute({
         fileName: file.filename,
         fileType: file.mimetype,
         body: buffer,
       })
-      return result
+      return response
     } catch (error) {
       if (error instanceof InvalidAttachmentTypeException) {
         throw new BadRequestException(error.message)
