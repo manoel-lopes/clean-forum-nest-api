@@ -8,7 +8,7 @@ type GetUserByEmailUseCaseRequest = {
   email: string
 }
 
-type GetUserByEmailUseCaseResponse = Omit<User, 'password'>
+type GetUserByEmailUseCaseResponse = Omit<User, 'password' | 'questions' | 'answers' | 'comments' | 'refreshTokens'>
 
 @Injectable()
 export class GetUserByEmailUseCase implements UseCase {
