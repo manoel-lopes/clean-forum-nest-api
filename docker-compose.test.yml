@@ -27,5 +27,5 @@ services:
     image: mailhog/mailhog:latest
     container_name: forum_mailhog_test
     ports:
-      - '1025:1025'  # SMTP port
-      - '8025:8025'  # Web UI port
+      - '11025:1025'  # SMTP port
+      - '18025:8025'  # Web UI port
