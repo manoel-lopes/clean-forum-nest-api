@@ -8,7 +8,7 @@ import * as schema from './schema'
 @Injectable()
 export class DrizzleService implements OnModuleInit, OnModuleDestroy {
   private pool: Pool
-  public db: NodePgDatabase<typeof schema>
+  db: NodePgDatabase<typeof schema>
 
   constructor (private readonly envService: EnvService) {}
 
