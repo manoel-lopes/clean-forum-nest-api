@@ -3,14 +3,14 @@ import type {
   AnswerCommentsRepository,
   PaginatedAnswerComments,
 } from '@/domain/application/repositories/answer-comments.repository'
-import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
+import type { Comment } from '@/domain/enterprise/entities/base/comment.entity'
 import { InMemoryCommentsRepository } from './in-memory-comments.repository'
 
 export class InMemoryAnswerCommentsRepository
-  extends InMemoryCommentsRepository<AnswerComment>
+  extends InMemoryCommentsRepository
   implements AnswerCommentsRepository {
   async findManyByAnswerId (answerId: string, params: PaginationParams): Promise<PaginatedAnswerComments> {
-    const comments = await this.findManyItemsBy({
+    return this.findManyItemsBy({
       where: { answerId },
       params: {
         page: params.page,
@@ -18,6 +18,11 @@ export class InMemoryAnswerCommentsRepository
         order: params.order,
       },
     })
-    return comments
+  }
+
+  override async findById (commentId: string): Promise<Comment | null> {
+    const comment = await super.findById(commentId)
+    if (!comment || !comment.answerId) return null
+    return comment
   }
 }
