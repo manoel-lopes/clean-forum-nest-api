@@ -1,17 +1,14 @@
-import type { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
+import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
 import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.repository'
 
-export class InMemoryAttachmentsRepository<T extends Attachment = Attachment> extends BaseRepository<T> {
-  async createMany (attachments: T[]): Promise<T[]> {
-    const createdAttachments: T[] = []
+export class InMemoryAttachmentsRepository extends BaseRepository<Attachment> {
+  async saveMany (attachments: Attachment[]): Promise<void> {
     for (const attachment of attachments) {
-      const created = await this.create(attachment)
-      createdAttachments.push(created)
+      await this.save(attachment)
     }
-    return createdAttachments
   }
 
-  async update (attachmentId: string, data: Partial<Pick<T, 'title' | 'url'>>): Promise<T> {
+  async update (attachmentId: string, data: Partial<Pick<Attachment, 'title' | 'url'>>): Promise<Attachment> {
     const updatedAttachment = await this.updateOne({
       where: { id: attachmentId },
       data,
