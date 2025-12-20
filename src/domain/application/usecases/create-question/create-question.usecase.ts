@@ -1,8 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
-import type { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
-import { Slug } from '@/domain/enterprise/value-objects/slug/slug.vo'
+import { Question, type QuestionProps } from '@/domain/enterprise/entities/question.entity'
 import { QuestionWithTitleAlreadyRegisteredException } from './exceptions/question-with-title-already-registered.exception'
 
 type CreateQuestionRequest = Omit<QuestionProps, 'slug'>
@@ -13,20 +12,18 @@ export class CreateQuestionUseCase implements UseCase {
     @Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository
   ) {}
 
-  async execute (req: CreateQuestionRequest): Promise<Question> {
+  async execute (req: CreateQuestionRequest): Promise<void> {
     const { title, content, authorId, bestAnswerId } = req
     const questionWithTitle = await this.questionsRepository.findByTitle(title)
     if (questionWithTitle) {
       throw new QuestionWithTitleAlreadyRegisteredException()
     }
-    const slug = Slug.create(title)
-    const question = await this.questionsRepository.create({
+    const question = Question.create({
       title,
       content,
       authorId,
-      bestAnswerId,
-      slug: slug.value,
+      bestAnswerId
     })
-    return question
+    await this.questionsRepository.save(question)
   }
 }
