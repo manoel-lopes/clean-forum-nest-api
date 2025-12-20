@@ -1,14 +1,14 @@
-import type { EmailValidationProps } from '@/domain/enterprise/entities/email-validation.entity'
+import { EmailValidation, EmailValidationProps } from '@/domain/enterprise/entities/email-validation.entity'
 import { faker } from '@faker-js/faker'
 
-export function makeEmailValidationData (override: Partial<EmailValidationProps> = {}): EmailValidationProps {
+export function makeEmailValidation (override: Partial<EmailValidation> = {}): EmailValidation {
   const futureDate = new Date()
   futureDate.setMinutes(futureDate.getMinutes() + 10)
-  return {
+  const props: EmailValidationProps = {
     email: faker.internet.email(),
-    code: faker.string.uuid(),
     expiresAt: futureDate,
     isVerified: false,
     ...override,
   }
+  return EmailValidation.create(props)
 }
