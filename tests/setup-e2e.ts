@@ -1,8 +1,13 @@
-import { execSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import { config } from 'dotenv'
-import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient } from '@prisma/client'
+import { DataSource } from 'typeorm'
+import { Answer } from '@/domain/enterprise/entities/answer.entity'
+import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
+import { Comment } from '@/domain/enterprise/entities/base/comment.entity'
+import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
+import { Question } from '@/domain/enterprise/entities/question.entity'
+import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
+import { User } from '@/domain/enterprise/entities/user.entity'
 
 config({ path: '.env', override: true })
 config({ path: '.env.test', override: true })
@@ -14,6 +19,16 @@ process.on('unhandledRejection', (reason) => {
   throw reason
 })
 
+const entities = [
+  User,
+  Question,
+  Answer,
+  Comment,
+  Attachment,
+  RefreshToken,
+  EmailValidation,
+]
+
 function generateUniqueDatabaseURL (schemaId: string) {
   const databaseURL = process.env.DATABASE_URL
   if (!databaseURL) {
@@ -24,26 +39,55 @@ function generateUniqueDatabaseURL (schemaId: string) {
   return url.toString()
 }
 
-function createPrismaClient (connectionString: string): PrismaClient {
-  const adapter = new PrismaPg({ connectionString })
-  return new PrismaClient({ adapter })
+function createDataSource (connectionString: string, schema: string): DataSource {
+  return new DataSource({
+    type: 'postgres',
+    url: connectionString,
+    schema,
+    entities,
+    synchronize: true,
+    logging: false,
+  })
 }
 
 let schemaId: string
-let prisma: PrismaClient
+let dataSource: DataSource
+let baseDataSource: DataSource
+
 beforeAll(async () => {
   schemaId = randomUUID()
   const databaseURL = generateUniqueDatabaseURL(schemaId)
   process.env.DATABASE_URL = databaseURL
+
   const baseDatabaseURL = process.env.DATABASE_URL?.replace(/\?schema=.*$/, '') || process.env.DATABASE_URL
-  const tempPrisma = createPrismaClient(baseDatabaseURL)
-  await tempPrisma.$executeRawUnsafe(`CREATE SCHEMA IF NOT EXISTS "${schemaId}"`)
-  await tempPrisma.$disconnect()
-  execSync(`DATABASE_URL="${databaseURL}" pnpm prisma migrate deploy`, { stdio: 'pipe' })
-  prisma = createPrismaClient(databaseURL)
+
+  baseDataSource = new DataSource({
+    type: 'postgres',
+    url: baseDatabaseURL,
+    logging: false,
+  })
+
+  await baseDataSource.initialize()
+  await baseDataSource.query(`CREATE SCHEMA IF NOT EXISTS "${schemaId}"`)
+  await baseDataSource.destroy()
+
+  dataSource = createDataSource(databaseURL, schemaId)
+  await dataSource.initialize()
 })
 
 afterAll(async () => {
-  await prisma.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${schemaId}" CASCADE`)
-  await prisma.$disconnect()
+  if (dataSource?.isInitialized) {
+    await dataSource.destroy()
+  }
+
+  const baseDatabaseURL = process.env.DATABASE_URL?.replace(/\?schema=.*$/, '') || process.env.DATABASE_URL
+  baseDataSource = new DataSource({
+    type: 'postgres',
+    url: baseDatabaseURL,
+    logging: false,
+  })
+
+  await baseDataSource.initialize()
+  await baseDataSource.query(`DROP SCHEMA IF EXISTS "${schemaId}" CASCADE`)
+  await baseDataSource.destroy()
 })
