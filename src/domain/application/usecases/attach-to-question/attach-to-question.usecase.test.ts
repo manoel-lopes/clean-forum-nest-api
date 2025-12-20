@@ -4,7 +4,7 @@ import { InMemoryQuestionAttachmentsRepository } from '@/infra/persistence/repos
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { AttachToQuestionUseCase } from './attach-to-question.usecase'
-import { makeQuestionData } from '@tests/factories/domain/make-question'
+import { makeQuestion } from '@tests/factories/domain/make-question'
 
 describe('AttachToQuestionUseCase', () => {
   let sut: AttachToQuestionUseCase
@@ -28,7 +28,8 @@ describe('AttachToQuestionUseCase', () => {
   })
 
   it('should attach a file to a question', async () => {
-    const question = await questionsRepository.create(makeQuestionData())
+    const question = makeQuestion()
+    await questionsRepository.save(question)
 
     const request = {
       questionId: question.id,
@@ -36,10 +37,12 @@ describe('AttachToQuestionUseCase', () => {
       url: 'https://example.com/test.pdf',
     }
 
-    const response = await sut.execute(request)
+    await sut.execute(request)
 
-    expect(response.questionId).toBe(question.id)
-    expect(response.title).toBe('Test Document')
-    expect(response.url).toBe('https://example.com/test.pdf')
+    const attachments = await questionAttachmentsRepository.findManyByQuestionId(question.id, { page: 1, pageSize: 10 })
+    expect(attachments.items).toHaveLength(1)
+    expect(attachments.items[0].questionId).toBe(question.id)
+    expect(attachments.items[0].title).toBe('Test Document')
+    expect(attachments.items[0].url).toBe('https://example.com/test.pdf')
   })
 })

@@ -4,7 +4,7 @@ import { InMemoryAnswerAttachmentsRepository } from '@/infra/persistence/reposit
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { AttachToAnswerUseCase } from './attach-to-answer.usecase'
-import { makeAnswerData } from '@tests/factories/domain/make-answer'
+import { makeAnswer } from '@tests/factories/domain/make-answer'
 
 describe('AttachToAnswerUseCase', () => {
   let sut: AttachToAnswerUseCase
@@ -26,16 +26,19 @@ describe('AttachToAnswerUseCase', () => {
   })
 
   it('should attach a file to an answer', async () => {
-    const answer = await answersRepository.create(makeAnswerData())
+    const answer = makeAnswer()
+    await answersRepository.save(answer)
 
-    const response = await sut.execute({
+    await sut.execute({
       answerId: answer.id,
       title: 'Test Document',
       url: 'https://example.com/document.pdf',
     })
 
-    expect(response.answerId).toEqual(answer.id)
-    expect(response.title).toEqual('Test Document')
-    expect(response.url).toEqual('https://example.com/document.pdf')
+    const attachments = await answerAttachmentsRepository.findManyByAnswerId(answer.id, { page: 1, pageSize: 10 })
+    expect(attachments.items).toHaveLength(1)
+    expect(attachments.items[0].answerId).toEqual(answer.id)
+    expect(attachments.items[0].title).toEqual('Test Document')
+    expect(attachments.items[0].url).toEqual('https://example.com/document.pdf')
   })
 })
