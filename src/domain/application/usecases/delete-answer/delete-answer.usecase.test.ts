@@ -1,7 +1,7 @@
 import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { DeleteAnswerUseCase } from './delete-answer.usecase'
-import { makeAnswerData } from '@tests/factories/domain/make-answer'
+import { makeAnswer } from '@tests/factories/domain/make-answer'
 
 describe('DeleteAnswerUseCase', () => {
   let sut: DeleteAnswerUseCase
@@ -22,7 +22,8 @@ describe('DeleteAnswerUseCase', () => {
   })
 
   it('should not delete an answer if the user is not the author', async () => {
-    const answer = await answersRepository.create(makeAnswerData())
+    const answer = makeAnswer()
+    await answersRepository.save(answer)
 
     await expect(
       sut.execute({
@@ -33,7 +34,8 @@ describe('DeleteAnswerUseCase', () => {
   })
 
   it('should delete an answer', async () => {
-    const answer = await answersRepository.create(makeAnswerData())
+    const answer = makeAnswer()
+    await answersRepository.save(answer)
 
     await sut.execute({ answerId: answer.id, authorId: answer.authorId })
 
