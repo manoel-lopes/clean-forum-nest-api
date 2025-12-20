@@ -12,24 +12,24 @@ import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()
 export class DrizzleQuestionAttachmentsRepository
-  extends BaseDrizzleRepository
+  extends BaseDrizzleRepository<typeof attachments, QuestionAttachment, QuestionAttachmentProps>
   implements QuestionAttachmentsRepository {
-  constructor (private readonly drizzle: DrizzleService) {
-    super()
+  constructor (drizzle: DrizzleService) {
+    super(drizzle, attachments)
   }
 
   async create (data: QuestionAttachmentProps): Promise<QuestionAttachment> {
     const [attachment] = await this.drizzle.db
       .insert(attachments)
-      .values({ ...data, link: data.url, answerId: null })
+      .values({ ...data, answerId: null })
       .returning()
     return {
       id: attachment.id,
       title: attachment.title,
-      url: attachment.link,
+      url: attachment.url,
       questionId: attachment.questionId!,
       createdAt: attachment.createdAt,
-      updatedAt: attachment.updatedAt ?? attachment.createdAt,
+      updatedAt: attachment.updatedAt,
     }
   }
 
@@ -37,15 +37,15 @@ export class DrizzleQuestionAttachmentsRepository
     if (data.length === 0) return []
     const inserted = await this.drizzle.db
       .insert(attachments)
-      .values(data.map(d => ({ ...d, link: d.url, answerId: null })))
+      .values(data.map(d => ({ ...d, answerId: null })))
       .returning()
     return inserted.map(attachment => ({
       id: attachment.id,
       title: attachment.title,
-      url: attachment.link,
+      url: attachment.url,
       questionId: attachment.questionId!,
       createdAt: attachment.createdAt,
-      updatedAt: attachment.updatedAt ?? attachment.createdAt,
+      updatedAt: attachment.updatedAt,
     }))
   }
 
@@ -59,10 +59,10 @@ export class DrizzleQuestionAttachmentsRepository
     return {
       id: attachment.id,
       title: attachment.title,
-      url: attachment.link,
+      url: attachment.url,
       questionId: attachment.questionId,
       createdAt: attachment.createdAt,
-      updatedAt: attachment.updatedAt ?? attachment.createdAt,
+      updatedAt: attachment.updatedAt,
     }
   }
 
@@ -95,10 +95,10 @@ export class DrizzleQuestionAttachmentsRepository
       items: attachmentsList.map(attachment => ({
         id: attachment.id,
         title: attachment.title,
-        url: attachment.link,
+        url: attachment.url,
         questionId: attachment.questionId!,
         createdAt: attachment.createdAt,
-        updatedAt: attachment.updatedAt ?? attachment.createdAt,
+        updatedAt: attachment.updatedAt,
       })),
     }
   }
@@ -106,7 +106,7 @@ export class DrizzleQuestionAttachmentsRepository
   async update (attachmentId: string, data: Partial<Pick<QuestionAttachment, 'title' | 'url'>>): Promise<QuestionAttachment> {
     const updateData: Partial<typeof attachments.$inferInsert> = {}
     if (data.title) updateData.title = data.title
-    if (data.url) updateData.link = data.url
+    if (data.url) updateData.url = data.url
     const [updatedAttachment] = await this.drizzle.db
       .update(attachments)
       .set(updateData)
@@ -115,10 +115,10 @@ export class DrizzleQuestionAttachmentsRepository
     return {
       id: updatedAttachment.id,
       title: updatedAttachment.title,
-      url: updatedAttachment.link,
+      url: updatedAttachment.url,
       questionId: updatedAttachment.questionId!,
       createdAt: updatedAttachment.createdAt,
-      updatedAt: updatedAttachment.updatedAt ?? updatedAttachment.createdAt,
+      updatedAt: updatedAttachment.updatedAt,
     }
   }
 
