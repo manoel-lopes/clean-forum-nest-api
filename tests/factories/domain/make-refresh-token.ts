@@ -1,12 +1,13 @@
-import type { RefreshToken, RefreshTokenProps } from '@/domain/enterprise/entities/refresh-token.entity'
+import { RefreshToken, RefreshTokenProps } from '@/domain/enterprise/entities/refresh-token.entity'
 import { faker } from '@faker-js/faker'
 
-export function makeRefreshTokenData (override: Partial<RefreshToken> = {}): RefreshTokenProps {
+export function makeRefreshToken (override: Partial<RefreshTokenProps> = {}): RefreshToken {
   const expiresAt = new Date()
   expiresAt.setDate(expiresAt.getDate() + 7) // 7 days
-  const refreshToken: RefreshTokenProps = {
+  const props: RefreshTokenProps = {
     userId: faker.string.uuid(),
     expiresAt,
+    ...override,
   }
-  return Object.assign(refreshToken, override)
+  return RefreshToken.create(props)
 }
