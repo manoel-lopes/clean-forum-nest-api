@@ -5,8 +5,8 @@ import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { ChooseQuestionBestAnswerUseCase } from './choose-question-best-answer.usecase'
-import { makeAnswerData } from '@tests/factories/domain/make-answer'
-import { makeQuestionData } from '@tests/factories/domain/make-question'
+import { makeAnswer } from '@tests/factories/domain/make-answer'
+import { makeQuestion } from '@tests/factories/domain/make-question'
 
 describe('ChooseQuestionBestAnswerUseCase', () => {
   let sut: ChooseQuestionBestAnswerUseCase
@@ -29,7 +29,8 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
   })
 
   it('should not choose the best answer for a nonexistent question', async () => {
-    const answer = await answersRepository.create(makeAnswerData({ questionId: 'non_existent_question_id' }))
+    const answer = makeAnswer({ questionId: 'non_existent_question_id' })
+    await answersRepository.save(answer)
 
     await expect(
       sut.execute({
@@ -40,8 +41,10 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
   })
 
   it('should not choose the best answer for a question not owned by the author', async () => {
-    const question = await questionsRepository.create(makeQuestionData())
-    const answer = await answersRepository.create(makeAnswerData({ questionId: question.id }))
+    const question = makeQuestion()
+    await questionsRepository.save(question)
+    const answer = makeAnswer({ questionId: question.id })
+    await answersRepository.save(answer)
 
     await expect(
       sut.execute({
@@ -52,7 +55,8 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
   })
 
   it('should not choose the best answer for a question with no answers', async () => {
-    const question = await questionsRepository.create(makeQuestionData())
+    const question = makeQuestion()
+    await questionsRepository.save(question)
 
     await expect(
       sut.execute({
@@ -63,8 +67,10 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
   })
 
   it('should be able to choose the best answer for a question', async () => {
-    const question = await questionsRepository.create(makeQuestionData())
-    const answer = await answersRepository.create(makeAnswerData({ questionId: question.id }))
+    const question = makeQuestion()
+    await questionsRepository.save(question)
+    const answer = makeAnswer({ questionId: question.id })
+    await answersRepository.save(answer)
 
     const response = await sut.execute({
       answerId: answer.id,
