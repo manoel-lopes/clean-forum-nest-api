@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
 import { AnswerAttachmentsRepository } from '@/domain/application/repositories/answer-attachments.repository'
-import type { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
+import type { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 type UpdateAnswerAttachmentRequest = {
@@ -16,7 +16,7 @@ export class UpdateAnswerAttachmentUseCase implements UseCase {
     @Inject(AnswerAttachmentsRepository) private readonly answerAttachmentsRepository: AnswerAttachmentsRepository
   ) {}
 
-  async execute (request: UpdateAnswerAttachmentRequest): Promise<AnswerAttachment> {
+  async execute (request: UpdateAnswerAttachmentRequest): Promise<Attachment> {
     const { attachmentId, title, url } = request
     const attachment = await this.answerAttachmentsRepository.findById(attachmentId)
     if (!attachment) {
