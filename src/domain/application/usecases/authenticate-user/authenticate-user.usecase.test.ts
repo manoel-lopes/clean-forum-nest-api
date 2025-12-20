@@ -5,7 +5,7 @@ import { InMemoryRefreshTokensRepository } from '@/infra/persistence/repositorie
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import type { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
 import { AuthenticateUserUseCase } from './authenticate-user.usecase'
-import { makeUserData } from '@tests/factories/domain/make-user'
+import { makeUser } from '@tests/factories/domain/make-user'
 
 vi.mock('@/infra/env/env', () => ({
   env: {
@@ -42,10 +42,9 @@ describe('AuthenticateUserUseCase', () => {
 
   it('should not authenticate a user passing the wrong password', async () => {
     const email = 'user@example.com'
-    await usersRepository.create({
-      ...makeUserData({ email }),
-      password: await passwordHasherStub.hash('correct-password'),
-    })
+    const hashedPassword = await passwordHasherStub.hash('correct-password')
+    const user = makeUser({ email, password: hashedPassword })
+    await usersRepository.save(user)
 
     const request = {
       email,
@@ -57,10 +56,9 @@ describe('AuthenticateUserUseCase', () => {
 
   it('should authenticate the user', async () => {
     const password = 'user-password'
-    const user = await usersRepository.create({
-      ...makeUserData({ email: 'user@example.com' }),
-      password: await passwordHasherStub.hash(password),
-    })
+    const hashedPassword = await passwordHasherStub.hash(password)
+    const user = makeUser({ email: 'user@example.com', password: hashedPassword })
+    await usersRepository.save(user)
 
     const request = {
       email: user.email,
