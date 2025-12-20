@@ -2,7 +2,7 @@ import { JwtService } from '@nestjs/jwt'
 import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { InMemoryRefreshTokensRepository } from '@/infra/persistence/repositories/in-memory/in-memory-refresh-tokens.repository'
 import { RefreshAccessTokenUseCase } from './refresh-token.usecase'
-import { makeRefreshTokenData } from '@tests/factories/domain/make-refresh-token'
+import { makeRefreshToken } from '@tests/factories/domain/make-refresh-token'
 
 vi.mock('@/infra/env/env', () => ({
   env: {
@@ -33,55 +33,45 @@ describe('RefreshAccessTokenUseCase', () => {
   })
 
   it('should throw an error when the refresh token is expired', async () => {
-    const refreshTokenId = 'expired-refresh-token-id'
     const twoHoursAgo = new Date()
     twoHoursAgo.setHours(twoHoursAgo.getHours() - 2)
-    await refreshTokensRepository.create(
-      makeRefreshTokenData({
-        id: refreshTokenId,
-        expiresAt: twoHoursAgo,
-      })
-    )
+    const refreshToken = makeRefreshToken({ expiresAt: twoHoursAgo })
+    await refreshTokensRepository.save(refreshToken)
 
-    const request = { refreshTokenId }
+    const request = { refreshTokenId: refreshToken.id }
 
     await expect(sut.execute(request)).rejects.toThrow('The refresh token has expired')
   })
 
   it('should refresh the access token successfully when the refresh token is valid', async () => {
-    const refreshTokenId = 'valid-refresh-token-id'
     const userId = 'test-user-id'
     const expectedToken = 'new-jwt-token'
     vi.mocked(jwtService.sign).mockReturnValue(expectedToken)
-    await refreshTokensRepository.create(makeRefreshTokenData({ id: refreshTokenId, userId }))
+    const refreshToken = makeRefreshToken({ userId })
+    await refreshTokensRepository.save(refreshToken)
 
-    const response = await sut.execute({ refreshTokenId })
+    const response = await sut.execute({ refreshTokenId: refreshToken.id })
 
     expect(response).toEqual({ token: expectedToken })
     expect(jwtService.sign).toHaveBeenCalledWith({ sub: userId })
   })
 
   it('should not throw an error when the refresh token is not expired', async () => {
-    const refreshTokenId = 'valid-refresh-token-id'
-    await refreshTokensRepository.create(makeRefreshTokenData({ id: refreshTokenId }))
+    const refreshToken = makeRefreshToken()
+    await refreshTokensRepository.save(refreshToken)
 
-    const request = { refreshTokenId }
+    const request = { refreshTokenId: refreshToken.id }
 
     await expect(sut.execute(request)).resolves.not.toThrow()
   })
 
   it('should not consider token expired when expiresAt equals current time', async () => {
-    const refreshTokenId = 'boundary-refresh-token-id'
     const now = new Date()
     vi.setSystemTime(now)
-    await refreshTokensRepository.create(
-      makeRefreshTokenData({
-        id: refreshTokenId,
-        expiresAt: now,
-      })
-    )
+    const refreshToken = makeRefreshToken({ expiresAt: now })
+    await refreshTokensRepository.save(refreshToken)
 
-    const request = { refreshTokenId }
+    const request = { refreshTokenId: refreshToken.id }
 
     await expect(sut.execute(request)).resolves.not.toThrow()
     vi.useRealTimers()
@@ -89,19 +79,13 @@ describe('RefreshAccessTokenUseCase', () => {
 
   it('should delete all user refresh tokens when token is expired', async () => {
     const userId = 'test-user-id'
-    const refreshTokenId = 'expired-refresh-token-id'
     const twoHoursAgo = new Date()
     twoHoursAgo.setHours(twoHoursAgo.getHours() - 2)
-    await refreshTokensRepository.create(
-      makeRefreshTokenData({
-        id: refreshTokenId,
-        userId,
-        expiresAt: twoHoursAgo,
-      })
-    )
+    const refreshToken = makeRefreshToken({ userId, expiresAt: twoHoursAgo })
+    await refreshTokensRepository.save(refreshToken)
     const deleteSpy = vi.spyOn(refreshTokensRepository, 'deleteManyByUserId')
 
-    const request = { refreshTokenId }
+    const request = { refreshTokenId: refreshToken.id }
 
     await expect(sut.execute(request)).rejects.toThrow('The refresh token has expired')
     expect(deleteSpy).toHaveBeenCalledWith(userId)
