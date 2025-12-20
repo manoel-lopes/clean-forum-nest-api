@@ -1,8 +1,7 @@
 import { INestApplication } from '@nestjs/common'
 import request from 'supertest'
 import { DataSource } from 'typeorm'
-
-import { EmailValidationEntity } from '@/infra/persistence/typeorm/entities/email-validation.entity'
+import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
 import { makeApp } from '@tests/helpers/app/make-app'
 import { verifyEmailValidation } from '@tests/helpers/domain/enterprise/users/email-validation-requests'
 
@@ -20,7 +19,7 @@ describe('VerifyEmailValidation', () => {
   })
 
   beforeEach(async () => {
-    await dataSource.getRepository(EmailValidationEntity).clear()
+    await dataSource.getRepository(EmailValidation).clear()
   })
 
   it('should return 422 when email is not a valid email format', async () => {
@@ -78,8 +77,8 @@ describe('VerifyEmailValidation', () => {
   it('should return 204 when email validation is verified successfully', async () => {
     const email = 'test@example.com'
     const code = '123456'
-    const repository = dataSource.getRepository(EmailValidationEntity)
-    const emailValidation = repository.create({
+    const repository = dataSource.getRepository(EmailValidation)
+    const emailValidation = repository.save({
       email,
       code,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60),
