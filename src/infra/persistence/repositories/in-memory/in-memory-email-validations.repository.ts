@@ -9,7 +9,7 @@ export class InMemoryEmailValidationsRepository
   extends BaseRepository<EmailValidation>
   implements EmailValidationsRepository {
   async findByEmail (email: string): Promise<EmailValidation | null> {
-    const emailValidation = await this.findOneBy('email', email)
+    const emailValidation = await this.findOne('email', email)
     return emailValidation
   }
 

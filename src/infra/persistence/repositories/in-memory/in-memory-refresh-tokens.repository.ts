@@ -4,7 +4,7 @@ import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.
 
 export class InMemoryRefreshTokensRepository extends BaseRepository<RefreshToken> implements RefreshTokensRepository {
   async findByUserId (userId: string): Promise<RefreshToken | null> {
-    return this.findOneBy('userId', userId)
+    return this.findOne('userId', userId)
   }
 
   async deleteManyByUserId (userId: string) {

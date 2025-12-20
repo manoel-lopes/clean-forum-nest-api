@@ -20,15 +20,15 @@ export class InMemoryQuestionsRepository extends BaseRepository<Question> implem
   }
 
   async findById (questionId: string): Promise<Question | null> {
-    return this.findOneBy('id', questionId)
+    return this.findOne('id', questionId)
   }
 
   async findByTitle (questionTitle: string): Promise<Question | null> {
-    return this.findOneBy('title', questionTitle)
+    return this.findOne('title', questionTitle)
   }
 
   async findBySlug (params: FindQuestionBySlugParams): Promise<FindQuestionsResult> {
-    return this.findOneBy('slug', params.slug)
+    return this.findOne('slug', params.slug)
   }
 
   async findMany (params: FindManyQuestionsParams): Promise<PaginatedQuestions> {

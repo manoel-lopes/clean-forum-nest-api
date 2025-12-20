@@ -11,7 +11,7 @@ export class InMemoryUsersRepository extends BaseRepository<User> implements Use
   }
 
   async findByEmail (email: string): Promise<User | null> {
-    const user = await this.findOneBy('email', email)
+    const user = await this.findOne('email', email)
     return user
   }
 
