@@ -3,7 +3,7 @@ import type { UsersRepository } from '@/domain/application/repositories/users.re
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import { CreateQuestionUseCase } from './create-question.usecase'
-import { makeUserData } from '@tests/factories/domain/make-user'
+import { makeUser } from '@tests/factories/domain/make-user'
 
 describe('CreateQuestionUseCase', () => {
   let sut: CreateQuestionUseCase
@@ -17,7 +17,8 @@ describe('CreateQuestionUseCase', () => {
   })
 
   it('should not create a question with a title already registered', async () => {
-    const author = await usersRepository.create(makeUserData())
+    const author = makeUser()
+    await usersRepository.save(author)
 
     const request = {
       title: 'Existing Question Title',
@@ -30,7 +31,8 @@ describe('CreateQuestionUseCase', () => {
   })
 
   it('should create an unanswered question', async () => {
-    const author = await usersRepository.create(makeUserData())
+    const author = makeUser()
+    await usersRepository.save(author)
 
     const request = {
       title: 'New Question Title',
@@ -43,15 +45,16 @@ describe('CreateQuestionUseCase', () => {
     const question = await questionsRepository.findByTitle('New Question Title')
 
     expect(question).not.toBeNull()
-    expect(question!.title).toBe('New Question Title')
-    expect(question!.content).toBe('Question content')
-    expect(question!.slug).toBe('new-question-title')
-    expect(question!.authorId).toBe(author.id)
+    expect(question.title).toBe('New Question Title')
+    expect(question.content).toBe('Question content')
+    expect(question.slug).toBe('new-question-title')
+    expect(question.authorId).toBe(author.id)
     expect(question?.bestAnswerId).toBeUndefined()
   })
 
   it('should create a question with a best answer', async () => {
-    const author = await usersRepository.create(makeUserData())
+    const author = makeUser()
+    await usersRepository.save(author)
 
     const request = {
       title: 'Question With Answer',
@@ -65,10 +68,10 @@ describe('CreateQuestionUseCase', () => {
     const question = await questionsRepository.findByTitle('Question With Answer')
 
     expect(question).not.toBeNull()
-    expect(question!.title).toBe('Question With Answer')
-    expect(question!.content).toBe('Question content')
-    expect(question!.slug).toBe('question-with-answer')
-    expect(question!.authorId).toBe(author.id)
-    expect(question!.bestAnswerId).toBe('best-answer-id')
+    expect(question.title).toBe('Question With Answer')
+    expect(question.content).toBe('Question content')
+    expect(question.slug).toBe('question-with-answer')
+    expect(question.authorId).toBe(author.id)
+    expect(question.bestAnswerId).toBe('best-answer-id')
   })
 })
