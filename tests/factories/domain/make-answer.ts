@@ -1,14 +1,15 @@
-import type { AnswerProps } from '@/domain/enterprise/entities/answer.entity'
+import { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
 import { faker } from '@faker-js/faker'
 
-export function makeAnswerData (override: Partial<AnswerProps> = {}): AnswerProps {
-  const content = faker.lorem.paragraphs()
+export function makeAnswer (override: Partial<Answer> = {}): Answer {
+  const content = override.content ?? faker.lorem.paragraphs()
   const excerpt = content.length > 45 ? content.substring(0, 45).trimEnd() + '...' : content + '...'
-  const answer: AnswerProps = {
+  const props: AnswerProps = {
     content,
     excerpt,
     authorId: faker.string.uuid(),
     questionId: faker.string.uuid(),
+    ...override,
   }
-  return Object.assign(answer, override)
+  return Answer.create(props)
 }
