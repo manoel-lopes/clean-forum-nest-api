@@ -68,7 +68,7 @@ function generateCreateTablesSql (schemaId: string): string {
       "questionId" varchar(36) REFERENCES "${schemaId}"."questions"("id") ON DELETE CASCADE,
       "answerId" varchar(36) REFERENCES "${schemaId}"."answers"("id") ON DELETE CASCADE,
       "createdAt" timestamp with time zone NOT NULL DEFAULT now(),
-      "updatedAt" timestamp with time zone
+      "updatedAt" timestamp with time zone NOT NULL DEFAULT now()
     );
     CREATE INDEX "comments_questionId_idx" ON "${schemaId}"."comments"("questionId");
     CREATE INDEX "comments_answerId_idx" ON "${schemaId}"."comments"("answerId");
@@ -80,11 +80,11 @@ function generateCreateTablesSql (schemaId: string): string {
     CREATE TABLE "${schemaId}"."attachments" (
       "id" varchar(36) PRIMARY KEY,
       "title" text NOT NULL,
-      "link" text NOT NULL,
+      "url" text NOT NULL,
       "questionId" varchar(36) REFERENCES "${schemaId}"."questions"("id") ON DELETE CASCADE,
       "answerId" varchar(36) REFERENCES "${schemaId}"."answers"("id") ON DELETE CASCADE,
       "createdAt" timestamp with time zone NOT NULL DEFAULT now(),
-      "updatedAt" timestamp with time zone
+      "updatedAt" timestamp with time zone NOT NULL DEFAULT now()
     );
     CREATE INDEX "attachments_questionId_idx" ON "${schemaId}"."attachments"("questionId");
     CREATE INDEX "attachments_answerId_idx" ON "${schemaId}"."attachments"("answerId");
@@ -123,6 +123,7 @@ beforeAll(async () => {
   schemaId = randomUUID()
   const databaseURL = generateUniqueDatabaseURL(schemaId)
   process.env.DATABASE_URL = databaseURL
+  process.env.PGOPTIONS = `-c search_path=${schemaId}`
 
   const baseDatabaseURL = databaseURL.replace(/\?schema=.*$/, '')
   const setupPool = new Pool({ connectionString: baseDatabaseURL })
