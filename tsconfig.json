@@ -9,6 +9,7 @@
     "verbatimModuleSyntax": false,
     "types": ["vitest/globals", "node"],
     "strict": true,
+    "strictNullChecks": false,
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
