@@ -1,4 +1,5 @@
 import { Global, Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
 import { AnswerAttachmentsRepository } from '@/domain/application/repositories/answer-attachments.repository'
 import { AnswerCommentsRepository } from '@/domain/application/repositories/answer-comments.repository'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
@@ -8,6 +9,14 @@ import { QuestionCommentsRepository } from '@/domain/application/repositories/qu
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
+import { Answer } from '@/domain/enterprise/entities/answer.entity'
+import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
+import { Comment } from '@/domain/enterprise/entities/base/comment.entity'
+import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
+import { Question } from '@/domain/enterprise/entities/question.entity'
+import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
+import { User } from '@/domain/enterprise/entities/user.entity'
+import { EnvService } from '@/infra/env/env.service'
 import { TypeOrmAnswerAttachmentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answer-attachments.repository'
 import { TypeOrmAnswerCommentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answer-comments.repository'
 import { TypeOrmAnswersRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answers.repository'
@@ -17,11 +26,24 @@ import { TypeOrmQuestionCommentsRepository } from '@/infra/persistence/repositor
 import { TypeOrmQuestionsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-questions.repository'
 import { TypeOrmRefreshTokensRepository } from '@/infra/persistence/repositories/typeorm/typeorm-refresh-tokens.repository'
 import { TypeOrmUsersRepository } from '@/infra/persistence/repositories/typeorm/typeorm-users.repository'
-import { TypeOrmPersistenceModule } from '@/infra/persistence/typeorm/typeorm.module'
+
+const entities = [User, Question, Answer, Comment, Attachment, RefreshToken, EmailValidation]
 
 @Global()
 @Module({
-  imports: [TypeOrmPersistenceModule],
+  imports: [
+    TypeOrmModule.forRootAsync({
+      inject: [EnvService],
+      useFactory: (envService: EnvService) => ({
+        type: 'postgres',
+        url: envService.get('DATABASE_URL'),
+        entities,
+        synchronize: false,
+        logging: envService.get('NODE_ENV') === 'development',
+      }),
+    }),
+    TypeOrmModule.forFeature(entities),
+  ],
   providers: [
     { provide: UsersRepository, useClass: TypeOrmUsersRepository },
     { provide: QuestionsRepository, useClass: TypeOrmQuestionsRepository },
