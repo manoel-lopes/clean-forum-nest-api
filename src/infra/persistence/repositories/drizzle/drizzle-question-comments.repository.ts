@@ -12,9 +12,11 @@ import type { QuestionComment, QuestionCommentProps } from '@/domain/enterprise/
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()
-export class DrizzleQuestionCommentsRepository extends BaseDrizzleRepository implements QuestionCommentsRepository {
-  constructor (private readonly drizzle: DrizzleService) {
-    super()
+export class DrizzleQuestionCommentsRepository
+  extends BaseDrizzleRepository<typeof comments, QuestionComment>
+  implements QuestionCommentsRepository {
+  constructor (drizzle: DrizzleService) {
+    super(drizzle, comments)
   }
 
   async create (data: QuestionCommentProps): Promise<QuestionComment> {
@@ -25,7 +27,7 @@ export class DrizzleQuestionCommentsRepository extends BaseDrizzleRepository imp
     return {
       ...comment,
       questionId: comment.questionId!,
-      updatedAt: comment.updatedAt ?? comment.createdAt,
+      updatedAt: comment.updatedAt,
     }
   }
 
@@ -39,7 +41,7 @@ export class DrizzleQuestionCommentsRepository extends BaseDrizzleRepository imp
     return {
       ...comment,
       questionId: comment.questionId,
-      updatedAt: comment.updatedAt ?? comment.createdAt,
+      updatedAt: comment.updatedAt,
     }
   }
 
@@ -72,7 +74,7 @@ export class DrizzleQuestionCommentsRepository extends BaseDrizzleRepository imp
       items: commentsList.map(c => ({
         ...c,
         questionId: c.questionId!,
-        updatedAt: c.updatedAt ?? c.createdAt,
+        updatedAt: c.updatedAt,
       })),
     }
   }
@@ -86,7 +88,7 @@ export class DrizzleQuestionCommentsRepository extends BaseDrizzleRepository imp
     return {
       ...updatedComment,
       questionId: updatedComment.questionId!,
-      updatedAt: updatedComment.updatedAt ?? updatedComment.createdAt,
+      updatedAt: updatedComment.updatedAt,
     }
   }
 
