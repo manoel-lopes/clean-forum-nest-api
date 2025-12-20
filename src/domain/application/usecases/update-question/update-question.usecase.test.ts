@@ -2,7 +2,7 @@ import type { QuestionsRepository } from '@/domain/application/repositories/ques
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { UpdateQuestionUseCase } from './update-question.usecase'
-import { makeQuestionData } from '@tests/factories/domain/make-question'
+import { makeQuestion } from '@tests/factories/domain/make-question'
 
 describe('UpdateQuestionUseCase', () => {
   let sut: UpdateQuestionUseCase
@@ -23,8 +23,8 @@ describe('UpdateQuestionUseCase', () => {
   })
 
   it('should not update a question if the user is not the author', async () => {
-    const questionData = makeQuestionData({ authorId: 'original-author' })
-    const question = await questionsRepository.create(questionData)
+    const question = makeQuestion({ authorId: 'original-author' })
+    await questionsRepository.save(question)
 
     const request = {
       questionId: question.id,
@@ -36,7 +36,8 @@ describe('UpdateQuestionUseCase', () => {
   })
 
   it('should update the question title', async () => {
-    const question = await questionsRepository.create(makeQuestionData())
+    const question = makeQuestion()
+    await questionsRepository.save(question)
 
     const response = await sut.execute({
       questionId: question.id,
@@ -49,7 +50,8 @@ describe('UpdateQuestionUseCase', () => {
   })
 
   it('should update the question content', async () => {
-    const question = await questionsRepository.create(makeQuestionData())
+    const question = makeQuestion()
+    await questionsRepository.save(question)
 
     const response = await sut.execute({
       questionId: question.id,
@@ -62,7 +64,8 @@ describe('UpdateQuestionUseCase', () => {
   })
 
   it('should update both title and content', async () => {
-    const question = await questionsRepository.create(makeQuestionData())
+    const question = makeQuestion()
+    await questionsRepository.save(question)
 
     const response = await sut.execute({
       questionId: question.id,

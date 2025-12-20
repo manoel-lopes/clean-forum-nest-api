@@ -1,7 +1,7 @@
 import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { UpdateAnswerUseCase } from './update-answer.usecase'
-import { makeAnswerData } from '@tests/factories/domain/make-answer'
+import { makeAnswer } from '@tests/factories/domain/make-answer'
 
 describe('UpdateAnswerUseCase', () => {
   let sut: UpdateAnswerUseCase
@@ -22,7 +22,8 @@ describe('UpdateAnswerUseCase', () => {
   })
 
   it('should not update an answer if the user is not the author', async () => {
-    const answer = await answersRepository.create(makeAnswerData({ authorId: 'original-author' }))
+    const answer = makeAnswer({ authorId: 'original-author' })
+    await answersRepository.save(answer)
 
     const request = {
       answerId: answer.id,
@@ -34,7 +35,8 @@ describe('UpdateAnswerUseCase', () => {
   })
 
   it('should update the answer content', async () => {
-    const answer = await answersRepository.create(makeAnswerData({ content: 'Original content' }))
+    const answer = makeAnswer({ content: 'Original content' })
+    await answersRepository.save(answer)
 
     const request = {
       answerId: answer.id,
