@@ -4,7 +4,7 @@ import { UseCase } from '@/core/domain/application/use-case'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
-import type { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
+import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { InvalidPasswordException } from './exceptions/invalid-password.exception'
 
@@ -40,7 +40,8 @@ export class AuthenticateUserUseCase implements UseCase {
     const token = this.jwtService.sign({ sub: user.id })
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + 7)
-    const refreshToken = await this.refreshTokensRepository.create({ userId: user.id, expiresAt })
+    const refreshToken = RefreshToken.create({ userId: user.id, expiresAt })
+    await this.refreshTokensRepository.save(refreshToken)
     return { token, refreshToken }
   }
 }
