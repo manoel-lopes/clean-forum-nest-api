@@ -2,7 +2,7 @@ import type { QuestionAttachmentsRepository } from '@/domain/application/reposit
 import { InMemoryQuestionAttachmentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-attachments.repository'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { UpdateQuestionAttachmentUseCase } from './update-question-attachment.usecase'
-import { makeQuestionAttachmentData } from '@tests/factories/domain/make-question-attachment'
+import { makeQuestionAttachment } from '@tests/factories/domain/make-question-attachment'
 
 describe('UpdateQuestionAttachmentUseCase', () => {
   let sut: UpdateQuestionAttachmentUseCase
@@ -23,10 +23,11 @@ describe('UpdateQuestionAttachmentUseCase', () => {
   })
 
   it('should update attachment title', async () => {
-    const attachment = await questionAttachmentsRepository.create(makeQuestionAttachmentData({
+    const attachment = makeQuestionAttachment({
       title: 'Original Title',
       url: 'https://example.com/original.pdf',
-    }))
+    })
+    await questionAttachmentsRepository.save(attachment)
 
     const response = await sut.execute({
       attachmentId: attachment.id,
@@ -39,10 +40,11 @@ describe('UpdateQuestionAttachmentUseCase', () => {
   })
 
   it('should update attachment link', async () => {
-    const attachment = await questionAttachmentsRepository.create(makeQuestionAttachmentData({
+    const attachment = makeQuestionAttachment({
       title: 'Document Title',
       url: 'https://example.com/original.pdf',
-    }))
+    })
+    await questionAttachmentsRepository.save(attachment)
 
     const response = await sut.execute({
       attachmentId: attachment.id,
@@ -55,7 +57,8 @@ describe('UpdateQuestionAttachmentUseCase', () => {
   })
 
   it('should update both title and link', async () => {
-    const attachment = await questionAttachmentsRepository.create(makeQuestionAttachmentData())
+    const attachment = makeQuestionAttachment()
+    await questionAttachmentsRepository.save(attachment)
 
     const response = await sut.execute({
       attachmentId: attachment.id,

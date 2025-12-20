@@ -2,7 +2,7 @@ import type { AnswerAttachmentsRepository } from '@/domain/application/repositor
 import { InMemoryAnswerAttachmentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-attachments.repository'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { UpdateAnswerAttachmentUseCase } from './update-answer-attachment.usecase'
-import { makeAnswerAttachmentData } from '@tests/factories/domain/make-answer-attachment'
+import { makeAnswerAttachment } from '@tests/factories/domain/make-answer-attachment'
 
 describe('UpdateAnswerAttachmentUseCase', () => {
   let sut: UpdateAnswerAttachmentUseCase
@@ -23,10 +23,11 @@ describe('UpdateAnswerAttachmentUseCase', () => {
   })
 
   it('should update attachment title', async () => {
-    const attachment = await answerAttachmentsRepository.create(makeAnswerAttachmentData({
+    const attachment = makeAnswerAttachment({
       title: 'Original Title',
       url: 'https://example.com/original.pdf',
-    }))
+    })
+    await answerAttachmentsRepository.save(attachment)
 
     const response = await sut.execute({
       attachmentId: attachment.id,
@@ -39,10 +40,11 @@ describe('UpdateAnswerAttachmentUseCase', () => {
   })
 
   it('should update attachment link', async () => {
-    const attachment = await answerAttachmentsRepository.create(makeAnswerAttachmentData({
+    const attachment = makeAnswerAttachment({
       title: 'Document Title',
       url: 'https://example.com/original.pdf',
-    }))
+    })
+    await answerAttachmentsRepository.save(attachment)
 
     const response = await sut.execute({
       attachmentId: attachment.id,
@@ -55,7 +57,8 @@ describe('UpdateAnswerAttachmentUseCase', () => {
   })
 
   it('should update both title and link', async () => {
-    const attachment = await answerAttachmentsRepository.create(makeAnswerAttachmentData())
+    const attachment = makeAnswerAttachment()
+    await answerAttachmentsRepository.save(attachment)
 
     const response = await sut.execute({
       attachmentId: attachment.id,
