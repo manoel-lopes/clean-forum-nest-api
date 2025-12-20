@@ -1,8 +1,6 @@
-import { uuidv7 } from 'uuidv7'
 import type { PaginatedItems } from '@/core/domain/application/paginated-items'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
-import type { Entity } from '@/core/domain/entity'
-import type { Props } from '@/shared/types/custom/props'
+import type { BaseEntity } from '@/domain/enterprise/entities/base/base.entity'
 
 export type FindManyItemsByParams<Item> = {
   where: {
@@ -11,18 +9,11 @@ export type FindManyItemsByParams<Item> = {
   params: PaginationParams
 }
 
-export abstract class BaseInMemoryRepository<Item extends Entity> {
+export abstract class BaseInMemoryRepository<Item extends BaseEntity> {
   protected items: Item[] = []
 
-  async create (data: Props<Item>): Promise<Item> {
-    const baseProps = {
-      id: uuidv7(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
-    const item: Item = Object.assign(Object.create(null), baseProps, data)
+  async save (item: Item): Promise<void> {
     this.items.push(item)
-    return item
   }
 
   async findById (id: string): Promise<Item | null> {
@@ -38,7 +29,10 @@ export abstract class BaseInMemoryRepository<Item extends Entity> {
     pageSize = 10,
     order = 'desc',
   }: PaginationParams): Promise<PaginatedItems<Item>> {
-    const items = this.sortItems(this.items, order).slice((page - 1) * pageSize, page * pageSize)
+    const items = this.sortItems(this.items, order).slice(
+      (page - 1) * pageSize,
+      page * pageSize
+    )
     return this.paginate({ items, page, pageSize, order })
   }
 
@@ -59,7 +53,7 @@ export abstract class BaseInMemoryRepository<Item extends Entity> {
     }
   }
 
-  protected paginate<T extends Entity>({
+  protected paginate<T extends BaseEntity>({
     items,
     page = 1,
     pageSize = 10,
@@ -113,7 +107,7 @@ export abstract class BaseInMemoryRepository<Item extends Entity> {
     })
   }
 
-  private sortItems<T extends Entity>(items: T[], order: 'asc' | 'desc'): T[] {
+  private sortItems<T extends BaseEntity>(items: T[], order: 'asc' | 'desc'): T[] {
     return items.sort((a, b) =>
       order === 'asc' ? a.createdAt.getTime() - b.createdAt.getTime() : b.createdAt.getTime() - a.createdAt.getTime()
     )
