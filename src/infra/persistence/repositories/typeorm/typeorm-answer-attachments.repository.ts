@@ -6,38 +6,36 @@ import type {
   AnswerAttachmentsRepository,
   PaginatedAnswerAttachments,
 } from '@/domain/application/repositories/answer-attachments.repository'
-import { AttachmentEntity } from '@/infra/persistence/typeorm/entities/attachment.entity'
-import type { AnswerAttachment, AnswerAttachmentProps } from '@/domain/enterprise/entities/answer-attachment.entity'
+import { TypeOrmAttachmentMapper } from '@/infra/persistence/mappers/typeorm/typeorm-attachment.mapper'
+import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()
 export class TypeOrmAnswerAttachmentsRepository
-  extends BaseTypeOrmRepository<AttachmentEntity>
+  extends BaseTypeOrmRepository<Attachment>
   implements AnswerAttachmentsRepository {
   constructor (
     @InjectEntityManager()
     manager: EntityManager
   ) {
-    super(AttachmentEntity, manager)
+    super(Attachment, manager)
   }
 
-  async create (data: AnswerAttachmentProps): Promise<AnswerAttachment> {
-    const entity = this.repository.create({ ...data, link: data.url, questionId: null })
-    const saved = await this.repository.save(entity)
-    return this.toDomain(saved)
+  async save (attachment: Attachment): Promise<Attachment> {
+    const saved = await this.repository.save(attachment)
+    return TypeOrmAttachmentMapper.toDomain(saved)
   }
 
-  async createMany (data: AnswerAttachmentProps[]): Promise<AnswerAttachment[]> {
-    if (data.length === 0) return []
-    const entities = data.map(d => this.repository.create({ ...d, link: d.url, questionId: null }))
-    const saved = await this.repository.save(entities)
-    return saved.map(e => this.toDomain(e))
+  async saveMany (attachments: Attachment[]): Promise<Attachment[]> {
+    if (attachments.length === 0) return []
+    const saved = await this.repository.save(attachments)
+    return saved.map(TypeOrmAttachmentMapper.toDomain)
   }
 
-  async findById (attachmentId: string): Promise<AnswerAttachment | null> {
-    const entity = await this.repository.findOne({ where: { id: attachmentId } })
-    if (!entity || !entity.answerId) return null
-    return this.toDomain(entity)
+  async findById (attachmentId: string): Promise<Attachment | null> {
+    const attachment = await this.repository.findOne({ where: { id: attachmentId } })
+    if (!attachment || !attachment.answerId) return null
+    return TypeOrmAttachmentMapper.toDomain(attachment)
   }
 
   async findManyByAnswerId (
@@ -57,17 +55,13 @@ export class TypeOrmAnswerAttachmentsRepository
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: attachmentsList.map(a => this.toDomain(a)),
+      items: attachmentsList.map(TypeOrmAttachmentMapper.toDomain),
     }
   }
 
-  async update (attachmentId: string, data: Partial<Pick<AnswerAttachment, 'title' | 'url'>>): Promise<AnswerAttachment> {
-    const updateData: Partial<AttachmentEntity> = {}
-    if (data.title) updateData.title = data.title
-    if (data.url) updateData.link = data.url
-    await this.repository.update(attachmentId, updateData)
-    const updated = await this.repository.findOneOrFail({ where: { id: attachmentId } })
-    return this.toDomain(updated)
+  async update (attachmentId: string, data: Partial<Pick<Attachment, 'title' | 'url'>>): Promise<Attachment> {
+    const updated = await this.repository.save({ id: attachmentId, ...data })
+    return TypeOrmAttachmentMapper.toDomain(updated)
   }
 
   override async delete (attachmentId: string): Promise<void> {
@@ -77,16 +71,5 @@ export class TypeOrmAnswerAttachmentsRepository
   async deleteMany (attachmentIds: string[]): Promise<void> {
     if (attachmentIds.length === 0) return
     await this.repository.delete({ id: In(attachmentIds) })
-  }
-
-  private toDomain (entity: AttachmentEntity): AnswerAttachment {
-    return {
-      id: entity.id,
-      title: entity.title,
-      url: entity.link,
-      answerId: entity.answerId!,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt ?? entity.createdAt,
-    }
   }
 }
