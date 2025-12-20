@@ -11,7 +11,7 @@ type ChooseQuestionBestAnswerRequest = {
   answerId: string
 }
 
-export type ChooseQuestionBestAnswerResponse = Omit<Question, 'answers'>
+export type ChooseQuestionBestAnswerResponse = Omit<Question, 'answers' | 'comments' | 'attachments' | 'author'>
 
 @Injectable()
 export class ChooseQuestionBestAnswerUseCase implements UseCase {
