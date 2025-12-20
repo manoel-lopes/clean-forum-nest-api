@@ -13,36 +13,23 @@ import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.en
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()
-export class DrizzleAnswersRepository extends BaseDrizzleRepository implements AnswersRepository {
-  constructor (private readonly drizzle: DrizzleService) {
-    super()
+export class DrizzleAnswersRepository
+  extends BaseDrizzleRepository<typeof answers, Answer, AnswerProps>
+  implements AnswersRepository {
+  constructor (drizzle: DrizzleService) {
+    super(drizzle, answers)
   }
 
   async create (data: AnswerProps): Promise<Answer> {
-    const [answer] = await this.drizzle.db.insert(answers).values(data).returning()
-    return answer
-  }
-
-  async findById (answerId: string): Promise<Answer | null> {
-    const [answer] = await this.drizzle.db
-      .select()
-      .from(answers)
-      .where(eq(answers.id, answerId))
-      .limit(1)
-    return answer ?? null
-  }
-
-  async update ({ data, where }: UpdateAnswerData): Promise<Answer> {
-    const [updatedAnswer] = await this.drizzle.db
-      .update(answers)
-      .set(data)
-      .where(eq(answers.id, where.id))
-      .returning()
-    return updatedAnswer
+    return this.save(data)
   }
 
   async delete (answerId: string): Promise<void> {
-    await this.drizzle.db.delete(answers).where(eq(answers.id, answerId))
+    await this.deleteById(answerId)
+  }
+
+  async update ({ data, where }: UpdateAnswerData): Promise<Answer> {
+    return this.updateOne({ where, data })
   }
 
   async findManyByQuestionId ({
