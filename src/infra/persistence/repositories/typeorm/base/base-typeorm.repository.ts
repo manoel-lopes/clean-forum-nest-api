@@ -26,10 +26,6 @@ export abstract class BaseTypeOrmRepository<T extends ObjectLiteral> {
     }
   }
 
-  async save (entity: T): Promise<T> {
-    return this.repository.save(entity)
-  }
-
   async findOneById (id: string, relations?: string[]): Promise<T | null> {
     let queryBuilder = this.repository
       .createQueryBuilder('entity')
