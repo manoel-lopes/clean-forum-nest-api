@@ -21,32 +21,23 @@ import type { Question, QuestionProps } from '@/domain/enterprise/entities/quest
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()
-export class DrizzleQuestionsRepository extends BaseDrizzleRepository implements QuestionsRepository {
-  constructor (private readonly drizzle: DrizzleService) {
-    super()
+export class DrizzleQuestionsRepository
+  extends BaseDrizzleRepository<typeof questions, Question, QuestionProps>
+  implements QuestionsRepository {
+  constructor (drizzle: DrizzleService) {
+    super(drizzle, questions)
   }
 
   async create (data: QuestionProps): Promise<Question> {
-    const [question] = await this.drizzle.db.insert(questions).values(data).returning()
-    return question
+    return this.save(data)
   }
 
-  async findById (questionId: string): Promise<Question | null> {
-    const [question] = await this.drizzle.db
-      .select()
-      .from(questions)
-      .where(eq(questions.id, questionId))
-      .limit(1)
-    return question ?? null
+  async delete (questionId: string): Promise<void> {
+    await this.deleteById(questionId)
   }
 
   async findByTitle (questionTitle: string): Promise<Question | null> {
-    const [question] = await this.drizzle.db
-      .select()
-      .from(questions)
-      .where(eq(questions.title, questionTitle))
-      .limit(1)
-    return question ?? null
+    return this.findOne({ where: { title: questionTitle } })
   }
 
   async findBySlug ({
@@ -150,17 +141,8 @@ export class DrizzleQuestionsRepository extends BaseDrizzleRepository implements
     }
   }
 
-  async delete (questionId: string): Promise<void> {
-    await this.drizzle.db.delete(questions).where(eq(questions.id, questionId))
-  }
-
   async update ({ data, where }: UpdateQuestionData): Promise<Question> {
-    const [updatedQuestion] = await this.drizzle.db
-      .update(questions)
-      .set(data)
-      .where(eq(questions.id, where.id))
-      .returning()
-    return updatedQuestion
+    return this.updateOne({ where, data })
   }
 
   async findManyByUserId (
