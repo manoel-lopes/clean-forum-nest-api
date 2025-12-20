@@ -2,7 +2,7 @@ import type { AnswerAttachmentsRepository } from '@/domain/application/repositor
 import { InMemoryAnswerAttachmentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-attachments.repository'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { DeleteAnswerAttachmentUseCase } from './delete-answer-attachment.usecase'
-import { makeAnswerAttachmentData } from '@tests/factories/domain/make-answer-attachment'
+import { makeAnswerAttachment } from '@tests/factories/domain/make-answer-attachment'
 
 describe('DeleteAnswerAttachmentUseCase', () => {
   let sut: DeleteAnswerAttachmentUseCase
@@ -20,7 +20,8 @@ describe('DeleteAnswerAttachmentUseCase', () => {
   })
 
   it('should delete an attachment', async () => {
-    const attachment = await answerAttachmentsRepository.create(makeAnswerAttachmentData())
+    const attachment = makeAnswerAttachment()
+    await answerAttachmentsRepository.save(attachment)
 
     await sut.execute({ attachmentId: attachment.id })
 
