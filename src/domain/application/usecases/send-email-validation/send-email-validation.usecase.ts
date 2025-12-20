@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
 import { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
 import { EmailService } from '@/infra/adapters/email/ports/email-service'
+import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
 import { EmailValidationCode } from '@/domain/enterprise/value-objects/email-validation-code/email-validation-code.vo'
 import { SendEmailValidationError } from './errors/send-email-validation.exception'
 
@@ -18,28 +19,31 @@ export class SendEmailValidationUseCase implements UseCase {
 
   async execute ({ email }: SendEmailValidationRequest) {
     try {
-      const code = EmailValidationCode.create()
       const expiresAt = new Date()
       expiresAt.setMinutes(expiresAt.getMinutes() + 10)
       const existingValidation = await this.emailValidationsRepository.findByEmail(email)
+      let code: string
       if (existingValidation) {
+        const validationCode = EmailValidationCode.create()
+        code = validationCode.value
         await this.emailValidationsRepository.update({
           where: { id: existingValidation.id },
           data: {
-            code: code.value,
+            code,
             expiresAt,
             isVerified: false,
           },
         })
       } else {
-        await this.emailValidationsRepository.create({
+        const newValidation = EmailValidation.create({
           email,
-          code: code.value,
           expiresAt,
           isVerified: false,
         })
+        code = newValidation.code
+        await this.emailValidationsRepository.save(newValidation)
       }
-      await this.emailService.sendValidationCode(email, code.value)
+      await this.emailService.sendValidationCode(email, code)
     } catch (error) {
       throw new SendEmailValidationError(error.message)
     }
