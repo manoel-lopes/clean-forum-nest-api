@@ -5,8 +5,8 @@ import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-m
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import { AnswerQuestionUseCase } from './answer-question.usecase'
-import { makeQuestionData } from '@tests/factories/domain/make-question'
-import { makeUserData } from '@tests/factories/domain/make-user'
+import { makeQuestion } from '@tests/factories/domain/make-question'
+import { makeUser } from '@tests/factories/domain/make-user'
 
 describe('AnswerQuestionUseCase', () => {
   let sut: AnswerQuestionUseCase
@@ -32,7 +32,8 @@ describe('AnswerQuestionUseCase', () => {
   })
 
   it('should not answer an inexistent question', async () => {
-    const author = await usersRepository.create(makeUserData())
+    const author = makeUser()
+    await usersRepository.save(author)
 
     const request = {
       questionId: 'inexistent-question-id',
@@ -44,8 +45,10 @@ describe('AnswerQuestionUseCase', () => {
   })
 
   it('should correctly answer a question', async () => {
-    const author = await usersRepository.create(makeUserData())
-    const question = await questionsRepository.create(makeQuestionData())
+    const author = makeUser()
+    await usersRepository.save(author)
+    const question = makeQuestion()
+    await questionsRepository.save(question)
 
     const request = {
       questionId: question.id,
@@ -53,15 +56,13 @@ describe('AnswerQuestionUseCase', () => {
       authorId: author.id,
     }
 
-    const response = await sut.execute(request)
+    await sut.execute(request)
 
-    const answer = await answersRepository.findById(response.id)
-    expect(response.id).toEqual(answer?.id)
-    expect(response.content).toEqual(answer?.content)
-    expect(response.authorId).toEqual(answer?.authorId)
-    expect(response.questionId).toEqual(answer?.questionId)
-    expect(response.createdAt).toEqual(answer?.createdAt)
-    expect(response.updatedAt).toEqual(answer?.updatedAt)
-    expect(response.excerpt).toBe('any long answer, with more than 45 characters...')
+    const answers = await answersRepository.findManyByQuestionId({ questionId: question.id, page: 1, pageSize: 10 })
+    expect(answers.items).toHaveLength(1)
+    expect(answers.items[0].content).toBe(request.content)
+    expect(answers.items[0].authorId).toBe(author.id)
+    expect(answers.items[0].questionId).toBe(question.id)
+    expect(answers.items[0].excerpt).toBe('any long answer, with more than 45 characters...')
   })
 })
