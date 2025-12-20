@@ -1,11 +1,13 @@
-import type { AnswerComment, AnswerCommentProps } from '@/domain/enterprise/entities/answer-comment.entity'
+import { AnswerComment, AnswerCommentProps } from '@/domain/enterprise/entities/answer-comment.entity'
 import { faker } from '@faker-js/faker'
 
-export function makeAnswerCommentData (override: Partial<AnswerComment> = {}): AnswerCommentProps {
-  const comment: AnswerCommentProps = {
+export function makeAnswerComment (override: Partial<AnswerComment> = {}): AnswerComment {
+  const props: AnswerCommentProps = {
     content: faker.lorem.sentence(),
     authorId: faker.string.uuid(),
     answerId: faker.string.uuid(),
+    questionId: undefined,
+    ...override,
   }
-  return Object.assign(comment, override)
+  return AnswerComment.create(props)
 }
