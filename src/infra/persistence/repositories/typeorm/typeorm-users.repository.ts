@@ -3,39 +3,37 @@ import { Injectable } from '@nestjs/common'
 import { InjectEntityManager } from '@nestjs/typeorm'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
 import type { PaginatedUsers, UpdateUserData, UsersRepository } from '@/domain/application/repositories/users.repository'
-import { UserEntity } from '@/infra/persistence/typeorm/entities/user.entity'
-import type { User, UserProps } from '@/domain/enterprise/entities/user.entity'
+import { TypeOrmUserMapper } from '@/infra/persistence/mappers/typeorm/typeorm-user.mapper'
+import { User } from '@/domain/enterprise/entities/user.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()
-export class TypeOrmUsersRepository extends BaseTypeOrmRepository<UserEntity> implements UsersRepository {
+export class TypeOrmUsersRepository extends BaseTypeOrmRepository<User> implements UsersRepository {
   constructor (
     @InjectEntityManager()
     manager: EntityManager
   ) {
-    super(UserEntity, manager)
+    super(User, manager)
   }
 
-  async create (data: UserProps): Promise<User> {
-    const entity = this.repository.create(data)
-    const saved = await this.repository.save(entity)
-    return this.toDomain(saved)
+  async save (user: User): Promise<User> {
+    const saved = await this.repository.save(user)
+    return TypeOrmUserMapper.toDomain(saved)
   }
 
   async findById (userId: string): Promise<User | null> {
-    const entity = await this.repository.findOne({ where: { id: userId } })
-    return entity ? this.toDomain(entity) : null
+    const user = await this.repository.findOne({ where: { id: userId } })
+    return user ? TypeOrmUserMapper.toDomain(user) : null
   }
 
   async findByEmail (email: string): Promise<User | null> {
-    const entity = await this.repository.findOne({ where: { email } })
-    return entity ? this.toDomain(entity) : null
+    const user = await this.repository.findOne({ where: { email } })
+    return user ? TypeOrmUserMapper.toDomain(user) : null
   }
 
   async update ({ where, data }: UpdateUserData): Promise<User> {
-    await this.repository.update(where.id, data)
-    const updated = await this.repository.findOneOrFail({ where: { id: where.id } })
-    return this.toDomain(updated)
+    const updated = await this.repository.save({ id: where.id, ...data })
+    return TypeOrmUserMapper.toDomain(updated)
   }
 
   override async delete (userId: string): Promise<void> {
@@ -55,18 +53,7 @@ export class TypeOrmUsersRepository extends BaseTypeOrmRepository<UserEntity> im
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: usersList.map(u => this.toDomain(u)),
-    }
-  }
-
-  private toDomain (entity: UserEntity): User {
-    return {
-      id: entity.id,
-      name: entity.name,
-      email: entity.email,
-      password: entity.password,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
+      items: usersList.map(TypeOrmUserMapper.toDomain),
     }
   }
 }
