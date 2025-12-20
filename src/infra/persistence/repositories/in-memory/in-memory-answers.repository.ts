@@ -4,7 +4,7 @@ import type {
   PaginatedAnswers,
   UpdateAnswerData,
 } from '@/domain/application/repositories/answers.repository'
-import type { Answer } from '@/domain/enterprise/entities/answer.entity'
+import { Answer } from '@/domain/enterprise/entities/answer.entity'
 import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.repository'
 
 export class InMemoryAnswersRepository extends BaseRepository<Answer> implements AnswersRepository {
