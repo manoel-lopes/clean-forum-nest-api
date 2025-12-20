@@ -3,7 +3,7 @@ import type { QuestionsRepository } from '@/domain/application/repositories/ques
 import { InMemoryQuestionCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-comments.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { CommentOnQuestionUseCase } from './comment-on-question.usecase'
-import { makeQuestionData } from '@tests/factories/domain/make-question'
+import { makeQuestion } from '@tests/factories/domain/make-question'
 
 describe('CommentOnQuestionUseCase', () => {
   let sut: CommentOnQuestionUseCase
@@ -27,10 +27,12 @@ describe('CommentOnQuestionUseCase', () => {
   })
 
   it('should comment on a question', async () => {
-    const question = await questionsRepository.create(makeQuestionData())
+    const questionId = 'question-id'
+    await questionsRepository.save(makeQuestion({ id: questionId }))
+    const question = await questionsRepository.findById(questionId)
 
     const request = {
-      questionId: question.id,
+      questionId,
       content: 'Test comment content',
       authorId: 'author-id',
     }

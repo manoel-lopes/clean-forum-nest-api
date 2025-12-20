@@ -3,7 +3,7 @@ import type { AnswersRepository } from '@/domain/application/repositories/answer
 import { InMemoryAnswerCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-comments.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { CommentOnAnswerUseCase } from './comment-on-answer.usecase'
-import { makeAnswerData } from '@tests/factories/domain/make-answer'
+import { makeAnswer } from '@tests/factories/domain/make-answer'
 
 describe('CommentOnAnswerUseCase', () => {
   let sut: CommentOnAnswerUseCase
@@ -27,7 +27,8 @@ describe('CommentOnAnswerUseCase', () => {
   })
 
   it('should comment on a answer', async () => {
-    const answer = await answersRepository.create(makeAnswerData())
+    const answer = makeAnswer()
+    await answersRepository.save(answer)
 
     const request = {
       answerId: answer.id,
