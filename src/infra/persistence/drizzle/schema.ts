@@ -77,7 +77,7 @@ export const comments = pgTable('comments', {
   questionId: varchar('questionId', { length: 36 }).references(() => questions.id, { onDelete: 'cascade' }),
   answerId: varchar('answerId', { length: 36 }).references(() => answers.id, { onDelete: 'cascade' }),
   createdAt: timestamp('createdAt', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt', { withTimezone: true }).$onUpdate(() => new Date()),
+  updatedAt: timestamp('updatedAt', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 }, (table) => [
   index('comments_questionId_idx').on(table.questionId),
   index('comments_answerId_idx').on(table.answerId),
@@ -96,11 +96,11 @@ export const commentsRelations = relations(comments, ({ one }) => ({
 export const attachments = pgTable('attachments', {
   id: varchar('id', { length: 36 }).primaryKey().$defaultFn(() => uuidv7()),
   title: text('title').notNull(),
-  link: text('link').notNull(),
+  url: text('url').notNull(),
   questionId: varchar('questionId', { length: 36 }).references(() => questions.id, { onDelete: 'cascade' }),
   answerId: varchar('answerId', { length: 36 }).references(() => answers.id, { onDelete: 'cascade' }),
   createdAt: timestamp('createdAt', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt', { withTimezone: true }).$onUpdate(() => new Date()),
+  updatedAt: timestamp('updatedAt', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 }, (table) => [
   index('attachments_questionId_idx').on(table.questionId),
   index('attachments_answerId_idx').on(table.answerId),
