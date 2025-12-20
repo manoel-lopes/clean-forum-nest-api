@@ -1,8 +1,8 @@
 import { InMemoryQuestionCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-comments.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { DeleteQuestionCommentUseCase } from './delete-question-comment.usecase'
-import { makeQuestionData } from '@tests/factories/domain/make-question'
-import { makeQuestionCommentData } from '@tests/factories/domain/make-question-comment'
+import { makeQuestion } from '@tests/factories/domain/make-question'
+import { makeQuestionComment } from '@tests/factories/domain/make-question-comment'
 
 describe('DeleteQuestionCommentUseCase', () => {
   let sut: DeleteQuestionCommentUseCase
@@ -25,12 +25,12 @@ describe('DeleteQuestionCommentUseCase', () => {
   })
 
   it('should not delete a comment if the question does not exist', async () => {
-    const question = await questionsRepository.create(makeQuestionData({ authorId: 'question-author-id' }))
-    const comment = await questionCommentsRepository.create(makeQuestionCommentData({
-      questionId: question.id,
-      authorId: 'comment-author-id',
-    }))
+    const question = makeQuestion({ authorId: 'question-author-id' })
+    await questionsRepository.save(question)
+    const comment = makeQuestionComment({ questionId: question.id, authorId: 'comment-author-id' })
+    await questionCommentsRepository.save(comment)
     await questionsRepository.delete(question.id)
+
     const request = {
       commentId: comment.id,
       authorId: 'comment-author-id',
@@ -40,12 +40,10 @@ describe('DeleteQuestionCommentUseCase', () => {
   })
 
   it('should not delete a comment if the user is not the comment author or question author', async () => {
-    const question = await questionsRepository.create(makeQuestionData({ authorId: 'question-author-id' }))
-
-    const comment = await questionCommentsRepository.create(makeQuestionCommentData({
-      questionId: question.id,
-      authorId: 'comment-author-id',
-    }))
+    const question = makeQuestion({ authorId: 'question-author-id' })
+    await questionsRepository.save(question)
+    const comment = makeQuestionComment({ questionId: question.id, authorId: 'comment-author-id' })
+    await questionCommentsRepository.save(comment)
 
     const request = {
       commentId: comment.id,
@@ -56,12 +54,10 @@ describe('DeleteQuestionCommentUseCase', () => {
   })
 
   it('should delete a comment when user is the comment author', async () => {
-    const question = await questionsRepository.create(makeQuestionData({ authorId: 'question-author-id' }))
-
-    const comment = await questionCommentsRepository.create(makeQuestionCommentData({
-      questionId: question.id,
-      authorId: 'comment-author-id',
-    }))
+    const question = makeQuestion({ authorId: 'question-author-id' })
+    await questionsRepository.save(question)
+    const comment = makeQuestionComment({ questionId: question.id, authorId: 'comment-author-id' })
+    await questionCommentsRepository.save(comment)
 
     const request = {
       commentId: comment.id,
@@ -75,12 +71,10 @@ describe('DeleteQuestionCommentUseCase', () => {
   })
 
   it('should delete a comment when user is the question author', async () => {
-    const question = await questionsRepository.create(makeQuestionData({ authorId: 'question-author-id' }))
-
-    const comment = await questionCommentsRepository.create(makeQuestionCommentData({
-      questionId: question.id,
-      authorId: 'comment-author-id',
-    }))
+    const question = makeQuestion({ authorId: 'question-author-id' })
+    await questionsRepository.save(question)
+    const comment = makeQuestionComment({ questionId: question.id, authorId: 'comment-author-id' })
+    await questionCommentsRepository.save(comment)
 
     const request = {
       commentId: comment.id,
