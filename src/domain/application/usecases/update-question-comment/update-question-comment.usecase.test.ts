@@ -1,6 +1,6 @@
 import { InMemoryQuestionCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-comments.repository'
 import { UpdateQuestionCommentUseCase } from './update-question-comment.usecase'
-import { makeQuestionCommentData } from '@tests/factories/domain/make-question-comment'
+import { makeQuestionComment } from '@tests/factories/domain/make-question-comment'
 
 describe('UpdateQuestionCommentUseCase', () => {
   let sut: UpdateQuestionCommentUseCase
@@ -22,7 +22,8 @@ describe('UpdateQuestionCommentUseCase', () => {
   })
 
   it('should not update a comment if the user is not the author', async () => {
-    const comment = await questionCommentsRepository.create(makeQuestionCommentData({ authorId: 'comment-author-id' }))
+    const comment = makeQuestionComment({ authorId: 'comment-author-id' })
+    await questionCommentsRepository.save(comment)
 
     const request = {
       commentId: comment.id,
@@ -34,10 +35,11 @@ describe('UpdateQuestionCommentUseCase', () => {
   })
 
   it('should update a question comment', async () => {
-    const comment = await questionCommentsRepository.create(makeQuestionCommentData({
+    const comment = makeQuestionComment({
       authorId: 'comment-author-id',
-      content: 'Original content',
-    }))
+      content: 'original content',
+    })
+    await questionCommentsRepository.save(comment)
 
     const request = {
       commentId: comment.id,

@@ -1,6 +1,6 @@
 import { InMemoryAnswerCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-comments.repository'
 import { UpdateAnswerCommentUseCase } from './update-answer-comment.usecase'
-import { makeAnswerCommentData } from '@tests/factories/domain/make-answer-comment'
+import { makeAnswerComment } from '@tests/factories/domain/make-answer-comment'
 
 describe('UpdateAnswerCommentUseCase', () => {
   let sut: UpdateAnswerCommentUseCase
@@ -22,7 +22,8 @@ describe('UpdateAnswerCommentUseCase', () => {
   })
 
   it('should not update a comment if the user is not the author', async () => {
-    const comment = await answerCommentsRepository.create(makeAnswerCommentData({ authorId: 'comment-author-id' }))
+    const comment = makeAnswerComment({ authorId: 'comment-author-id' })
+    await answerCommentsRepository.save(comment)
 
     const request = {
       commentId: comment.id,
@@ -34,10 +35,11 @@ describe('UpdateAnswerCommentUseCase', () => {
   })
 
   it('should update an answer comment', async () => {
-    const comment = await answerCommentsRepository.create(makeAnswerCommentData({
+    const comment = makeAnswerComment({
       authorId: 'comment-author-id',
       content: 'Original content',
-    }))
+    })
+    await answerCommentsRepository.save(comment)
 
     const request = {
       commentId: comment.id,
