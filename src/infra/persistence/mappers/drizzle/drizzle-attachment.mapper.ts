@@ -9,10 +9,10 @@ export class DrizzleAttachmentMapper {
     return {
       id: raw.id,
       title: raw.title,
-      url: raw.link,
+      url: raw.url,
       answerId: raw.answerId!,
       createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt ?? raw.createdAt,
+      updatedAt: raw.updatedAt,
     }
   }
 
@@ -20,10 +20,10 @@ export class DrizzleAttachmentMapper {
     return {
       id: raw.id,
       title: raw.title,
-      url: raw.link,
+      url: raw.url,
       questionId: raw.questionId!,
       createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt ?? raw.createdAt,
+      updatedAt: raw.updatedAt,
     }
   }
 }

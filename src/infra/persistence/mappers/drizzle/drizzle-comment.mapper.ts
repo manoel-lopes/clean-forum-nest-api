@@ -12,7 +12,7 @@ export class DrizzleCommentMapper {
       authorId: raw.authorId,
       answerId: raw.answerId!,
       createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt ?? raw.createdAt,
+      updatedAt: raw.updatedAt,
     }
   }
 
@@ -23,7 +23,7 @@ export class DrizzleCommentMapper {
       authorId: raw.authorId,
       questionId: raw.questionId!,
       createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt ?? raw.createdAt,
+      updatedAt: raw.updatedAt,
     }
   }
 }
