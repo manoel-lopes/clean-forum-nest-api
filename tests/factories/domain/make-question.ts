@@ -1,16 +1,17 @@
-import type { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
+import { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
 import { Slug } from '@/domain/enterprise/value-objects/slug/slug.vo'
 import { faker } from '@faker-js/faker'
 
-export function makeQuestionData (override: Partial<Question> = {}): QuestionProps {
+export function makeQuestion (override: Partial<Question> = {}): Question {
   const title = override.title ?? faker.lorem.sentence()
   const slug = override.slug ?? Slug.create(title).value
-  const question: QuestionProps = {
+  const props: QuestionProps = {
     title,
     slug,
     content: faker.lorem.paragraphs(),
     authorId: faker.string.uuid(),
     bestAnswerId: null,
+    ...override,
   }
-  return Object.assign(question, override)
+  return Question.create(props)
 }
