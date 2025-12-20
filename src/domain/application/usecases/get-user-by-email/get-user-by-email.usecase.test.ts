@@ -1,7 +1,7 @@
 import type { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import { GetUserByEmailUseCase } from './get-user-by-email.usecase'
-import { makeUserData } from '@tests/factories/domain/make-user'
+import { makeUser } from '@tests/factories/domain/make-user'
 
 describe('GetUserByEmailUseCase', () => {
   let usersRepository: UsersRepository
@@ -13,9 +13,8 @@ describe('GetUserByEmailUseCase', () => {
   })
 
   it('should be able to get a user by email', async () => {
-    const user = await usersRepository.create(makeUserData({
-      email: 'johndoe@example.com',
-    }))
+    const user = makeUser({ email: 'johndoe@example.com' })
+    await usersRepository.save(user)
 
     const request = { email: 'johndoe@example.com' }
 
