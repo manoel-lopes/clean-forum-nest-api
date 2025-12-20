@@ -1,6 +1,8 @@
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { FetchQuestionAnswersUseCase } from './fetch-question-answers.usecase'
+import { makeAnswer } from '@tests/factories/domain/make-answer'
+import { makeQuestion } from '@tests/factories/domain/make-question'
 
 describe('FetchQuestionAnswersUseCase', () => {
   let answersRepository: InMemoryAnswersRepository
@@ -14,16 +16,15 @@ describe('FetchQuestionAnswersUseCase', () => {
   })
 
   it('should fetch answers for a specific question', async () => {
-    const question = await questionsRepository.create({
-      authorId: 'author-1',
-      title: 'Test Question',
-      content: 'Content',
-      slug: 'test-question',
-    })
+    const question = makeQuestion()
+    await questionsRepository.save(question)
 
-    await answersRepository.create({ questionId: question.id, authorId: 'author-1', content: 'Answer 1', excerpt: 'Answer 1' })
-    await answersRepository.create({ questionId: question.id, authorId: 'author-2', content: 'Answer 2', excerpt: 'Answer 2' })
-    await answersRepository.create({ questionId: 'other-question', authorId: 'author-3', content: 'Answer 3', excerpt: 'Answer 3' })
+    const answer1 = makeAnswer({ questionId: question.id, authorId: 'author-1' })
+    const answer2 = makeAnswer({ questionId: question.id, authorId: 'author-2' })
+    const answer3 = makeAnswer({ questionId: 'other-question', authorId: 'author-3' })
+    await answersRepository.save(answer1)
+    await answersRepository.save(answer2)
+    await answersRepository.save(answer3)
 
     const response = await sut.execute({
       questionId: question.id,
@@ -49,12 +50,8 @@ describe('FetchQuestionAnswersUseCase', () => {
   })
 
   it('should return empty list if question has no answers', async () => {
-    const question = await questionsRepository.create({
-      authorId: 'author-1',
-      title: 'Test Question',
-      content: 'Content',
-      slug: 'test-question',
-    })
+    const question = makeQuestion()
+    await questionsRepository.save(question)
 
     const response = await sut.execute({
       questionId: question.id,
@@ -68,20 +65,12 @@ describe('FetchQuestionAnswersUseCase', () => {
   })
 
   it('should paginate question answers correctly', async () => {
-    const question = await questionsRepository.create({
-      authorId: 'author-1',
-      title: 'Test Question',
-      content: 'Content',
-      slug: 'test-question',
-    })
+    const question = makeQuestion()
+    await questionsRepository.save(question)
 
     for (let i = 0; i < 15; i++) {
-      await answersRepository.create({
-        questionId: question.id,
-        authorId: 'author-1',
-        content: `Answer ${i}`,
-        excerpt: `Answer ${i}`,
-      })
+      const answer = makeAnswer({ questionId: question.id, authorId: 'author-1' })
+      await answersRepository.save(answer)
     }
 
     const page1 = await sut.execute({
