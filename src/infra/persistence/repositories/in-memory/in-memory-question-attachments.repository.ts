@@ -3,14 +3,14 @@ import type {
   PaginatedQuestionAttachments,
   QuestionAttachmentsRepository,
 } from '@/domain/application/repositories/question-attachments.repository'
-import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
+import type { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
 import { InMemoryAttachmentsRepository } from './in-memory-attachments.repository'
 
 export class InMemoryQuestionAttachmentsRepository
-  extends InMemoryAttachmentsRepository<QuestionAttachment>
+  extends InMemoryAttachmentsRepository
   implements QuestionAttachmentsRepository {
   async findManyByQuestionId (questionId: string, params: PaginationParams): Promise<PaginatedQuestionAttachments> {
-    const attachments = await this.findManyItemsBy({
+    return this.findManyItemsBy({
       where: { questionId },
       params: {
         page: params.page,
@@ -18,6 +18,11 @@ export class InMemoryQuestionAttachmentsRepository
         order: params.order,
       },
     })
-    return attachments
+  }
+
+  override async findById (attachmentId: string): Promise<Attachment | null> {
+    const attachment = await super.findById(attachmentId)
+    if (!attachment || !attachment.questionId) return null
+    return attachment
   }
 }
