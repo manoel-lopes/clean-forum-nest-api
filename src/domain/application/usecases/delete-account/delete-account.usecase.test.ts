@@ -3,8 +3,8 @@ import type { UsersRepository } from '@/domain/application/repositories/users.re
 import { InMemoryRefreshTokensRepository } from '@/infra/persistence/repositories/in-memory/in-memory-refresh-tokens.repository'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import { DeleteAccountUseCase } from './delete-account.usecase'
-import { makeRefreshTokenData } from '@tests/factories/domain/make-refresh-token'
-import { makeUserData } from '@tests/factories/domain/make-user'
+import { makeRefreshToken } from '@tests/factories/domain/make-refresh-token'
+import { makeUser } from '@tests/factories/domain/make-user'
 
 describe('DeleteAccountUseCase', () => {
   let sut: DeleteAccountUseCase
@@ -18,7 +18,8 @@ describe('DeleteAccountUseCase', () => {
   })
 
   it('should delete a user account', async () => {
-    const user = await usersRepository.create(makeUserData())
+    const user = makeUser()
+    await usersRepository.save(user)
 
     await sut.execute({ userId: user.id })
 
@@ -27,8 +28,10 @@ describe('DeleteAccountUseCase', () => {
   })
 
   it('should delete the refresh token when deleting a user account', async () => {
-    const user = await usersRepository.create(makeUserData())
-    await refreshTokensRepository.create(makeRefreshTokenData({ userId: user.id }))
+    const user = makeUser()
+    await usersRepository.save(user)
+    const refreshToken = makeRefreshToken({ userId: user.id })
+    await refreshTokensRepository.save(refreshToken)
 
     await sut.execute({ userId: user.id })
 
