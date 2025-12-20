@@ -5,7 +5,7 @@ export type UpdateCommentData = {
   data: Partial<Omit<Comment, 'id' | 'createdAt' | 'updatedAt'>>
 }
 
-export type CommentsRepository<T extends Comment = Comment> = {
+export type CommentsRepository<T = Comment> = {
   findById(commentId: string): Promise<T | null>
   delete(commentId: string): Promise<void>
   update(commentData: UpdateCommentData): Promise<T>
