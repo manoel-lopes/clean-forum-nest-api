@@ -7,31 +7,30 @@ import type {
   PaginatedAnswerComments,
 } from '@/domain/application/repositories/answer-comments.repository'
 import type { UpdateCommentData } from '@/domain/application/repositories/base/comments.repository'
-import { CommentEntity } from '@/infra/persistence/typeorm/entities/comment.entity'
-import type { AnswerComment, AnswerCommentProps } from '@/domain/enterprise/entities/answer-comment.entity'
+import { TypeOrmCommentMapper } from '@/infra/persistence/mappers/typeorm/typeorm-comment.mapper'
+import { Comment } from '@/domain/enterprise/entities/base/comment.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()
 export class TypeOrmAnswerCommentsRepository
-  extends BaseTypeOrmRepository<CommentEntity>
+  extends BaseTypeOrmRepository<Comment>
   implements AnswerCommentsRepository {
   constructor (
     @InjectEntityManager()
     manager: EntityManager
   ) {
-    super(CommentEntity, manager)
+    super(Comment, manager)
   }
 
-  async create (data: AnswerCommentProps): Promise<AnswerComment> {
-    const entity = this.repository.create({ ...data, questionId: null })
-    const saved = await this.repository.save(entity)
-    return this.toDomain(saved)
+  async save (comment: Comment): Promise<Comment> {
+    const saved = await this.repository.save(comment)
+    return TypeOrmCommentMapper.toDomain(saved)
   }
 
-  async findById (commentId: string): Promise<AnswerComment | null> {
-    const entity = await this.repository.findOne({ where: { id: commentId } })
-    if (!entity || !entity.answerId) return null
-    return this.toDomain(entity)
+  async findById (commentId: string): Promise<Comment | null> {
+    const comment = await this.repository.findOne({ where: { id: commentId } })
+    if (!comment || !comment.answerId) return null
+    return TypeOrmCommentMapper.toDomain(comment)
   }
 
   async findManyByAnswerId (
@@ -51,28 +50,16 @@ export class TypeOrmAnswerCommentsRepository
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: commentsList.map(c => this.toDomain(c)),
+      items: commentsList.map(TypeOrmCommentMapper.toDomain),
     }
   }
 
-  async update ({ where, data }: UpdateCommentData): Promise<AnswerComment> {
-    await this.repository.update(where.id, data)
-    const updated = await this.repository.findOneOrFail({ where: { id: where.id } })
-    return this.toDomain(updated)
+  async update ({ where, data }: UpdateCommentData): Promise<Comment> {
+    const updated = await this.repository.save({ id: where.id, ...data })
+    return TypeOrmCommentMapper.toDomain(updated)
   }
 
   override async delete (commentId: string): Promise<void> {
     await this.repository.delete(commentId)
-  }
-
-  private toDomain (entity: CommentEntity): AnswerComment {
-    return {
-      id: entity.id,
-      content: entity.content,
-      authorId: entity.authorId,
-      answerId: entity.answerId!,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt ?? entity.createdAt,
-    }
   }
 }
