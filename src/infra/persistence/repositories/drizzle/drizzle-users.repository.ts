@@ -1,4 +1,4 @@
-import { asc, count, desc, eq } from 'drizzle-orm'
+import { asc, count, desc } from 'drizzle-orm'
 import { Injectable } from '@nestjs/common'
 import type { PaginatedItems } from '@/core/domain/application/paginated-items'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
@@ -9,45 +9,27 @@ import type { User, UserProps } from '@/domain/enterprise/entities/user.entity'
 import { BaseDrizzleRepository } from './base/base-drizzle.repository'
 
 @Injectable()
-export class DrizzleUsersRepository extends BaseDrizzleRepository implements UsersRepository {
-  constructor (private readonly drizzle: DrizzleService) {
-    super()
+export class DrizzleUsersRepository
+  extends BaseDrizzleRepository<typeof users, User, UserProps>
+  implements UsersRepository {
+  constructor (drizzle: DrizzleService) {
+    super(drizzle, users)
   }
 
   async create (data: UserProps): Promise<User> {
-    const [user] = await this.drizzle.db.insert(users).values(data).returning()
-    return user
+    return this.save(data)
   }
 
   async update ({ where, data }: UpdateUserData): Promise<User> {
-    const [updatedUser] = await this.drizzle.db
-      .update(users)
-      .set(data)
-      .where(eq(users.id, where.id))
-      .returning()
-    return updatedUser
-  }
-
-  async findById (userId: string): Promise<User | null> {
-    const [user] = await this.drizzle.db
-      .select()
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1)
-    return user ?? null
+    return this.updateOne({ where, data })
   }
 
   async delete (userId: string): Promise<void> {
-    await this.drizzle.db.delete(users).where(eq(users.id, userId))
+    await this.deleteById(userId)
   }
 
   async findByEmail (userEmail: string): Promise<User | null> {
-    const [user] = await this.drizzle.db
-      .select()
-      .from(users)
-      .where(eq(users.email, userEmail))
-      .limit(1)
-    return user ?? null
+    return this.findOne({ where: { email: userEmail } })
   }
 
   async findMany ({ page = 1, pageSize = 10, order = 'desc' }: PaginationParams): Promise<PaginatedItems<User>> {
