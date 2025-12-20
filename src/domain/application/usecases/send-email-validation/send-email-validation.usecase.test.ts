@@ -38,7 +38,7 @@ describe('SendEmailValidationUseCase', () => {
     const savedEmailValidation = await emailValidationsRepository.findByEmail(request.email)
     const expectedExpiry = new Date(startTime)
     expectedExpiry.setMinutes(expectedExpiry.getMinutes() + 10)
-    const timeDiffMs = Math.abs(savedEmailValidation!.expiresAt.getTime() - expectedExpiry.getTime())
+    const timeDiffMs = Math.abs(savedEmailValidation.expiresAt.getTime() - expectedExpiry.getTime())
     expect(timeDiffMs).toBeLessThan(1000)
   })
 
@@ -69,5 +69,26 @@ describe('SendEmailValidationUseCase', () => {
     expect(updatedValidation?.id).toBe(firstValidation?.id)
     expect(updatedValidation?.code).not.toBe(firstCode)
     expect(updatedValidation?.isVerified).toBe(false)
+  })
+
+  it('should send the generated code via email for new validations', async () => {
+    const request = { email: 'jhondoe@example.com' }
+    const sendValidationCodeSpy = vi.spyOn(emailService, 'sendValidationCode')
+
+    await sut.execute(request)
+
+    const savedValidation = await emailValidationsRepository.findByEmail(request.email)
+    expect(sendValidationCodeSpy).toHaveBeenCalledWith(request.email, savedValidation?.code)
+  })
+
+  it('should send the new code via email when updating existing validation', async () => {
+    const request = { email: 'jhondoe@example.com' }
+    const sendValidationCodeSpy = vi.spyOn(emailService, 'sendValidationCode')
+
+    await sut.execute(request)
+    await sut.execute(request)
+
+    const updatedValidation = await emailValidationsRepository.findByEmail(request.email)
+    expect(sendValidationCodeSpy).toHaveBeenLastCalledWith(request.email, updatedValidation?.code)
   })
 })
