@@ -1,7 +1,7 @@
 import type { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
 import { InMemoryEmailValidationsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-email-validations.repository'
 import { VerifyEmailValidationUseCase } from './verify-email-validation.usecase'
-import { makeEmailValidationData } from '@tests/factories/domain/make-email-validation'
+import { makeEmailValidation } from '@tests/factories/domain/make-email-validation'
 
 describe('VerifyEmailValidationUseCase', () => {
   let sut: VerifyEmailValidationUseCase
@@ -21,42 +21,41 @@ describe('VerifyEmailValidationUseCase', () => {
   })
 
   it('should throw an error if the email validation is expired', async () => {
-    await emailValidationsRepository.create(
-      makeEmailValidationData({ ...request, expiresAt: new Date(Date.now() - 1000) })
-    )
+    const emailValidation = makeEmailValidation({ email: request.email, expiresAt: new Date(Date.now() - 1000) })
+    await emailValidationsRepository.save(emailValidation)
 
     await expect(sut.execute(request)).rejects.toThrowError('Validation code has expired')
   })
 
   it('should throw an error if the code is invalid', async () => {
-    await emailValidationsRepository.create(makeEmailValidationData({ ...request, code: '654321' }))
+    const emailValidation = makeEmailValidation({ email: request.email })
+    await emailValidationsRepository.save(emailValidation)
 
     await expect(sut.execute(request)).rejects.toThrowError('Invalid validation code')
   })
 
   it('should throw an error if the email is already verified', async () => {
-    await emailValidationsRepository.create(
-      makeEmailValidationData({ ...request, isVerified: true })
-    )
+    const emailValidation = makeEmailValidation({ email: request.email, isVerified: true })
+    await emailValidationsRepository.save(emailValidation)
 
     await expect(sut.execute(request)).rejects.toThrowError('This email has already been isVerified')
   })
 
   it('should throw an error when expiration is 1ms in the past', async () => {
     const pastDate = new Date(Date.now() - 1)
-    await emailValidationsRepository.create(
-      makeEmailValidationData({ ...request, expiresAt: pastDate })
-    )
+    const emailValidation = makeEmailValidation({ email: request.email, expiresAt: pastDate })
+    await emailValidationsRepository.save(emailValidation)
 
     await expect(sut.execute(request)).rejects.toThrowError('Validation code has expired')
   })
 
   it('should verify email validation successfully', async () => {
-    await emailValidationsRepository.create(makeEmailValidationData({ ...request, code: '123456' }))
+    const emailValidation = makeEmailValidation({ email: request.email })
+    await emailValidationsRepository.save(emailValidation)
 
-    await sut.execute(request)
+    await sut.execute({ email: request.email, code: emailValidation.code })
 
-    const emailValidation = await emailValidationsRepository.findByEmail(request.email)
-    expect(emailValidation?.isVerified).toBe(true)
+    const verified = await emailValidationsRepository.findByEmail(request.email)
+    expect(verified?.isVerified).toBe(true)
   })
 })
