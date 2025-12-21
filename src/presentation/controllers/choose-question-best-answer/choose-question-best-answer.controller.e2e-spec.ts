@@ -6,8 +6,8 @@ import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
+import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 
 describe('ChooseQuestionBestAnswer', () => {
   let app: INestApplication
@@ -75,10 +75,11 @@ describe('ChooseQuestionBestAnswer', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, token, { questionId, content: 'Answer content' })
-    const answerId = createAnswerResponse.body.id
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
+    const answerId = answersResponse.body.items[0].id
 
     const response = await request(app.getHttpServer())
       .patch(`/answers/${answerId}/best`)
@@ -120,10 +121,11 @@ describe('ChooseQuestionBestAnswer', () => {
     })
     const authorToken = authorAuthResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, authorToken, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, authorToken, { questionId, content: 'Answer content' })
-    const answerId = createAnswerResponse.body.id
+    await createQuestion(app, authorToken, questionData)
+    const question = await getQuestionByTile(app, authorToken, questionData.title)
+    await createAnswer(app, authorToken, { questionId: question.id, content: 'Answer content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, authorToken)
+    const answerId = answersResponse.body.items[0].id
     const otherUserData = aUser().build()
     await createUser(app, otherUserData)
     const otherUserAuthResponse = await authenticateUser(app, {

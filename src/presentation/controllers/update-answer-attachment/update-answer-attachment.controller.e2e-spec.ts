@@ -5,8 +5,8 @@ import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
+import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { createAnswerAttachment, updateAnswerAttachment } from '@tests/helpers/domain/enterprise/answers/answer-attachment-requests'
 
 describe('UpdateAnswerAttachment', () => {
@@ -151,29 +151,32 @@ describe('UpdateAnswerAttachment', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, token, { questionId, content: 'Answer content' })
-    const answerId = createAnswerResponse.body.id
-    const createAttachmentResponse = await createAnswerAttachment(app, token, {
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
+    const answerId = answersResponse.body.items[0].id
+    await createAnswerAttachment(app, token, {
       answerId,
       title: 'Original title',
       url: 'https://example.com/original.pdf',
     })
-    const attachmentId = createAttachmentResponse.body.id
+    const answersWithAttachments = await fetchQuestionAnswers(app, question.id, token, { include: 'attachments' })
+    const attachment = answersWithAttachments.body.items[0].attachments[0]
 
     const response = await updateAnswerAttachment(app, token, {
-      attachmentId,
+      attachmentId: attachment.id,
       title: 'Updated title',
       url: 'https://example.com/updated.pdf',
     })
 
     expect(response.statusCode).toBe(200)
-    expect(response.body).toHaveProperty('id')
-    expect(response.body).toHaveProperty('title')
-    expect(response.body).toHaveProperty('url')
+    expect(response.body.id).toBe(attachment.id)
     expect(response.body.title).toBe('Updated title')
     expect(response.body.url).toBe('https://example.com/updated.pdf')
+    expect(response.body.createdAt).toBe(attachment.createdAt)
+    expect(response.body.updatedAt).toBeDefined()
+    expect(new Date(response.body.updatedAt).getTime()).toBeGreaterThan(new Date(attachment.updatedAt).getTime())
   })
 
   it('should return 404 when attachment does not exist', async () => {
