@@ -1,16 +1,60 @@
-import { EntityManager, EntityTarget, FindOneOptions, FindOptionsWhere, ObjectLiteral, Repository } from 'typeorm'
+import {
+  DeepPartial,
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsWhere,
+  Repository
+} from 'typeorm'
+import { BaseEntity } from '@/domain/enterprise/entities/base/base.entity'
 
-export abstract class BaseTypeOrmRepository<T extends ObjectLiteral> {
-  protected readonly repository: Repository<T>
+export type UpdateEntityData<T> = DeepPartial<T>
 
-  constructor (
-    readonly entity: EntityTarget<T>,
-    readonly manager: EntityManager
-  ) {
-    this.repository = manager.getRepository(entity)
+export abstract class BaseTypeOrmRepository<T extends BaseEntity> {
+  constructor (protected readonly repository: Repository<T>) {}
+
+  async save (entity: T): Promise<void> {
+    await this.repository.save(entity)
   }
 
-  protected sanitizePagination (page: number, pageSize: number): {
+  async findById (id: string): Promise<T | null> {
+    const entity = await this.findOne({ where: { id } as FindOptionsWhere<T> })
+    return entity
+  }
+
+  async delete (id: string): Promise<void> {
+    await this.repository.delete(id)
+  }
+
+  protected async updateOne (data: UpdateEntityData<T> & { id: string }): Promise<T> {
+    await this.repository.save(data)
+    const entity = await this.findById(data.id)
+    if (!entity) {
+      throw new Error('Entity not found after update')
+    }
+    return entity
+  }
+
+  protected async findOne (options: FindOneOptions<T>): Promise<T | null> {
+    const entity = await this.repository.findOne(options)
+    return entity
+  }
+
+  protected async find (options: FindOneOptions<T>): Promise<T[]> {
+    const entity = await this.repository.find(options)
+    return entity
+  }
+
+  protected async findAndCount (options: FindManyOptions<T>): Promise<[T[], number]> {
+    const entity = await this.repository.findAndCount(options)
+    return entity
+  }
+
+  protected async createMany (entities: T[]): Promise<void> {
+    if (!entities.length) return
+    await this.repository.save(entities)
+  }
+
+  protected formatPagination (page: number, pageSize: number): {
     page: number
     pageSize: number
     limit: number
@@ -24,33 +68,5 @@ export abstract class BaseTypeOrmRepository<T extends ObjectLiteral> {
       limit: sanitizedPageSize,
       offset: (sanitizedPage - 1) * sanitizedPageSize,
     }
-  }
-
-  async findOneById (id: string, relations?: string[]): Promise<T | null> {
-    let queryBuilder = this.repository
-      .createQueryBuilder('entity')
-      .where('entity.id = :id', { id })
-    if (relations) {
-      for (const relation of relations) {
-        queryBuilder = queryBuilder.leftJoinAndSelect(`entity.${relation}`, relation)
-      }
-    }
-    return queryBuilder.getOne()
-  }
-
-  async findOne (options: FindOneOptions<T>): Promise<T | null> {
-    return this.repository.findOne(options)
-  }
-
-  async find (options: FindOneOptions<T>): Promise<T[]> {
-    return this.repository.find(options)
-  }
-
-  async delete (id: string): Promise<void> {
-    await this.repository.delete(id)
-  }
-
-  async count (where?: FindOptionsWhere<T>): Promise<number> {
-    return this.repository.count({ where })
   }
 }
