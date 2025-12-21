@@ -8,7 +8,7 @@ export type PaginationWithIncludeParams = PaginationParams & {
 }
 
 export type UpdateQuestionData = {
-  where: { id: string }
+  questionId: string
   data: Partial<Omit<Question, 'id' | 'createdAt' | 'updatedAt'>>
 }
 

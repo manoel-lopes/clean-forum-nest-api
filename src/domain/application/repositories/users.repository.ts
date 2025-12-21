@@ -3,7 +3,7 @@ import type { PaginationParams } from '@/core/domain/application/pagination-para
 import type { User } from '@/domain/enterprise/entities/user.entity'
 
 export type UpdateUserData = {
-  where: { id: string }
+  userId: string
   data: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>
 }
 

@@ -9,7 +9,7 @@ export type FindManyByQuestionIdParams = PaginationParams & {
 }
 
 export type UpdateAnswerData = {
-  where: { id: string }
+  answerId: string
   data: Partial<Omit<Answer, 'id' | 'createdAt' | 'updatedAt'>>
 }
 

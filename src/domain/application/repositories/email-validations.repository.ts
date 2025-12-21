@@ -1,7 +1,7 @@
 import type { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
 
 export type UpdateEmailValidationData = {
-  where: { id: string }
+  emailValidationId: string
   data: Partial<Omit<EmailValidation, 'id' | 'createdAt' | 'updatedAt'>>
 }
 

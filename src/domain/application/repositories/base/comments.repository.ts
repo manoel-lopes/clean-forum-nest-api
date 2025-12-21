@@ -1,7 +1,7 @@
 import type { Comment } from '@/domain/enterprise/entities/base/comment.entity'
 
 export type UpdateCommentData = {
-  where: { id: string }
+  commentId: string
   data: Partial<Omit<Comment, 'id' | 'createdAt' | 'updatedAt'>>
 }
 
