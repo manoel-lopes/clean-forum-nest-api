@@ -1,4 +1,6 @@
+import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
+import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 import { GetQuestionBySlugUseCase } from './get-question-by-slug.usecase'
@@ -7,13 +9,15 @@ import { makeQuestion } from '@tests/factories/domain/make-question'
 describe('GetQuestionBySlugUseCase', () => {
   let sut: GetQuestionBySlugUseCase
   let questionRepository: QuestionsRepository
+  let answersRepository: AnswersRepository
   const request = {
     slug: 'any-slug',
   }
 
   beforeEach(() => {
     questionRepository = new InMemoryQuestionsRepository()
-    sut = new GetQuestionBySlugUseCase(questionRepository)
+    answersRepository = new InMemoryAnswersRepository()
+    sut = new GetQuestionBySlugUseCase(questionRepository, answersRepository)
   })
 
   it('should not get a nonexistent question', async () => {
