@@ -3,7 +3,7 @@ import request from 'supertest'
 import { DataSource } from 'typeorm'
 import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
 import { makeApp } from '@tests/helpers/app/make-app'
-import { verifyEmailValidation } from '@tests/helpers/domain/enterprise/users/email-validation-requests'
+import { sendEmailValidation, verifyEmailValidation } from '@tests/helpers/domain/enterprise/users/email-validation-requests'
 
 describe('VerifyEmailValidation', () => {
   let app: INestApplication
@@ -76,17 +76,12 @@ describe('VerifyEmailValidation', () => {
 
   it('should return 204 when email validation is verified successfully', async () => {
     const email = 'test@example.com'
-    const code = '123456'
-    const repository = dataSource.getRepository(EmailValidation)
-    const emailValidation = repository.save({
-      email,
-      code,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60),
-      isVerified: false,
-    })
-    await repository.save(emailValidation)
+    await sendEmailValidation(app, { email })
 
-    const response = await verifyEmailValidation(app, { email, code })
+    const repository = dataSource.getRepository(EmailValidation)
+    const savedValidation = await repository.findOneBy({ email })
+
+    const response = await verifyEmailValidation(app, { email, code: savedValidation?.code })
 
     expect(response.statusCode).toBe(204)
   })
