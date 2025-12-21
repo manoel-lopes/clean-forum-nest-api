@@ -9,5 +9,5 @@ export abstract class BaseEntity {
   readonly createdAt = new Date()
 
   @UpdateDateColumn({ type: 'timestamptz', nullable: true })
-  readonly updatedAt?: Date = new Date()
+  readonly updatedAt: Date = new Date()
 }
