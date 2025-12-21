@@ -1,42 +1,24 @@
-import { EntityManager } from 'typeorm'
+import { Repository } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { InjectEntityManager } from '@nestjs/typeorm'
+import { InjectRepository } from '@nestjs/typeorm'
 import type {
   AnswersRepository,
   FindManyByQuestionIdParams,
   PaginatedAnswers,
   UpdateAnswerData,
 } from '@/domain/application/repositories/answers.repository'
-import { TypeOrmAnswerMapper } from '@/infra/persistence/mappers/typeorm/typeorm-answer.mapper'
 import { Answer } from '@/domain/enterprise/entities/answer.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()
 export class TypeOrmAnswersRepository extends BaseTypeOrmRepository<Answer> implements AnswersRepository {
-  constructor (
-    @InjectEntityManager()
-    manager: EntityManager
-  ) {
-    super(Answer, manager)
+  constructor (@InjectRepository(Answer) repository: Repository<Answer>) {
+    super(repository)
   }
 
-  async save (answer: Answer): Promise<Answer> {
-    const saved = await this.repository.save(answer)
-    return TypeOrmAnswerMapper.toDomain(saved)
-  }
-
-  async findById (answerId: string): Promise<Answer | null> {
-    const answer = await this.repository.findOne({ where: { id: answerId } })
-    return answer ? TypeOrmAnswerMapper.toDomain(answer) : null
-  }
-
-  async update ({ data, where }: UpdateAnswerData): Promise<Answer> {
-    const updated = await this.repository.save({ id: where.id, ...data })
-    return TypeOrmAnswerMapper.toDomain(updated)
-  }
-
-  override async delete (answerId: string): Promise<void> {
-    await this.repository.delete(answerId)
+  async update ({ answerId, data }: UpdateAnswerData): Promise<Answer> {
+    const updated = await this.updateOne({ id: answerId, ...data })
+    return updated
   }
 
   async findManyByQuestionId ({
@@ -46,8 +28,8 @@ export class TypeOrmAnswersRepository extends BaseTypeOrmRepository<Answer> impl
     order = 'desc',
     include = [],
   }: FindManyByQuestionIdParams): Promise<PaginatedAnswers> {
-    const pagination = this.sanitizePagination(page, pageSize)
-    const [answers, totalItems] = await this.repository.findAndCount({
+    const pagination = this.formatPagination(page, pageSize)
+    const [items, totalItems] = await this.findAndCount({
       where: { questionId },
       order: { createdAt: order === 'desc' ? 'DESC' : 'ASC' },
       skip: pagination.offset,
@@ -60,7 +42,7 @@ export class TypeOrmAnswersRepository extends BaseTypeOrmRepository<Answer> impl
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: answers.map(TypeOrmAnswerMapper.toDomain),
+      items,
     }
   }
 }

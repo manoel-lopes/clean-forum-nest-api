@@ -1,49 +1,32 @@
-import { EntityManager, In } from 'typeorm'
+import { Repository } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { InjectEntityManager } from '@nestjs/typeorm'
+import { InjectRepository } from '@nestjs/typeorm'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
 import type {
   PaginatedQuestionAttachments,
   QuestionAttachmentsRepository,
 } from '@/domain/application/repositories/question-attachments.repository'
-import { TypeOrmAttachmentMapper } from '@/infra/persistence/mappers/typeorm/typeorm-attachment.mapper'
-import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
+import { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()
 export class TypeOrmQuestionAttachmentsRepository
-  extends BaseTypeOrmRepository<Attachment>
+  extends BaseTypeOrmRepository<QuestionAttachment>
   implements QuestionAttachmentsRepository {
-  constructor (
-    @InjectEntityManager()
-    manager: EntityManager
-  ) {
-    super(Attachment, manager)
+  constructor (@InjectRepository(QuestionAttachment) repository: Repository<QuestionAttachment>) {
+    super(repository)
   }
 
-  async save (attachment: Attachment): Promise<Attachment> {
-    const saved = await this.repository.save(attachment)
-    return TypeOrmAttachmentMapper.toDomain(saved)
-  }
-
-  async saveMany (attachments: Attachment[]): Promise<Attachment[]> {
-    if (attachments.length === 0) return []
-    const saved = await this.repository.save(attachments)
-    return saved.map(TypeOrmAttachmentMapper.toDomain)
-  }
-
-  async findById (attachmentId: string): Promise<Attachment | null> {
-    const attachment = await this.repository.findOne({ where: { id: attachmentId } })
-    if (!attachment || !attachment.questionId) return null
-    return TypeOrmAttachmentMapper.toDomain(attachment)
+  async saveMany (attachments: QuestionAttachment[]): Promise<void> {
+    await this.createMany(attachments)
   }
 
   async findManyByQuestionId (
     questionId: string,
     { page = 1, pageSize = 10, order = 'desc' }: PaginationParams
   ): Promise<PaginatedQuestionAttachments> {
-    const pagination = this.sanitizePagination(page, pageSize)
-    const [attachmentsList, totalItems] = await this.repository.findAndCount({
+    const pagination = this.formatPagination(page, pageSize)
+    const [items, totalItems] = await this.findAndCount({
       where: { questionId },
       order: { createdAt: order === 'desc' ? 'DESC' : 'ASC' },
       skip: pagination.offset,
@@ -55,21 +38,19 @@ export class TypeOrmQuestionAttachmentsRepository
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: attachmentsList.map(TypeOrmAttachmentMapper.toDomain),
+      items,
     }
   }
 
-  async update (attachmentId: string, data: Partial<Pick<Attachment, 'title' | 'url'>>): Promise<Attachment> {
-    const updated = await this.repository.save({ id: attachmentId, ...data })
-    return TypeOrmAttachmentMapper.toDomain(updated)
-  }
-
-  override async delete (attachmentId: string): Promise<void> {
-    await this.repository.delete(attachmentId)
+  async update (attachmentId: string, data: Partial<Pick<QuestionAttachment, 'title' | 'url'>>): Promise<QuestionAttachment> {
+    const updated = await this.updateOne({ id: attachmentId, ...data })
+    return updated
   }
 
   async deleteMany (attachmentIds: string[]): Promise<void> {
     if (attachmentIds.length === 0) return
-    await this.repository.delete({ id: In(attachmentIds) })
+    for (const id of attachmentIds) {
+      await this.delete(id)
+    }
   }
 }
