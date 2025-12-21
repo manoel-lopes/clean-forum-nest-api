@@ -9,10 +9,7 @@ export class InMemoryAttachmentsRepository extends BaseRepository<Attachment> {
   }
 
   async update (attachmentId: string, data: Partial<Pick<Attachment, 'title' | 'url'>>): Promise<Attachment> {
-    const updatedAttachment = await this.updateOne({
-      where: { id: attachmentId },
-      data,
-    })
+    const updatedAttachment = await this.updateOne({ id: attachmentId, ...data })
     return updatedAttachment
   }
 

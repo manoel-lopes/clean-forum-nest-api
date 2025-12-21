@@ -11,11 +11,8 @@ import type { Question } from '@/domain/enterprise/entities/question.entity'
 import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.repository'
 
 export class InMemoryQuestionsRepository extends BaseRepository<Question> implements QuestionsRepository {
-  async update (questionData: UpdateQuestionData): Promise<Question> {
-    const question = await this.updateOne({
-      where: { id: questionData.where.id },
-      data: questionData.data,
-    })
+  async update ({ questionId, data }: UpdateQuestionData): Promise<Question> {
+    const question = await this.updateOne({ id: questionId, ...data })
     return question
   }
 

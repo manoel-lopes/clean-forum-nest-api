@@ -5,9 +5,8 @@ import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.
 export class InMemoryCommentsRepository
   extends BaseRepository<Comment>
   implements CommentsRepository<Comment> {
-  async update (commentData: UpdateCommentData): Promise<Comment> {
-    const { where, data } = commentData
-    const updatedComment = await this.updateOne({ where, data })
+  async update ({ commentId, data }: UpdateCommentData): Promise<Comment> {
+    const updatedComment = await this.updateOne({ id: commentId, ...data })
     return updatedComment
   }
 }

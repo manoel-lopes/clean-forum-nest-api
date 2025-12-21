@@ -13,8 +13,8 @@ export class InMemoryEmailValidationsRepository
     return emailValidation
   }
 
-  async update (emailValidationData: UpdateEmailValidationData): Promise<EmailValidation> {
-    const updatedEmailValidation = await this.updateOne(emailValidationData)
+  async update ({ emailValidationId, data }: UpdateEmailValidationData): Promise<EmailValidation> {
+    const updatedEmailValidation = await this.updateOne({ id: emailValidationId, ...data })
     return updatedEmailValidation
   }
 

@@ -5,8 +5,8 @@ import type { User } from '@/domain/enterprise/entities/user.entity'
 import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.repository'
 
 export class InMemoryUsersRepository extends BaseRepository<User> implements UsersRepository {
-  async update (userData: UpdateUserData): Promise<User> {
-    const updatedUser = await this.updateOne(userData)
+  async update ({ userId, data }: UpdateUserData): Promise<User> {
+    const updatedUser = await this.updateOne({ id: userId, ...data })
     return updatedUser
   }
 
