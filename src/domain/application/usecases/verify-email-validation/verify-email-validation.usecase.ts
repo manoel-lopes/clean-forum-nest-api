@@ -35,7 +35,7 @@ export class VerifyEmailValidationUseCase implements UseCase {
       throw new InvalidCodeError(codeValue)
     }
     await this.emailValidationsRepository.update({
-      where: { id: emailValidation.id },
+      emailValidationId: emailValidation.id,
       data: {
         isVerified: true,
       },
