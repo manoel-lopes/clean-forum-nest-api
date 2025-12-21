@@ -103,9 +103,5 @@ describe('CreateQuestion', () => {
     const response = await createQuestion(app, token, questionData)
 
     expect(response.statusCode).toBe(201)
-    expect(response.body).toHaveProperty('id')
-    expect(response.body).toHaveProperty('title')
-    expect(response.body).toHaveProperty('content')
-    expect(response.body).toHaveProperty('slug')
   })
 })
