@@ -7,7 +7,7 @@ import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion, deleteQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createQuestion, deleteQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
 
 describe('DeleteQuestion', () => {
   let app: INestApplication
@@ -89,8 +89,8 @@ describe('DeleteQuestion', () => {
     })
     const authorToken = authorAuthResponse.body.token
     const questionData = aQuestion().build()
-    const createResponse = await createQuestion(app, authorToken, questionData)
-    const questionId = createResponse.body.id
+    await createQuestion(app, authorToken, questionData)
+    const question = await getQuestionByTile(app, authorToken, questionData.title)
     const otherUserData = aUser().build()
     await createUser(app, otherUserData)
     const otherUserAuthResponse = await authenticateUser(app, {
@@ -99,7 +99,7 @@ describe('DeleteQuestion', () => {
     })
     const otherUserToken = otherUserAuthResponse.body.token
 
-    const response = await deleteQuestion(app, otherUserToken, { questionId })
+    const response = await deleteQuestion(app, otherUserToken, { questionId: question.id })
 
     expect(response.statusCode).toBe(403)
     expect(response.body).toEqual({
@@ -121,10 +121,10 @@ describe('DeleteQuestion', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createResponse = await createQuestion(appWithError, token, questionData)
-    const questionId = createResponse.body.id
+    await createQuestion(appWithError, token, questionData)
+    const question = await getQuestionByTile(appWithError, token, questionData.title)
 
-    const response = await deleteQuestion(appWithError, token, { questionId })
+    const response = await deleteQuestion(appWithError, token, { questionId: question.id })
 
     expect(response.statusCode).toBe(500)
     expect(response.body).toEqual({
@@ -143,10 +143,10 @@ describe('DeleteQuestion', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createResponse = await createQuestion(app, token, questionData)
-    const questionId = createResponse.body.id
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
 
-    const response = await deleteQuestion(app, token, { questionId })
+    const response = await deleteQuestion(app, token, { questionId: question.id })
 
     expect(response.statusCode).toBe(204)
   })
