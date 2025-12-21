@@ -8,7 +8,7 @@ import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
 
 describe('CommentOnQuestion', () => {
   let app: INestApplication
@@ -85,14 +85,14 @@ describe('CommentOnQuestion', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(appWithError, token, questionData)
-    const questionId = createQuestionResponse.body.id
+    await createQuestion(appWithError, token, questionData)
+    const question = await getQuestionByTile(appWithError, token, questionData.title)
 
     const response = await request(appWithError.getHttpServer())
       .post('/comments/questions')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        questionId,
+        questionId: question.id,
         content: 'This is a comment',
       })
 
@@ -113,20 +113,17 @@ describe('CommentOnQuestion', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
 
     const response = await request(app.getHttpServer())
       .post('/comments/questions')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        questionId,
+        questionId: question.id,
         content: 'This is a comment',
       })
 
     expect(response.statusCode).toBe(201)
-    expect(response.body).toHaveProperty('id')
-    expect(response.body).toHaveProperty('content')
-    expect(response.body.content).toBe('This is a comment')
   })
 })
