@@ -9,13 +9,6 @@ import { QuestionCommentsRepository } from '@/domain/application/repositories/qu
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
-import { Answer } from '@/domain/enterprise/entities/answer.entity'
-import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
-import { Comment } from '@/domain/enterprise/entities/base/comment.entity'
-import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
-import { Question } from '@/domain/enterprise/entities/question.entity'
-import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
-import { User } from '@/domain/enterprise/entities/user.entity'
 import { EnvService } from '@/infra/env/env.service'
 import { TypeOrmAnswerAttachmentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answer-attachments.repository'
 import { TypeOrmAnswerCommentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answer-comments.repository'
@@ -26,8 +19,31 @@ import { TypeOrmQuestionCommentsRepository } from '@/infra/persistence/repositor
 import { TypeOrmQuestionsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-questions.repository'
 import { TypeOrmRefreshTokensRepository } from '@/infra/persistence/repositories/typeorm/typeorm-refresh-tokens.repository'
 import { TypeOrmUsersRepository } from '@/infra/persistence/repositories/typeorm/typeorm-users.repository'
+import { Answer } from '@/domain/enterprise/entities/answer.entity'
+import { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
+import { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
+import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
+import { Comment } from '@/domain/enterprise/entities/base/comment.entity'
+import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
+import { Question } from '@/domain/enterprise/entities/question.entity'
+import { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
+import { QuestionComment } from '@/domain/enterprise/entities/question-comment.entity'
+import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
+import { User } from '@/domain/enterprise/entities/user.entity'
 
-const entities = [User, Question, Answer, Comment, Attachment, RefreshToken, EmailValidation]
+const entities = [
+  User,
+  Question,
+  Answer,
+  Comment,
+  QuestionComment,
+  AnswerComment,
+  Attachment,
+  QuestionAttachment,
+  AnswerAttachment,
+  RefreshToken,
+  EmailValidation,
+]
 
 @Global()
 @Module({
