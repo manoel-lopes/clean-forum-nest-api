@@ -5,9 +5,17 @@ import { aUser } from '@tests/builders/user.builder'
 import { makeApp } from '@tests/helpers/app/make-app'
 import { updateQuestionComment } from '@tests/helpers/domain/enterprise/comments/comment-requests'
 import { commentOnQuestion } from '@tests/helpers/domain/enterprise/questions/question-comment-requests'
-import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createQuestion, getQuestionBySlug, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
+
+type Comment = {
+  id: string
+  content: string
+  authorId: string
+  questionId: string
+  createdAt: string
+}
 
 describe('UpdateQuestionComment', () => {
   let app: INestApplication
@@ -75,13 +83,14 @@ describe('UpdateQuestionComment', () => {
     })
     const authorToken = authorAuthResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, authorToken, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createCommentResponse = await commentOnQuestion(app, authorToken, {
-      questionId,
+    await createQuestion(app, authorToken, questionData)
+    const question = await getQuestionByTile(app, authorToken, questionData.title)
+    await commentOnQuestion(app, authorToken, {
+      questionId: question.id,
       content: 'Original comment',
     })
-    const commentId = createCommentResponse.body.id
+    const questionWithComments = await getQuestionBySlug(app, question.slug, authorToken, { include: 'comments' })
+    const comment = questionWithComments.body.comments.find((c: Comment) => c.content === 'Original comment')
     const otherUserData = aUser().build()
     await createUser(app, otherUserData)
     const otherUserAuthResponse = await authenticateUser(app, {
@@ -93,7 +102,7 @@ describe('UpdateQuestionComment', () => {
     const response = await updateQuestionComment(
       app,
       otherUserToken,
-      { commentId },
+      { commentId: comment.id },
       { content: 'Updated comment' }
     )
 
@@ -114,22 +123,24 @@ describe('UpdateQuestionComment', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createCommentResponse = await commentOnQuestion(app, token, {
-      questionId,
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await commentOnQuestion(app, token, {
+      questionId: question.id,
       content: 'Original comment',
     })
-    const { id: commentId, authorId, createdAt } = createCommentResponse.body
+    const questionWithComments = await getQuestionBySlug(app, question.slug, token, { include: 'comments' })
+    const comment = questionWithComments.body.comments.find((c: Comment) => c.content === 'Original comment')
 
-    const response = await updateQuestionComment(app, token, { commentId }, { content: 'Updated comment' })
+    const response = await updateQuestionComment(app, token, { commentId: comment.id }, { content: 'Updated comment' })
 
     expect(response.statusCode).toBe(200)
-    expect(response.body.id).toBe(commentId)
+    expect(response.body.id).toBe(comment.id)
     expect(response.body.content).toBe('Updated comment')
-    expect(response.body.authorId).toBe(authorId)
-    expect(response.body.questionId).toBe(questionId)
-    expect(response.body.createdAt).toBe(createdAt)
+    expect(response.body.authorId).toBe(comment.authorId)
+    expect(response.body.questionId).toBe(question.id)
+    expect(response.body.createdAt).toBe(comment.createdAt)
     expect(response.body.updatedAt).toBeDefined()
+    expect(new Date(response.body.updatedAt).getTime()).toBeGreaterThan(new Date(comment.updatedAt).getTime())
   })
 })

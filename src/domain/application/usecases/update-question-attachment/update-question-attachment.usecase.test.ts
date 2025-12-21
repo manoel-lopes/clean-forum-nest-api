@@ -38,7 +38,7 @@ describe('UpdateQuestionAttachmentUseCase', () => {
     expect(response.url).toBe('https://example.com/original.pdf')
   })
 
-  it('should update attachment link', async () => {
+  it('should update attachment url', async () => {
     const attachment = await questionAttachmentsRepository.create(makeQuestionAttachmentData({
       title: 'Document Title',
       url: 'https://example.com/original.pdf',
@@ -54,7 +54,7 @@ describe('UpdateQuestionAttachmentUseCase', () => {
     expect(response.url).toBe('https://example.com/updated.pdf')
   })
 
-  it('should update both title and link', async () => {
+  it('should update both title and url', async () => {
     const attachment = await questionAttachmentsRepository.create(makeQuestionAttachmentData())
 
     const response = await sut.execute({

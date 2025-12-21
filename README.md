@@ -1047,7 +1047,7 @@ commentId=e1a1c1e0-1e0a-4b0e-1b0a-1e0a1b0e1b0a
 
 *   **Method:** `POST`
 *   **Path:** `/questions/:questionId/attachments`
-*   **Description:** Attaches a file (link) to a question.
+*   **Description:** Attaches a file (url) to a question.
 *   **Authentication:** Required
 
 **URL Parameters:**
@@ -1086,7 +1086,7 @@ questionId=b7a7b7e0-7e0a-4b0e-7b0a-7e0a7b0e7b0a
 
 *   **Method:** `POST`
 *   **Path:** `/answers/:answerId/attachments`
-*   **Description:** Attaches a file (link) to an answer.
+*   **Description:** Attaches a file (url) to an answer.
 *   **Authentication:** Required
 
 **URL Parameters:**

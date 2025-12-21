@@ -5,8 +5,8 @@ import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
+import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { createAnswerAttachment, deleteAnswerAttachment } from '@tests/helpers/domain/enterprise/answers/answer-attachment-requests'
 
 describe('DeleteAnswerAttachment', () => {
@@ -70,16 +70,18 @@ describe('DeleteAnswerAttachment', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, token, { questionId, content: 'Answer content' })
-    const answerId = createAnswerResponse.body.id
-    const createAttachmentResponse = await createAnswerAttachment(app, token, {
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
+    const answerId = answersResponse.body.items[0].id
+    await createAnswerAttachment(app, token, {
       answerId,
       title: 'Attachment title',
       url: 'https://example.com/file.pdf',
     })
-    const attachmentId = createAttachmentResponse.body.id
+    const answersWithAttachments = await fetchQuestionAnswers(app, question.id, token, { include: 'attachments' })
+    const attachmentId = answersWithAttachments.body.items[0].attachments[0].id
 
     const response = await deleteAnswerAttachment(app, token, attachmentId)
 

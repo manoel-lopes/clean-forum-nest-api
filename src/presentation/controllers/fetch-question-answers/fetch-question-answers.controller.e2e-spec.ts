@@ -5,7 +5,7 @@ import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { commentOnAnswer } from '@tests/helpers/domain/enterprise/answers/answer-comment-requests'
 import { attachToAnswer } from '@tests/helpers/domain/enterprise/answers/answer-attachment-requests'
@@ -52,13 +52,13 @@ describe('FetchQuestionAnswers', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    await createAnswer(app, token, { questionId, content: 'Answer 1' })
-    await createAnswer(app, token, { questionId, content: 'Answer 2' })
-    await createAnswer(app, token, { questionId, content: 'Answer 3' })
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer 1' })
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer 2' })
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer 3' })
 
-    const response = await fetchQuestionAnswers(app, questionId, token, { page: 1, pageSize: 2 })
+    const response = await fetchQuestionAnswers(app, question.id, token, { page: 1, pageSize: 2 })
 
     expect(response.statusCode).toBe(200)
     expect(response.body.items).toHaveLength(2)
@@ -77,14 +77,14 @@ describe('FetchQuestionAnswers', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    await createAnswer(app, token, { questionId, content: 'Answer 1' })
-    await createAnswer(app, token, { questionId, content: 'Answer 2' })
-    await createAnswer(app, token, { questionId, content: 'Answer 3' })
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer 1' })
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer 2' })
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer 3' })
 
-    const page1Response = await fetchQuestionAnswers(app, questionId, token, { page: 1, pageSize: 2 })
-    const page2Response = await fetchQuestionAnswers(app, questionId, token, { page: 2, pageSize: 2 })
+    const page1Response = await fetchQuestionAnswers(app, question.id, token, { page: 1, pageSize: 2 })
+    const page2Response = await fetchQuestionAnswers(app, question.id, token, { page: 2, pageSize: 2 })
 
     expect(page1Response.statusCode).toBe(200)
     expect(page2Response.statusCode).toBe(200)
@@ -113,10 +113,10 @@ describe('FetchQuestionAnswers', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
 
-    const response = await fetchQuestionAnswers(app, questionId)
+    const response = await fetchQuestionAnswers(app, question.id)
 
     expect(response.statusCode).toBe(200)
     expect(response.body).toHaveProperty('items')
@@ -131,11 +131,11 @@ describe('FetchQuestionAnswers', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    await createAnswer(app, token, { questionId, content: 'Answer content' })
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
 
-    const response = await fetchQuestionAnswers(app, questionId, token, { include: 'author' })
+    const response = await fetchQuestionAnswers(app, question.id, token, { include: 'author' })
 
     expect(response.statusCode).toBe(200)
     expect(response.body.items[0]).toHaveProperty('author')
@@ -152,13 +152,14 @@ describe('FetchQuestionAnswers', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, token, { questionId, content: 'Answer content' })
-    const answerId = createAnswerResponse.body.id
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
+    const answerId = answersResponse.body.items[0].id
     await commentOnAnswer(app, token, { answerId, content: 'Test comment' })
 
-    const response = await fetchQuestionAnswers(app, questionId, token, { include: 'comments' })
+    const response = await fetchQuestionAnswers(app, question.id, token, { include: 'comments' })
 
     expect(response.statusCode).toBe(200)
     expect(response.body.items[0]).toHaveProperty('comments')
@@ -175,13 +176,14 @@ describe('FetchQuestionAnswers', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, token, { questionId, content: 'Answer content' })
-    const answerId = createAnswerResponse.body.id
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
+    const answerId = answersResponse.body.items[0].id
     await attachToAnswer(app, token, { answerId, title: 'Test attachment', url: 'https://example.com/file.pdf' })
 
-    const response = await fetchQuestionAnswers(app, questionId, token, { include: 'attachments' })
+    const response = await fetchQuestionAnswers(app, question.id, token, { include: 'attachments' })
 
     expect(response.statusCode).toBe(200)
     expect(response.body.items[0]).toHaveProperty('attachments')
@@ -198,14 +200,15 @@ describe('FetchQuestionAnswers', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, token, { questionId, content: 'Answer content' })
-    const answerId = createAnswerResponse.body.id
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
+    const answerId = answersResponse.body.items[0].id
     await commentOnAnswer(app, token, { answerId, content: 'Test comment' })
     await attachToAnswer(app, token, { answerId, title: 'Test attachment', url: 'https://example.com/file.pdf' })
 
-    const response = await fetchQuestionAnswers(app, questionId, token, { include: 'author,comments,attachments' })
+    const response = await fetchQuestionAnswers(app, question.id, token, { include: 'author,comments,attachments' })
 
     expect(response.statusCode).toBe(200)
     expect(response.body.items[0]).toHaveProperty('author')
