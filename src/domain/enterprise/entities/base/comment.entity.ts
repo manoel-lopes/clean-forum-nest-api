@@ -34,8 +34,8 @@ export abstract class Comment extends BaseEntity {
   @JoinColumn({ name: 'answerId' })
   readonly answer?: Answer
 
-  protected constructor (props: CommentProps, id?: string) {
-    super(id)
+  protected constructor (props: CommentProps) {
+    super()
     Object.assign(this, props)
   }
 }

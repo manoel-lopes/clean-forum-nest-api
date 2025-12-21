@@ -40,14 +40,14 @@ export class Question extends BaseEntity {
   @OneToMany(() => Attachment, attachment => attachment.question)
   readonly attachments: Attachment[]
 
-  private constructor (props: QuestionProps, id?: string) {
-    super(id)
+  private constructor (props: QuestionProps) {
+    super()
     Object.assign(this, props)
   }
 
-  static create (props: QuestionProps, id?: string): Question {
+  static create (props: QuestionProps): Question {
     const slug = Slug.create(props.title)
     const questionSlug = props.slug ?? slug.value
-    return new Question({ ...props, slug: questionSlug }, id)
+    return new Question({ ...props, slug: questionSlug })
   }
 }

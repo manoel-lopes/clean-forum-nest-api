@@ -6,11 +6,11 @@ export type QuestionCommentProps = Props<QuestionComment>
 
 @ChildEntity('question')
 export class QuestionComment extends Comment {
-  private constructor (props: QuestionCommentProps, id?: string) {
-    super(props, id)
+  private constructor (props: QuestionCommentProps) {
+    super(props)
   }
 
-  static create (props: QuestionCommentProps, id?: string): QuestionComment {
-    return new QuestionComment(props, id)
+  static create (props: QuestionCommentProps): QuestionComment {
+    return new QuestionComment(props)
   }
 }

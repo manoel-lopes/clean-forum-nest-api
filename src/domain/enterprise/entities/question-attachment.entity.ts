@@ -6,11 +6,11 @@ export type QuestionAttachmentProps = Props<QuestionAttachment>
 
 @ChildEntity('question')
 export class QuestionAttachment extends Attachment {
-  private constructor (props: QuestionAttachmentProps, id?: string) {
-    super(props, id)
+  private constructor (props: QuestionAttachmentProps) {
+    super(props)
   }
 
-  static create (props: QuestionAttachmentProps, id?: string): QuestionAttachment {
-    return new QuestionAttachment(props, id)
+  static create (props: QuestionAttachmentProps): QuestionAttachment {
+    return new QuestionAttachment(props)
   }
 }

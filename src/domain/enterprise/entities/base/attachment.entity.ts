@@ -35,8 +35,8 @@ export abstract class Attachment extends BaseEntity {
   @JoinColumn({ name: 'answerId' })
   readonly answer: Answer
 
-  protected constructor (props: AttachmentProps, id?: string) {
-    super(id)
+  protected constructor (props: AttachmentProps) {
+    super()
     Object.assign(this, props)
   }
 }

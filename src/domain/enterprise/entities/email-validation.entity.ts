@@ -19,14 +19,14 @@ export class EmailValidation extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   readonly isVerified: boolean
 
-  private constructor (props: Omit<EmailValidation, 'id'>, id?: string) {
-    super(id)
+  private constructor (props: EmailValidationProps & { code: string }) {
+    super()
     Object.assign(this, props)
   }
 
-  static create (props: EmailValidationProps, id?: string): EmailValidation {
+  static create (props: EmailValidationProps): EmailValidation {
     const validationCode = EmailValidationCode.create()
     const code = validationCode.value
-    return new EmailValidation({ ...props, code }, id)
+    return new EmailValidation({ ...props, code })
   }
 }

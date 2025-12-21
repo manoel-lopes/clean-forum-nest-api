@@ -17,12 +17,12 @@ export class RefreshToken extends BaseEntity {
   @JoinColumn({ name: 'userId' })
   readonly user: User
 
-  private constructor (props: RefreshTokenProps, id?: string) {
-    super(id)
+  private constructor (props: RefreshTokenProps) {
+    super()
     Object.assign(this, props)
   }
 
-  static create (props: RefreshTokenProps, id?: string): RefreshToken {
-    return new RefreshToken(props, id)
+  static create (props: RefreshTokenProps): RefreshToken {
+    return new RefreshToken(props)
   }
 }

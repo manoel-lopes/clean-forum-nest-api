@@ -31,12 +31,12 @@ export class User extends BaseEntity {
   @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
   readonly refreshTokens: RefreshToken[]
 
-  private constructor (props: UserProps, id?: string) {
-    super(id)
+  private constructor (props: UserProps) {
+    super()
     Object.assign(this, props)
   }
 
-  static create (props: UserProps, id?: string): User {
-    return new User(props, id)
+  static create (props: UserProps): User {
+    return new User(props)
   }
 }

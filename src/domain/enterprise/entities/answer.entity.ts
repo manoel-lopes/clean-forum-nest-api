@@ -41,13 +41,13 @@ export class Answer extends BaseEntity {
   @OneToMany(() => Attachment, attachment => attachment.answer)
   readonly attachments: Attachment[]
 
-  private constructor (props: AnswerProps, id?: string) {
-    super(id)
+  private constructor (props: AnswerProps) {
+    super()
     Object.assign(this, props)
   }
 
-  static create (props: AnswerProps, id?: string): Answer {
+  static create (props: AnswerProps): Answer {
     const excerpt = props.excerpt ?? props.content.substring(0, 45).replace(/ $/, '').concat('...')
-    return new Answer({ ...props, excerpt }, id)
+    return new Answer({ ...props, excerpt })
   }
 }
