@@ -1,5 +1,3 @@
-import { Optional } from '../common/optional'
-
 type PrimitiveKeys<T> = {
   [K in keyof T]: T[K] extends object | null | undefined
     ? T[K] extends Date | null | undefined
@@ -8,4 +6,4 @@ type PrimitiveKeys<T> = {
     : K
 }[keyof T]
 
-export type Props<T> = Optional<Omit<Pick<T, PrimitiveKeys<T>>, 'id'>, 'createdAt' | 'updatedAt'>
+export type Props<T> = Omit<Pick<T, PrimitiveKeys<T>>, 'id' | 'createdAt' | 'updatedAt'>
