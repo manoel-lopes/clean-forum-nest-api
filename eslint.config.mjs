@@ -8,6 +8,10 @@ export default [
   {
     rules: {
       'lines-between-class-members': 'off',
+      '@typescript-eslint/consistent-type-assertions': ['error', {
+        assertionStyle: 'as',
+        objectLiteralTypeAssertions: 'allow',
+      }],
     },
   },
 ]
