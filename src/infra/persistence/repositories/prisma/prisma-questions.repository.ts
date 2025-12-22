@@ -56,12 +56,12 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
             take: pagination.take,
             skip: pagination.skip,
             orderBy: { createdAt: order },
+            ...include,
             include: {
               author: true,
               ...answerIncludes,
             },
           },
-          ...include,
         }
       }),
       this.prisma.answer.count({ where: { question: { slug } } }),
