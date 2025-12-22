@@ -13,7 +13,6 @@ import { PrismaAnswerMapper } from '@/infra/persistence/mappers/prisma/prisma-an
 import { PrismaQuestionMapper } from '@/infra/persistence/mappers/prisma/prisma-question.mapper'
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import type { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
-import type { ForumIncludeOptions } from '@/shared/types/forum/include-option'
 
 @Injectable()
 export class PrismaQuestionsRepository implements QuestionsRepository {
@@ -49,14 +48,22 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
     answerIncludes,
   }: FindQuestionBySlugParams): Promise<FindQuestionsResult> {
     const pagination = formatPagination(page, pageSize)
-    const questionInclude = this.buildQuestionInclude(
-      pagination,
-      order,
-      include,
-      answerIncludes
-    )
     const [question, totalAnswers] = await this.prisma.$transaction([
-      this.prisma.question.findUnique({ where: { slug }, include: questionInclude }),
+      this.prisma.question.findUnique({
+        where: { slug },
+        include: {
+          answers: {
+            take: pagination.take,
+            skip: pagination.skip,
+            orderBy: { createdAt: order },
+            include: {
+              author: true,
+              ...answerIncludes,
+            },
+          },
+          ...include,
+        }
+      }),
       this.prisma.answer.count({ where: { question: { slug } } }),
     ])
     if (!question) return null
@@ -137,26 +144,6 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
       items: questions.map(PrismaQuestionMapper.toDomain),
-    }
-  }
-
-  private buildQuestionInclude (
-    pagination: ReturnType<typeof formatPagination>,
-    order: 'asc' | 'desc',
-    include?: ForumIncludeOptions,
-    answerIncludes?: ForumIncludeOptions
-  ) {
-    return {
-      answers: {
-        take: pagination.take,
-        skip: pagination.skip,
-        orderBy: { createdAt: order },
-        include: {
-          author: true,
-          ...answerIncludes,
-        },
-      },
-      ...include,
     }
   }
 }
