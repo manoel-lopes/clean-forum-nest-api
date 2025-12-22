@@ -47,7 +47,7 @@ export class PrismaQuestionCommentsRepository implements QuestionCommentsReposit
       pageSize,
       totalItems,
       totalPages: Math.ceil(totalItems / pageSize),
-      items: comments.map((comment) => PrismaQuestionCommentMapper.toDomain(comment)),
+      items: comments.map(PrismaQuestionCommentMapper.toDomain),
       order,
     }
   }
@@ -56,7 +56,7 @@ export class PrismaQuestionCommentsRepository implements QuestionCommentsReposit
     const comments = await this.prisma.comment.findMany({
       where: { questionId: { not: null } },
     })
-    return comments.map((comment) => PrismaQuestionCommentMapper.toDomain(comment))
+    return comments.map(PrismaQuestionCommentMapper.toDomain)
   }
 
   async delete (commentId: string): Promise<void> {

@@ -13,15 +13,13 @@ export class PrismaAnswerAttachmentsRepository implements AnswerAttachmentsRepos
   constructor (private readonly prisma: PrismaService) {}
 
   async create (data: AnswerAttachmentProps): Promise<AnswerAttachment> {
-    const { url, ...rest } = data
-    const attachment = await this.prisma.attachment.create({ data: { ...rest, link: url } })
+    const attachment = await this.prisma.attachment.create({ data })
     return PrismaAnswerAttachmentMapper.toDomain(attachment)
   }
 
   async createMany (attachments: AnswerAttachmentProps[]): Promise<AnswerAttachment[]> {
-    const mappedData = attachments.map(({ url, ...rest }) => ({ ...rest, link: url }))
-    const created = await this.prisma.attachment.createManyAndReturn({ data: mappedData })
-    return created.map((attachment) => PrismaAnswerAttachmentMapper.toDomain(attachment))
+    const created = await this.prisma.attachment.createManyAndReturn({ data: attachments })
+    return created.map(PrismaAnswerAttachmentMapper.toDomain)
   }
 
   async findById (attachmentId: string): Promise<AnswerAttachment | null> {
@@ -48,7 +46,7 @@ export class PrismaAnswerAttachmentsRepository implements AnswerAttachmentsRepos
       pageSize,
       totalItems,
       totalPages: Math.ceil(totalItems / pageSize),
-      items: attachments.map((attachment) => PrismaAnswerAttachmentMapper.toDomain(attachment)),
+      items: attachments.map(PrismaAnswerAttachmentMapper.toDomain),
       order,
     }
   }
@@ -57,11 +55,9 @@ export class PrismaAnswerAttachmentsRepository implements AnswerAttachmentsRepos
     attachmentId: string,
     data: Partial<Pick<AnswerAttachment, 'title' | 'url'>>
   ): Promise<AnswerAttachment> {
-    const { url, ...rest } = data
-    const updateData = url ? { ...rest, link: url } : rest
     const updatedAttachment = await this.prisma.attachment.update({
       where: { id: attachmentId },
-      data: updateData,
+      data,
     })
     return PrismaAnswerAttachmentMapper.toDomain(updatedAttachment)
   }

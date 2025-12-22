@@ -16,15 +16,13 @@ export class PrismaQuestionAttachmentsRepository implements QuestionAttachmentsR
   constructor (private readonly prisma: PrismaService) {}
 
   async create (data: QuestionAttachmentProps): Promise<QuestionAttachment> {
-    const { url, ...rest } = data
-    const attachment = await this.prisma.attachment.create({ data: { ...rest, link: url } })
+    const attachment = await this.prisma.attachment.create({ data })
     return PrismaQuestionAttachmentMapper.toDomain(attachment)
   }
 
   async createMany (attachments: QuestionAttachmentProps[]): Promise<QuestionAttachment[]> {
-    const mappedData = attachments.map(({ url, ...rest }) => ({ ...rest, link: url }))
-    const created = await this.prisma.attachment.createManyAndReturn({ data: mappedData })
-    return created.map((attachment) => PrismaQuestionAttachmentMapper.toDomain(attachment))
+    const created = await this.prisma.attachment.createManyAndReturn({ data: attachments })
+    return created.map(PrismaQuestionAttachmentMapper.toDomain)
   }
 
   async findById (attachmentId: string): Promise<QuestionAttachment | null> {
@@ -51,7 +49,7 @@ export class PrismaQuestionAttachmentsRepository implements QuestionAttachmentsR
       pageSize,
       totalItems,
       totalPages: Math.ceil(totalItems / pageSize),
-      items: attachments.map((attachment) => PrismaQuestionAttachmentMapper.toDomain(attachment)),
+      items: attachments.map(PrismaQuestionAttachmentMapper.toDomain),
       order,
     }
   }
@@ -60,11 +58,9 @@ export class PrismaQuestionAttachmentsRepository implements QuestionAttachmentsR
     attachmentId: string,
     data: Partial<Pick<QuestionAttachment, 'title' | 'url'>>
   ): Promise<QuestionAttachment> {
-    const { url, ...rest } = data
-    const updateData = url ? { ...rest, link: url } : rest
     const updatedAttachment = await this.prisma.attachment.update({
       where: { id: attachmentId },
-      data: updateData,
+      data,
     })
     return PrismaQuestionAttachmentMapper.toDomain(updatedAttachment)
   }

@@ -14,7 +14,9 @@ import type { Question, QuestionProps } from '@/domain/enterprise/entities/quest
 import { BasePrismaRepository } from './base/base-prisma.repository'
 
 @Injectable()
-export class PrismaQuestionsRepository extends BasePrismaRepository implements QuestionsRepository {
+export class PrismaQuestionsRepository
+  extends BasePrismaRepository
+  implements QuestionsRepository {
   constructor (private readonly prisma: PrismaService) {
     super()
   }
@@ -60,13 +62,16 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
       this.prisma.answer.count({ where: { question: { slug } } }),
     ])
     if (!question) return null
-    return PrismaQuestionMapper.toDomain(question, {
+    const result = PrismaQuestionMapper.toDomain(question)
+    result.answers = {
+      items: question.answers,
       page: pagination.page,
-      pageSize: Math.min(pagination.pageSize, totalAnswers),
+      pageSize: pagination.pageSize,
       totalItems: totalAnswers,
       totalPages: Math.ceil(totalAnswers / pagination.pageSize),
       order,
-    })
+    }
+    return result
   }
 
   async findMany ({
@@ -91,7 +96,7 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: questions.map(PrismaQuestionMapper.toQuestion),
+      items: questions.map(PrismaQuestionMapper.toDomain),
     }
   }
 
@@ -133,7 +138,7 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: questions.map(PrismaQuestionMapper.toQuestion),
+      items: questions.map(PrismaQuestionMapper.toDomain),
     }
   }
 
