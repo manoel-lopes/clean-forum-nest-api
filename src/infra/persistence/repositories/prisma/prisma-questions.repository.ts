@@ -8,20 +8,16 @@ import type {
   QuestionsRepository,
   UpdateQuestionData,
 } from '@/domain/application/repositories/questions.repository'
+import { formatPagination } from '@/infra/persistence/helpers/format-pagination.helper'
 import { PrismaAnswerMapper } from '@/infra/persistence/mappers/prisma/prisma-answer.mapper'
 import { PrismaQuestionMapper } from '@/infra/persistence/mappers/prisma/prisma-question.mapper'
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import type { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
 import type { ForumIncludeOptions } from '@/shared/types/forum/include-option'
-import { BasePrismaRepository } from './base/base-prisma.repository'
 
 @Injectable()
-export class PrismaQuestionsRepository
-  extends BasePrismaRepository
-  implements QuestionsRepository {
-  constructor (private readonly prisma: PrismaService) {
-    super()
-  }
+export class PrismaQuestionsRepository implements QuestionsRepository {
+  constructor (private readonly prisma: PrismaService) {}
 
   async create (data: QuestionProps): Promise<Question> {
     const question = await this.prisma.question.create({ data })
@@ -52,7 +48,7 @@ export class PrismaQuestionsRepository
     include,
     answerIncludes,
   }: FindQuestionBySlugParams): Promise<FindQuestionsResult> {
-    const pagination = this.sanitizePagination(page, pageSize)
+    const pagination = formatPagination(page, pageSize)
     const questionInclude = this.buildQuestionInclude(
       pagination,
       order,
@@ -82,7 +78,7 @@ export class PrismaQuestionsRepository
     order = 'desc',
     include,
   }: FindManyQuestionsParams): Promise<PaginatedQuestions> {
-    const pagination = this.sanitizePagination(page, pageSize)
+    const pagination = formatPagination(page, pageSize)
     const [questions, totalItems] = await this.prisma.$transaction([
       this.prisma.question.findMany({
         skip: pagination.skip,
@@ -122,7 +118,7 @@ export class PrismaQuestionsRepository
     userId: string,
     { page = 1, pageSize = 10, order = 'desc' }: PaginationParams
   ): Promise<PaginatedQuestions> {
-    const pagination = this.sanitizePagination(page, pageSize)
+    const pagination = formatPagination(page, pageSize)
     const [questions, totalItems] = await this.prisma.$transaction([
       this.prisma.question.findMany({
         where: { authorId: userId },
@@ -145,7 +141,7 @@ export class PrismaQuestionsRepository
   }
 
   private buildQuestionInclude (
-    pagination: ReturnType<typeof this.sanitizePagination>,
+    pagination: ReturnType<typeof formatPagination>,
     order: 'asc' | 'desc',
     include?: ForumIncludeOptions,
     answerIncludes?: ForumIncludeOptions
