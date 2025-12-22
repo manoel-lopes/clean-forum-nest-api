@@ -24,14 +24,6 @@ export class FetchUsersController {
   @ApiOperation({ summary: 'Fetch users' })
   async handle (@Query() query: FetchUsersQuery) {
     const { page, pageSize, order } = query
-    const users = await this.usersRepository.findMany({ page, pageSize, order })
-    const sanitizedUsers = {
-      ...users,
-      items: users.items.map(user => {
-        const { password: _password, ...userWithoutPassword } = user
-        return userWithoutPassword
-      }),
-    }
-    return sanitizedUsers
+    return this.usersRepository.findMany({ page, pageSize, order })
   }
 }
