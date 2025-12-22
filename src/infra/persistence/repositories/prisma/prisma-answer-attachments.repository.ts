@@ -32,7 +32,7 @@ export class PrismaAnswerAttachmentsRepository implements AnswerAttachmentsRepos
 
   async findManyByAnswerId (answerId: string, params: PaginationParams): Promise<PaginatedAnswerAttachments> {
     const { page = 1, pageSize = 10, order = 'desc' } = params
-    const [attachments, totalItems] = await this.prisma.$transaction([
+    const [attachments, totalItems] = await Promise.all([
       this.prisma.attachment.findMany({
         where: { answerId },
         orderBy: { createdAt: order },

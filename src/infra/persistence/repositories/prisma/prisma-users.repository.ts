@@ -45,7 +45,7 @@ export class PrismaUsersRepository implements UsersRepository {
 
   async findMany ({ page = 1, pageSize = 10, order = 'desc' }: PaginationParams): Promise<PaginatedItems<UserWithoutPassword>> {
     const pagination = formatPagination(page, pageSize)
-    const [users, totalItems] = await this.prisma.$transaction([
+    const [users, totalItems] = await Promise.all([
       this.prisma.user.findMany({
         skip: pagination.skip,
         take: pagination.take,

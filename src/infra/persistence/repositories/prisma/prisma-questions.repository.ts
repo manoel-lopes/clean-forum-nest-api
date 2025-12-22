@@ -48,7 +48,7 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
     answerIncludes,
   }: FindQuestionBySlugParams): Promise<FindQuestionsResult> {
     const pagination = formatPagination(page, pageSize)
-    const [question, totalAnswers] = await this.prisma.$transaction([
+    const [question, totalAnswers] = await Promise.all([
       this.prisma.question.findUnique({
         where: { slug },
         include: {
@@ -86,7 +86,7 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
     include,
   }: FindManyQuestionsParams): Promise<PaginatedQuestions> {
     const pagination = formatPagination(page, pageSize)
-    const [questions, totalItems] = await this.prisma.$transaction([
+    const [questions, totalItems] = await Promise.all([
       this.prisma.question.findMany({
         skip: pagination.skip,
         take: pagination.take,
@@ -126,7 +126,7 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
     { page = 1, pageSize = 10, order = 'desc' }: PaginationParams
   ): Promise<PaginatedQuestions> {
     const pagination = formatPagination(page, pageSize)
-    const [questions, totalItems] = await this.prisma.$transaction([
+    const [questions, totalItems] = await Promise.all([
       this.prisma.question.findMany({
         where: { authorId: userId },
         skip: pagination.skip,

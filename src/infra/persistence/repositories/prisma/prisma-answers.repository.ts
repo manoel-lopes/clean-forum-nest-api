@@ -45,7 +45,7 @@ export class PrismaAnswersRepository implements AnswersRepository {
     include,
   }: FindManyByQuestionIdParams): Promise<PaginatedAnswers> {
     const pagination = formatPagination(page, pageSize)
-    const [rawAnswers, totalItems] = await this.prisma.$transaction([
+    const [rawAnswers, totalItems] = await Promise.all([
       this.prisma.answer.findMany({
         where: { questionId },
         skip: pagination.skip,
