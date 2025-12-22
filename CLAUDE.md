@@ -74,6 +74,53 @@ export class CreateUserUseCase {
 }
 ```
 
+## DRY Principle
+
+**DRY (Don't Repeat Yourself)** - Every piece of knowledge must have a single, authoritative representation.
+
+```typescript
+// ❌ Bad: Duplicated logic in multiple places
+const schema1 = z.string().transform(value => {
+  if (!value) return {}
+  const allowed = new Set(['a', 'b', 'c'])
+  const result: Record<string, boolean> = {}
+  for (const item of value.split(',')) {
+    if (allowed.has(item)) result[item] = true
+  }
+  return result
+})
+
+const schema2 = z.string().transform(value => {
+  if (!value) return {}
+  const allowed = new Set(['a', 'b', 'c'])  // Same logic duplicated!
+  const result: Record<string, boolean> = {}
+  for (const item of value.split(',')) {
+    if (allowed.has(item)) result[item] = true
+  }
+  return result
+})
+
+// ✅ Good: Extract to reusable function
+function parseOptions(value: string | null): Record<string, boolean> {
+  if (!value) return {}
+  const allowed = new Set(['a', 'b', 'c'])
+  const result: Record<string, boolean> = {}
+  for (const item of value.split(',')) {
+    if (allowed.has(item)) result[item] = true
+  }
+  return result
+}
+
+const schema1 = z.string().transform(parseOptions)
+const schema2 = z.string().transform(parseOptions)
+```
+
+DRY applies to:
+- Code logic (extract to functions/methods)
+- Data structures (single source of truth)
+- Configuration (centralize settings)
+- Knowledge/intent (not just literal code)
+
 ## Quick Reference
 
 ### Essential Commands
@@ -207,12 +254,59 @@ export class CreateQuestionController {
 
 ## Code Style Rules
 
+**Programming Style**: Use OOP for structure, declarative programming inside methods.
+```typescript
+// ✅ Good: OOP structure with declarative method body
+class PrismaQuestionsRepository extends BasePrismaRepository {
+  async findMany ({ page, pageSize, order, include }: FindManyParams) {
+    const [questions, totalItems] = await this.prisma.$transaction([
+      this.prisma.question.findMany({
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        orderBy: { createdAt: order },
+        include,
+      }),
+      this.prisma.question.count(),
+    ])
+    return { page, pageSize, totalItems, items: questions }
+  }
+}
+
+// ❌ Bad: Imperative style with mutations and complex logic
+class PrismaQuestionsRepository {
+  async findMany (params: FindManyParams) {
+    const pagination = this.buildPagination(params)
+    const includeObj = this.pickIncludes(params.include, ['a', 'b'])
+    let questions = await this.prisma.question.findMany({ ... })
+    questions = this.mapResults(questions)
+    return this.formatResponse(questions, pagination)
+  }
+}
+```
+
 **Critical Rules**:
+- **ALL tests must pass before a task is considered done** - Run `pnpm test` and ensure 0 failures
 - `no-explicit-any`: ERROR (exceptions: `vitest.config.mts`, some Prisma query files)
-- Type assertions: Use `as` syntax when necessary (configured via `consistent-type-assertions`)
+- **NO type assertions with `as`** - Use type guards, explicit typing, or refactor instead
 - `no-console`: ERROR
 - `max-len`: 120 characters
-- **NEVER use `undefined` as a value** - use `null` or omit property
+- **NEVER use `undefined` as a value** - use `null` or omit property:
+```typescript
+// ❌ Bad: returning or assigning undefined
+function getValue(): string | undefined {
+  if (!condition) return undefined
+  return 'value'
+}
+
+// ✅ Good: return null or use early return without value
+function getValue(): string | null {
+  if (!condition) return null
+  return 'value'
+}
+
+// ✅ Good: omit property instead of setting to undefined
+const obj = condition ? { include: value } : {}
+```
 - **NO nested ternaries** - use registry pattern (lookup object)
 - **NO if/else if chains** - use registry pattern
 
