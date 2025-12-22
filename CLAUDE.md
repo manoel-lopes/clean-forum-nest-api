@@ -4,7 +4,75 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Clean Forum NestJS API - a backend forum application built with NestJS v11 (Fastify), TypeScript, PostgreSQL (Prisma), and BullMQ. Follows Clean Architecture and Domain-Driven Design principles.
+Clean Forum NestJS API - a backend forum application built with NestJS v11 (Fastify), TypeScript, PostgreSQL (Prisma), and BullMQ. Follows Clean Architecture, Domain-Driven Design, and SOLID principles.
+
+## SOLID Principles
+
+This codebase adheres to SOLID principles. These guidelines help build software that is easier to scale and maintain.
+
+**S - Single Responsibility Principle (SRP)**
+A class should have only one reason to change. Each class/module should focus on a single task.
+```typescript
+// ✅ Good: Each mapper handles one entity type
+class PrismaQuestionCommentMapper {
+  static toDomain(raw: Comment): QuestionComment { ... }
+}
+
+// ❌ Bad: One mapper handling multiple unrelated entities
+class GenericMapper {
+  static mapUser(raw: User) { ... }
+  static mapQuestion(raw: Question) { ... }
+  static mapComment(raw: Comment) { ... }
+}
+```
+
+**O - Open-Closed Principle (OCP)**
+Classes should be open for extension but closed for modification. Extend behavior without changing existing code.
+```typescript
+// ✅ Good: New payment methods extend interface without modifying existing code
+interface PaymentProcessor { process(amount: number): Promise<void> }
+class StripeProcessor implements PaymentProcessor { ... }
+class PayPalProcessor implements PaymentProcessor { ... }
+```
+
+**L - Liskov Substitution Principle (LSP)**
+Subtypes must be substitutable for their base types. Child classes should work anywhere parent is expected.
+```typescript
+// ✅ Good: Any repository implementation works with the interface
+type UsersRepository = { findByEmail(email: string): Promise<User | null> }
+class PrismaUsersRepository implements UsersRepository { ... }
+class InMemoryUsersRepository implements UsersRepository { ... } // for tests
+```
+
+**I - Interface Segregation Principle (ISP)**
+Clients should not depend on interfaces they don't use. Split large interfaces into smaller, focused ones.
+```typescript
+// ✅ Good: Separate interfaces for different capabilities
+interface Readable { findById(id: string): Promise<Entity | null> }
+interface Writable { create(data: Props): Promise<Entity> }
+interface Deletable { delete(id: string): Promise<void> }
+
+// ❌ Bad: One large interface forcing unused methods
+interface Repository {
+  findById(id: string): Promise<Entity | null>
+  create(data: Props): Promise<Entity>
+  delete(id: string): Promise<void>
+  export(format: string): Promise<Buffer>  // Not all repos need this
+}
+```
+
+**D - Dependency Inversion Principle (DIP)**
+High-level modules should not depend on low-level modules. Both should depend on abstractions.
+```typescript
+// ✅ Good: Use case depends on abstraction (interface), not implementation
+@Injectable()
+export class CreateUserUseCase {
+  constructor(
+    @Inject(UsersRepository) private readonly usersRepository: UsersRepository,
+    @Inject(PasswordHasher) private readonly passwordHasher: PasswordHasher,
+  ) {}
+}
+```
 
 ## Quick Reference
 
