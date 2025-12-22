@@ -6,7 +6,7 @@ export type CreateQuestionCommentData = {
   content?: unknown
 }
 
-export async function commentOnQuestion (app: INestApplication, token: string | undefined, commentData: CreateQuestionCommentData) {
+export async function commentOnQuestion (app: INestApplication, token: string , commentData: CreateQuestionCommentData) {
   const req = request(app.getHttpServer()).post('/comments/questions')
   if (token) {
     req.set('Authorization', `Bearer ${token}`)
