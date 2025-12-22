@@ -22,7 +22,7 @@ describe('UpdateQuestion', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await updateQuestion(app, undefined, {
+    const response = await updateQuestion(app, '', {
       questionId: 'any-id',
       title: 'Title',
       content: 'Content',

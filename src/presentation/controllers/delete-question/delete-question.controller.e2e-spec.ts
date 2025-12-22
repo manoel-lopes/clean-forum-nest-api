@@ -21,7 +21,7 @@ describe('DeleteQuestion', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await deleteQuestion(app, undefined, { questionId: 'any-id' })
+    const response = await deleteQuestion(app, '', { questionId: 'any-id' })
 
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({

@@ -21,7 +21,7 @@ describe('AttachToAnswer', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await attachToAnswer(app, undefined, {
+    const response = await attachToAnswer(app, '', {
       answerId: 'any-id',
       title: 'Title',
       url: 'https://example.com/file.pdf',

@@ -19,7 +19,7 @@ describe('DeleteAccount', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await deleteUser(app, undefined)
+    const response = await deleteUser(app, '')
 
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({

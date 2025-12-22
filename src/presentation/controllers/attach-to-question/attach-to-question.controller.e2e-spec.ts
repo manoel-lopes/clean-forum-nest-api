@@ -20,7 +20,7 @@ describe('AttachToQuestion', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await attachToQuestion(app, undefined, {
+    const response = await attachToQuestion(app, '', {
       questionId: 'any-id',
       title: 'Title',
       url: 'https://example.com/file.pdf',

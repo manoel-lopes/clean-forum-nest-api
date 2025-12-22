@@ -21,7 +21,7 @@ describe('UpdateAnswerAttachment', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await updateAnswerAttachment(app, undefined, {
+    const response = await updateAnswerAttachment(app, '', {
       attachmentId: 'any-id',
       title: 'Title',
       url: 'https://example.com/file.pdf',

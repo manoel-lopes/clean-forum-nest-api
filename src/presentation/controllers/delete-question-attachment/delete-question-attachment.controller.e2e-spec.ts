@@ -20,7 +20,7 @@ describe('DeleteQuestionAttachment', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await deleteQuestionAttachment(app, undefined, 'any-id')
+    const response = await deleteQuestionAttachment(app, '', 'any-id')
 
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({

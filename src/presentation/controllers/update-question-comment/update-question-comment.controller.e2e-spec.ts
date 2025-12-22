@@ -29,7 +29,7 @@ describe('UpdateQuestionComment', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await updateQuestionComment(app, undefined, { commentId: 'any-id' }, { content: 'Content' })
+    const response = await updateQuestionComment(app, '', { commentId: 'any-id' }, { content: 'Content' })
 
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({

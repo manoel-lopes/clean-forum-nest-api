@@ -23,7 +23,7 @@ describe('CreateQuestion', () => {
   it('should return 401 when no token is provided', async () => {
     const questionData = aQuestion().build()
 
-    const response = await createQuestion(app, undefined, questionData)
+    const response = await createQuestion(app, '', questionData)
 
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
