@@ -44,7 +44,7 @@ export class PrismaAnswersRepository extends BasePrismaRepository implements Ans
     page = 1,
     pageSize = 20,
     order = 'desc',
-    include = [],
+    include,
   }: FindManyByQuestionIdParams): Promise<PaginatedAnswers> {
     const pagination = this.sanitizePagination(page, pageSize)
     const [rawAnswers, totalItems] = await this.prisma.$transaction([
@@ -53,7 +53,7 @@ export class PrismaAnswersRepository extends BasePrismaRepository implements Ans
         skip: pagination.skip,
         take: pagination.take,
         orderBy: { createdAt: order },
-        include: this.pickIncludes(include, ['comments', 'attachments', 'author']),
+        include,
       }),
       this.prisma.answer.count({ where: { questionId } }),
     ])

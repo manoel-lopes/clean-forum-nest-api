@@ -8,9 +8,11 @@ import type {
   QuestionsRepository,
   UpdateQuestionData,
 } from '@/domain/application/repositories/questions.repository'
+import { PrismaAnswerMapper } from '@/infra/persistence/mappers/prisma/prisma-answer.mapper'
 import { PrismaQuestionMapper } from '@/infra/persistence/mappers/prisma/prisma-question.mapper'
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import type { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
+import type { ForumIncludeOptions } from '@/shared/types/forum/include-option'
 import { BasePrismaRepository } from './base/base-prisma.repository'
 
 @Injectable()
@@ -47,15 +49,15 @@ export class PrismaQuestionsRepository
     page = 1,
     pageSize = 10,
     order = 'desc',
-    include = [],
-    answerIncludes = [],
+    include,
+    answerIncludes,
   }: FindQuestionBySlugParams): Promise<FindQuestionsResult> {
     const pagination = this.sanitizePagination(page, pageSize)
     const questionInclude = this.buildQuestionInclude(
-      include,
-      answerIncludes,
       pagination,
-      order
+      order,
+      include,
+      answerIncludes
     )
     const [question, totalAnswers] = await this.prisma.$transaction([
       this.prisma.question.findUnique({ where: { slug }, include: questionInclude }),
@@ -64,7 +66,7 @@ export class PrismaQuestionsRepository
     if (!question) return null
     const result = PrismaQuestionMapper.toDomain(question)
     result.answers = {
-      items: question.answers,
+      items: question.answers.map(PrismaAnswerMapper.toDomain),
       page: pagination.page,
       pageSize: pagination.pageSize,
       totalItems: totalAnswers,
@@ -78,7 +80,7 @@ export class PrismaQuestionsRepository
     page = 1,
     pageSize = 20,
     order = 'desc',
-    include = [],
+    include,
   }: FindManyQuestionsParams): Promise<PaginatedQuestions> {
     const pagination = this.sanitizePagination(page, pageSize)
     const [questions, totalItems] = await this.prisma.$transaction([
@@ -86,7 +88,7 @@ export class PrismaQuestionsRepository
         skip: pagination.skip,
         take: pagination.take,
         orderBy: { createdAt: order },
-        include: this.pickIncludes(include, ['comments', 'attachments', 'author']),
+        include,
       }),
       this.prisma.question.count(),
     ])
@@ -143,26 +145,22 @@ export class PrismaQuestionsRepository
   }
 
   private buildQuestionInclude (
-    include: string[],
-    answerIncludes: string[],
     pagination: ReturnType<typeof this.sanitizePagination>,
-    order: 'asc' | 'desc'
+    order: 'asc' | 'desc',
+    include?: ForumIncludeOptions,
+    answerIncludes?: ForumIncludeOptions
   ) {
     return {
       answers: {
         take: pagination.take,
         skip: pagination.skip,
         orderBy: { createdAt: order },
-        include: this.buildAnswerInclude(answerIncludes),
+        include: {
+          author: true,
+          ...answerIncludes,
+        },
       },
-      ...this.pickIncludes(include, ['comments', 'attachments', 'author']),
-    }
-  }
-
-  private buildAnswerInclude (answerIncludes: string[]) {
-    return {
-      author: { select: BasePrismaRepository.AUTHOR_SELECT },
-      ...this.pickIncludes(answerIncludes, ['comments', 'attachments']),
+      ...include,
     }
   }
 }
