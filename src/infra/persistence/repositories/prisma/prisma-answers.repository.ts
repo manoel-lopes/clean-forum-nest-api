@@ -5,16 +5,14 @@ import type {
   PaginatedAnswers,
   UpdateAnswerData,
 } from '@/domain/application/repositories/answers.repository'
+import { formatPagination } from '@/infra/persistence/helpers/format-pagination.helper'
 import { PrismaAnswerMapper } from '@/infra/persistence/mappers/prisma/prisma-answer.mapper'
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
-import { BasePrismaRepository } from './base/base-prisma.repository'
 
 @Injectable()
-export class PrismaAnswersRepository extends BasePrismaRepository implements AnswersRepository {
-  constructor (private readonly prisma: PrismaService) {
-    super()
-  }
+export class PrismaAnswersRepository implements AnswersRepository {
+  constructor (private readonly prisma: PrismaService) {}
 
   async create (data: AnswerProps): Promise<Answer> {
     const answer = await this.prisma.answer.create({ data })
@@ -46,7 +44,7 @@ export class PrismaAnswersRepository extends BasePrismaRepository implements Ans
     order = 'desc',
     include,
   }: FindManyByQuestionIdParams): Promise<PaginatedAnswers> {
-    const pagination = this.sanitizePagination(page, pageSize)
+    const pagination = formatPagination(page, pageSize)
     const [rawAnswers, totalItems] = await this.prisma.$transaction([
       this.prisma.answer.findMany({
         where: { questionId },
