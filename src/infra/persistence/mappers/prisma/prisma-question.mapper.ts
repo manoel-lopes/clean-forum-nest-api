@@ -3,11 +3,10 @@ import type { QuestionWithRelations } from '@/domain/application/repositories/qu
 import type { Question } from '@/domain/enterprise/entities/question.entity'
 import { PrismaQuestionAttachmentMapper } from './prisma-question-attachment.mapper'
 import { PrismaQuestionCommentMapper } from './prisma-question-comment.mapper'
-
-type Author = Pick<User, 'id' | 'name' | 'email' | 'createdAt' | 'updatedAt'>
+import { PrismaUserMapper } from './prisma-user.mapper'
 
 type AnswerWithIncludes = Answer & {
-  author?: Author
+  author?: User
   comments?: Comment[]
   attachments?: Attachment[]
 }
@@ -16,7 +15,7 @@ type QuestionWithOptionalIncludes = Question & {
   answers?: AnswerWithIncludes[]
   comments?: Comment[]
   attachments?: Attachment[]
-  author?: Author
+  author?: User
 }
 
 export class PrismaQuestionMapper {
@@ -29,7 +28,9 @@ export class PrismaQuestionMapper {
     if (attachments) {
       result.attachments = attachments.map(PrismaQuestionAttachmentMapper.toDomain)
     }
-    if (author) result.author = author
+    if (author) {
+      result.author = PrismaUserMapper.toDomain(author)
+    }
     return result
   }
 }
