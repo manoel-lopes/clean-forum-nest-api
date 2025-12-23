@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, TableInheritance } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
 import { Props } from '@/shared/types/custom/props'
 import { Answer } from '../answer.entity'
 import { Question } from '../question.entity'
@@ -8,10 +8,12 @@ import { BaseEntity } from './base.entity'
 export type CommentProps = Props<Comment>
 
 @Entity('comments')
-@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export abstract class Comment extends BaseEntity {
   @Column({ type: 'text' })
   readonly content: string
+
+  @Column({ type: 'varchar' })
+  readonly type: 'question' | 'answer'
 
   @Column({ type: 'varchar', length: 36 })
   readonly authorId: string
