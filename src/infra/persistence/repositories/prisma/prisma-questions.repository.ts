@@ -52,11 +52,11 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
       this.prisma.question.findUnique({
         where: { slug },
         include: {
+          ...include,
           answers: {
             take: pagination.take,
             skip: pagination.skip,
             orderBy: { createdAt: order },
-            ...include,
             include: {
               author: true,
               ...answerIncludes,
