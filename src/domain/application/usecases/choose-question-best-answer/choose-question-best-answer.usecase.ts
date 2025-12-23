@@ -5,14 +5,14 @@ import { QuestionsRepository } from '@/domain/application/repositories/questions
 import type { Question } from '@/domain/enterprise/entities/question.entity'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
-import { Primitives } from '@/shared/types/custom/primitives'
+import { PrimitiveAndDates } from '@/shared/types/custom/primitive-and-dates'
 
 type ChooseQuestionBestAnswerRequest = {
   authorId: string
   answerId: string
 }
 
-export type ChooseQuestionBestAnswerResponse = Primitives<Question>
+export type ChooseQuestionBestAnswerResponse = PrimitiveAndDates<Question>
 
 @Injectable()
 export class ChooseQuestionBestAnswerUseCase implements UseCase {

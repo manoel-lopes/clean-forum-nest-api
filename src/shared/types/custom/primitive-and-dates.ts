@@ -1,4 +1,4 @@
-type PrimitiveKeys<T> = {
+type PrimitiveAndDateKeys<T> = {
   [K in keyof T]: T[K] extends object | null | undefined
     ? T[K] extends Date | null | undefined
       ? K
@@ -6,4 +6,4 @@ type PrimitiveKeys<T> = {
     : K
 }[keyof T]
 
-export type Primitives<T> = Pick<T, PrimitiveKeys<T>>
+export type PrimitiveAndDates<T> = Pick<T, PrimitiveAndDateKeys<T>>
