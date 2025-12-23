@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { setZodErrorMap } from 'zod-error-map'
 import {
   ArgumentMetadata,
   BadRequestException,
@@ -6,7 +7,6 @@ import {
   PipeTransform,
   UnprocessableEntityException,
 } from '@nestjs/common'
-import { ZodErrorMapper } from '../config/zod-error-mapper'
 
 @Injectable()
 export class ZodValidationPipe implements PipeTransform {
@@ -14,7 +14,7 @@ export class ZodValidationPipe implements PipeTransform {
 
   transform (value: unknown, _metadata: ArgumentMetadata) {
     try {
-      ZodErrorMapper.setErrorMap()
+      setZodErrorMap(z)
       return this.schema.parse(value)
     } catch (error) {
       if (error instanceof z.ZodError) {
