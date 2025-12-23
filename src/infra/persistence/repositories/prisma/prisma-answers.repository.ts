@@ -32,8 +32,11 @@ export class PrismaAnswersRepository implements AnswersRepository {
     })
   }
 
-  async update ({ where, data }: UpdateAnswerData): Promise<Answer> {
-    const updatedAnswer = await this.prisma.answer.update({ where, data })
+  async update ({ answerId, data }: UpdateAnswerData): Promise<Answer> {
+    const updatedAnswer = await this.prisma.answer.update({
+      where: { id: answerId },
+      data,
+    })
     return updatedAnswer
   }
 

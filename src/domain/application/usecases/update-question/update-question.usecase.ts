@@ -26,7 +26,7 @@ export class UpdateQuestionUseCase implements UseCase {
       throw new NotAuthorException('question')
     }
     const updatedQuestion = await this.questionsRepository.update({
-      where: { id: questionId },
+      questionId,
       data: { title, content },
     })
     return updatedQuestion

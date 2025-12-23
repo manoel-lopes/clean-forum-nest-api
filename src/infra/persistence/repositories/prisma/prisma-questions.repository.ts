@@ -111,11 +111,9 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
     })
   }
 
-  async update ({ data, where }: UpdateQuestionData): Promise<Question> {
+  async update ({ questionId, data }: UpdateQuestionData): Promise<Question> {
     const updatedQuestion = await this.prisma.question.update({
-      where: {
-        id: where.id,
-      },
+      where: { id: questionId },
       data,
     })
     return updatedQuestion
