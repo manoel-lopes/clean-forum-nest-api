@@ -21,7 +21,10 @@ export class ChooseQuestionBestAnswerUseCase implements UseCase {
     @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository
   ) {}
 
-  async execute ({ answerId, authorId }: ChooseQuestionBestAnswerRequest): Promise<ChooseQuestionBestAnswerResponse> {
+  async execute ({
+    answerId,
+    authorId
+  }: ChooseQuestionBestAnswerRequest): Promise<ChooseQuestionBestAnswerResponse> {
     const answer = await this.answersRepository.findById(answerId)
     if (!answer) {
       throw new ResourceNotFoundException('Answer')
