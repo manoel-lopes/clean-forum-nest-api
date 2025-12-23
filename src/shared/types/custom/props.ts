@@ -1,9 +1,3 @@
-type PrimitiveKeys<T> = {
-  [K in keyof T]: T[K] extends object | null | undefined
-    ? T[K] extends Date | null | undefined
-      ? K
-      : never
-    : K
-}[keyof T]
+import { PrimitiveAndDates } from './primitive-and-dates'
 
-export type Props<T> = Omit<Pick<T, PrimitiveKeys<T>>, 'id' | 'createdAt' | 'updatedAt'>
+export type Props<T> = Omit<PrimitiveAndDates<T>, 'id' | 'createdAt' | 'updatedAt'>
