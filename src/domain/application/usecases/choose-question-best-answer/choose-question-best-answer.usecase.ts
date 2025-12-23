@@ -5,13 +5,14 @@ import { QuestionsRepository } from '@/domain/application/repositories/questions
 import type { Question } from '@/domain/enterprise/entities/question.entity'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { PrimitiveAndDates } from '@/shared/types/custom/primitive-and-dates'
 
 type ChooseQuestionBestAnswerRequest = {
   authorId: string
   answerId: string
 }
 
-export type ChooseQuestionBestAnswerResponse = Omit<Question, 'answers' | 'comments' | 'attachments' | 'author'>
+export type ChooseQuestionBestAnswerResponse = PrimitiveAndDates<Question>
 
 @Injectable()
 export class ChooseQuestionBestAnswerUseCase implements UseCase {
@@ -36,15 +37,6 @@ export class ChooseQuestionBestAnswerUseCase implements UseCase {
       questionId: question.id,
       data: { bestAnswerId: answer.id },
     })
-    return {
-      id: editedQuestion.id,
-      title: editedQuestion.title,
-      content: editedQuestion.content,
-      slug: editedQuestion.slug,
-      authorId: editedQuestion.authorId,
-      bestAnswerId: editedQuestion.bestAnswerId,
-      createdAt: editedQuestion.createdAt,
-      updatedAt: editedQuestion.updatedAt,
-    }
+    return editedQuestion
   }
 }
