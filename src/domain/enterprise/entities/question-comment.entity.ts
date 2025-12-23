@@ -1,13 +1,14 @@
-import { ChildEntity } from 'typeorm'
 import { Props } from '@/shared/types/custom/props'
 import { Comment } from './base/comment.entity'
 
-export type QuestionCommentProps = Props<QuestionComment>
+export type QuestionCommentProps = Omit<Props<QuestionComment>, 'type'>
 
-@ChildEntity('question')
 export class QuestionComment extends Comment {
+  declare readonly questionId: string
+  declare readonly type: 'question'
+
   private constructor (props: QuestionCommentProps) {
-    super(props)
+    super({ ...props, type: 'question' })
   }
 
   static create (props: QuestionCommentProps): QuestionComment {
