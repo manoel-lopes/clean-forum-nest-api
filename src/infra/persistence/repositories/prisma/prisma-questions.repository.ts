@@ -131,9 +131,7 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
         take: pagination.take,
         orderBy: { createdAt: order },
       }),
-      this.prisma.question.count({
-        where: { authorId: userId },
-      }),
+      this.prisma.question.count({ where: { authorId: userId }, }),
     ])
     return {
       page: pagination.page,
