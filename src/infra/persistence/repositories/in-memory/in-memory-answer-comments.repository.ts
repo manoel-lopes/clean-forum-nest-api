@@ -20,7 +20,7 @@ export class InMemoryAnswerCommentsRepository
     })
   }
 
-  override async findById (commentId: string): Promise<Comment | null> {
+  async findById (commentId: string): Promise<Comment | null> {
     const comment = await super.findById(commentId)
     if (!comment || !comment.answerId) return null
     return comment
