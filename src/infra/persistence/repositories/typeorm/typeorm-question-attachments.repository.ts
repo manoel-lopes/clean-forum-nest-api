@@ -2,6 +2,7 @@ import { Repository } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
+import type { UpdateAttachmentData } from '@/domain/application/repositories/base/attachments.repository'
 import type {
   PaginatedQuestionAttachments,
   QuestionAttachmentsRepository,
@@ -42,7 +43,7 @@ export class TypeOrmQuestionAttachmentsRepository
     }
   }
 
-  async update (attachmentId: string, data: Partial<Pick<QuestionAttachment, 'title' | 'url'>>): Promise<QuestionAttachment> {
+  async update (attachmentId: string, data: UpdateAttachmentData): Promise<QuestionAttachment> {
     const updated = await this.updateOne({ id: attachmentId, ...data })
     return updated
   }

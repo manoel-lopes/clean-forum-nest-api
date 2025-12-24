@@ -6,6 +6,7 @@ import type {
   AnswerAttachmentsRepository,
   PaginatedAnswerAttachments,
 } from '@/domain/application/repositories/answer-attachments.repository'
+import type { UpdateAttachmentData } from '@/domain/application/repositories/base/attachments.repository'
 import { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
@@ -42,7 +43,7 @@ export class TypeOrmAnswerAttachmentsRepository
     }
   }
 
-  async update (attachmentId: string, data: Partial<Pick<AnswerAttachment, 'title' | 'url'>>): Promise<AnswerAttachment> {
+  async update (attachmentId: string, data: UpdateAttachmentData): Promise<AnswerAttachment> {
     const updated = await this.updateOne({ id: attachmentId, ...data })
     return updated
   }
