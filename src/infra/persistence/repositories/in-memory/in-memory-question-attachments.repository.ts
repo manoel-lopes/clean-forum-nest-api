@@ -3,11 +3,11 @@ import type {
   PaginatedQuestionAttachments,
   QuestionAttachmentsRepository,
 } from '@/domain/application/repositories/question-attachments.repository'
-import type { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
+import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
 import { InMemoryAttachmentsRepository } from './in-memory-attachments.repository'
 
 export class InMemoryQuestionAttachmentsRepository
-  extends InMemoryAttachmentsRepository
+  extends InMemoryAttachmentsRepository<QuestionAttachment>
   implements QuestionAttachmentsRepository {
   async findManyByQuestionId (questionId: string, params: PaginationParams): Promise<PaginatedQuestionAttachments> {
     return this.findManyItemsBy({
@@ -18,11 +18,5 @@ export class InMemoryQuestionAttachmentsRepository
         order: params.order,
       },
     })
-  }
-
-  override async findById (attachmentId: string): Promise<Attachment | null> {
-    const attachment = await super.findById(attachmentId)
-    if (!attachment || !attachment.questionId) return null
-    return attachment
   }
 }
