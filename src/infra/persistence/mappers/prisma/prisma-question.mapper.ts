@@ -3,7 +3,6 @@ import type { QuestionWithRelations } from '@/domain/application/repositories/qu
 import type { Question } from '@/domain/enterprise/entities/question.entity'
 import { PrismaQuestionAttachmentMapper } from './prisma-question-attachment.mapper'
 import { PrismaQuestionCommentMapper } from './prisma-question-comment.mapper'
-import { PrismaUserMapper } from './prisma-user.mapper'
 
 type AnswerWithIncludes = Answer & {
   author?: User
@@ -29,7 +28,8 @@ export class PrismaQuestionMapper {
       result.attachments = attachments.map(PrismaQuestionAttachmentMapper.toDomain)
     }
     if (author) {
-      result.author = PrismaUserMapper.toDomain(author)
+      const { password: _, ...authorWithoutPassword } = author
+      result.author = authorWithoutPassword
     }
     return result
   }

@@ -2,7 +2,6 @@ import type { Answer, Attachment, Comment, User } from '@prisma/client'
 import type { AnswerWithRelations } from '@/domain/application/repositories/answers.repository'
 import { PrismaAnswerAttachmentMapper } from './prisma-answer-attachment.mapper'
 import { PrismaAnswerCommentMapper } from './prisma-answer-comment.mapper'
-import { PrismaUserMapper } from './prisma-user.mapper'
 
 type PrismaAnswerWithOptionalIncludes = Answer & {
   comments?: Comment[]
@@ -21,7 +20,8 @@ export class PrismaAnswerMapper {
       result.attachments = attachments.map(PrismaAnswerAttachmentMapper.toDomain)
     }
     if (author) {
-      result.author = PrismaUserMapper.toDomain(author)
+      const { password: _, ...authorWithoutPassword } = author
+      result.author = authorWithoutPassword
     }
     return result
   }
