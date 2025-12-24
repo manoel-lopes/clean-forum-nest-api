@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { setZodErrorMap } from 'zod-error-map'
 import {
-  ArgumentMetadata,
   BadRequestException,
   Injectable,
   PipeTransform,
@@ -12,7 +11,7 @@ import {
 export class ZodValidationPipe implements PipeTransform {
   constructor (private schema: z.ZodSchema) {}
 
-  transform (value: unknown, _metadata: ArgumentMetadata) {
+  transform (value: unknown) {
     try {
       setZodErrorMap(z)
       return this.schema.parse(value)
