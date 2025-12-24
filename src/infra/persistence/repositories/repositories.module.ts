@@ -45,18 +45,32 @@ const entities = [
   EmailValidation,
 ]
 
+function extractSchemaFromUrl (databaseUrl: string): string | undefined {
+  try {
+    const url = new URL(databaseUrl)
+    return url.searchParams.get('schema') || undefined
+  } catch {
+    return undefined
+  }
+}
+
 @Global()
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       inject: [EnvService],
-      useFactory: (envService: EnvService) => ({
-        type: 'postgres',
-        url: envService.get('DATABASE_URL'),
-        entities,
-        synchronize: false,
-        logging: envService.get('NODE_ENV') === 'development',
-      }),
+      useFactory: (envService: EnvService) => {
+        const databaseUrl = envService.getDatabaseUrl()
+        const schema = extractSchemaFromUrl(databaseUrl)
+        return {
+          type: 'postgres',
+          url: databaseUrl,
+          schema,
+          entities,
+          synchronize: false,
+          logging: envService.get('NODE_ENV') === 'development',
+        }
+      },
     }),
     TypeOrmModule.forFeature(entities),
   ],
