@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { UseCase } from '@/core/domain/application/use-case'
+import { UseCase } from '@/core/domain/use-case'
 import { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
 import { EmailService } from '@/infra/adapters/email/ports/email-service'
 import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'

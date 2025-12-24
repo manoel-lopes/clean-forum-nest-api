@@ -1,5 +1,5 @@
-import type { PaginatedItems } from '@/core/domain/application/paginated-items'
-import type { PaginationParams } from '@/core/domain/application/pagination-params'
+import type { PaginatedItems } from '@/core/domain/paginated-items'
+import type { PaginationParams } from '@/core/domain/pagination-params'
 import type { UpdateUserData, UsersRepository } from '@/domain/application/repositories/users.repository'
 import type { User } from '@/domain/enterprise/entities/user.entity'
 import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.repository'

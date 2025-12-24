@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { UseCase } from '@/core/domain/application/use-case'
+import { UseCase } from '@/core/domain/use-case'
 import { QuestionCommentsRepository } from '@/domain/application/repositories/question-comments.repository'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'

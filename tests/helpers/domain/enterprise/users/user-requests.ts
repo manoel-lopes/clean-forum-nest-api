@@ -1,6 +1,6 @@
 import type { INestApplication } from '@nestjs/common'
 import request from 'supertest'
-import type { PaginationParams } from '@/core/domain/application/pagination-params'
+import type { PaginationParams } from '@/core/domain/pagination-params'
 
 export type CreateUserData = {
   name?: unknown

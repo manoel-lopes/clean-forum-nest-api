@@ -1,4 +1,4 @@
-import type { PaginationParams } from '@/core/domain/application/pagination-params'
+import type { PaginationParams } from '@/core/domain/pagination-params'
 import type {
   PaginatedQuestionComments,
   QuestionCommentsRepository,

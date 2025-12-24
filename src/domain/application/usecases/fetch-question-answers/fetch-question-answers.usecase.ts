@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { UseCase } from '@/core/domain/application/use-case'
+import { UseCase } from '@/core/domain/use-case'
 import { AnswersRepository, type FindManyByQuestionIdParams, type PaginatedAnswers } from '@/domain/application/repositories/answers.repository'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'

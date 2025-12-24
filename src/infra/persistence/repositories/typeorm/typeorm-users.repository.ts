@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { PaginationParams } from '@/core/domain/application/pagination-params'
+import type { PaginationParams } from '@/core/domain/pagination-params'
 import type { PaginatedUsers, UpdateUserData, UsersRepository } from '@/domain/application/repositories/users.repository'
 import { User } from '@/domain/enterprise/entities/user.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'

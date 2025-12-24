@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type { PaginationParams } from '@/core/domain/application/pagination-params'
-import { UseCase } from '@/core/domain/application/use-case'
+import type { PaginationParams } from '@/core/domain/pagination-params'
+import { UseCase } from '@/core/domain/use-case'
 import { type PaginatedQuestions, QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 
 type FetchUserQuestionsRequest = PaginationParams & {

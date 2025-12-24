@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { UseCase } from '@/core/domain/application/use-case'
+import { UseCase } from '@/core/domain/use-case'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'

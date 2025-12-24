@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { UseCase } from '@/core/domain/application/use-case'
+import { UseCase } from '@/core/domain/use-case'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { UseCase } from '@/core/domain/application/use-case'
+import { UseCase } from '@/core/domain/use-case'
 import { AnswersRepository, type PaginatedAnswers } from '@/domain/application/repositories/answers.repository'
 import { type FindQuestionBySlugParams, QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import type { Answer } from '@/domain/enterprise/entities/answer.entity'

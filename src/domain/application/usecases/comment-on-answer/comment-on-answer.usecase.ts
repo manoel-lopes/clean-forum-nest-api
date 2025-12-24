@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { UseCase } from '@/core/domain/application/use-case'
+import { UseCase } from '@/core/domain/use-case'
 import { AnswerCommentsRepository } from '@/domain/application/repositories/answer-comments.repository'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'

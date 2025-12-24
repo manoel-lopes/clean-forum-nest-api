@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { UseCase } from '@/core/domain/application/use-case'
+import { UseCase } from '@/core/domain/use-case'
 import { AnswerAttachmentsRepository } from '@/domain/application/repositories/answer-attachments.repository'
 import type { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'

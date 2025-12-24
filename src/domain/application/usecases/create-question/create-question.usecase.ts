@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { UseCase } from '@/core/domain/application/use-case'
+import { UseCase } from '@/core/domain/use-case'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { Question, type QuestionProps } from '@/domain/enterprise/entities/question.entity'
 import { QuestionWithTitleAlreadyRegisteredException } from './exceptions/question-with-title-already-registered.exception'

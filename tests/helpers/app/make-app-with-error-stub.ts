@@ -1,7 +1,7 @@
 import type { INestApplication, Type } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { AppModule } from '@/app.module'
-import type { UseCase } from '@/core/domain/application/use-case'
+import type { UseCase } from '@/core/domain/use-case'
 import { ThrowingUseCaseStub } from '@tests/helpers/domain/application/use-case.stub'
 
 type MakeAppWithErrorStubOptions = {

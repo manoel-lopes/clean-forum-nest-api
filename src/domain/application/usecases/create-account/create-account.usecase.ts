@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { UseCase } from '@/core/domain/application/use-case'
+import { UseCase } from '@/core/domain/use-case'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
 import { User, type UserProps } from '@/domain/enterprise/entities/user.entity'
