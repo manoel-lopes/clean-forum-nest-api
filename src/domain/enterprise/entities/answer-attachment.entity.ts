@@ -1,14 +1,14 @@
 import { Props } from '@/shared/types/custom/props'
-import { Attachment } from './base/attachment.entity'
+import { Attachment, ChildEntity } from './base/attachment.entity'
 
 export type AnswerAttachmentProps = Omit<Props<AnswerAttachment>, 'type'>
 
+@ChildEntity('answer')
 export class AnswerAttachment extends Attachment {
   declare readonly answerId: string
-  declare readonly type: 'answer'
 
   private constructor (props: AnswerAttachmentProps) {
-    super({ ...props, type: 'answer' })
+    super(props)
   }
 
   static create (props: AnswerAttachmentProps): AnswerAttachment {
