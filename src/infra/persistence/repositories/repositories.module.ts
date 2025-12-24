@@ -8,6 +8,10 @@ import { QuestionCommentsRepository } from '@/domain/application/repositories/qu
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
+import { PrismaAnswerAttachmentMapper } from '@/infra/persistence/mappers/prisma/prisma-answer-attachment.mapper'
+import { PrismaAnswerCommentMapper } from '@/infra/persistence/mappers/prisma/prisma-answer-comment.mapper'
+import { PrismaQuestionAttachmentMapper } from '@/infra/persistence/mappers/prisma/prisma-question-attachment.mapper'
+import { PrismaQuestionCommentMapper } from '@/infra/persistence/mappers/prisma/prisma-question-comment.mapper'
 import { PrismaModule } from '@/infra/persistence/prisma.module'
 import { PrismaAnswerAttachmentsRepository } from '@/infra/persistence/repositories/prisma/prisma-answer-attachments.repository'
 import { PrismaAnswerCommentsRepository } from '@/infra/persistence/repositories/prisma/prisma-answer-comments.repository'
@@ -23,6 +27,10 @@ import { PrismaUsersRepository } from '@/infra/persistence/repositories/prisma/p
 @Module({
   imports: [PrismaModule],
   providers: [
+    { provide: PrismaQuestionCommentMapper, useValue: PrismaQuestionCommentMapper },
+    { provide: PrismaAnswerCommentMapper, useValue: PrismaAnswerCommentMapper },
+    { provide: PrismaQuestionAttachmentMapper, useValue: PrismaQuestionAttachmentMapper },
+    { provide: PrismaAnswerAttachmentMapper, useValue: PrismaAnswerAttachmentMapper },
     { provide: UsersRepository, useClass: PrismaUsersRepository },
     { provide: QuestionsRepository, useClass: PrismaQuestionsRepository },
     { provide: AnswersRepository, useClass: PrismaAnswersRepository },
