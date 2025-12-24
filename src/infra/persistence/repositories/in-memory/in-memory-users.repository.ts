@@ -1,18 +1,12 @@
 import { uuidv7 } from 'uuidv7'
-import type { PaginatedItems } from '@/core/domain/application/paginated-items'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
-import type { UpdateUserData, UsersRepository, UserWithoutPassword } from '@/domain/application/repositories/users.repository'
+import type { PaginatedUsers, UpdateUserData, UsersRepository } from '@/domain/application/repositories/users.repository'
 import type { User, UserProps } from '@/domain/enterprise/entities/user.entity'
-
-function removePassword (user: User): UserWithoutPassword {
-  const { password: _, ...userWithoutPassword } = user
-  return userWithoutPassword
-}
 
 export class InMemoryUsersRepository implements UsersRepository {
   private items: User[] = []
 
-  async create (data: UserProps): Promise<UserWithoutPassword> {
+  async create (data: UserProps): Promise<User> {
     const user: User = {
       id: uuidv7(),
       createdAt: new Date(),
@@ -20,13 +14,11 @@ export class InMemoryUsersRepository implements UsersRepository {
       ...data,
     }
     this.items.push(user)
-    return removePassword(user)
+    return user
   }
 
-  async findById (id: string): Promise<UserWithoutPassword | null> {
-    const user = this.items.find(item => item.id === id)
-    if (!user) return null
-    return removePassword(user)
+  async findById (id: string): Promise<User | null> {
+    return this.items.find(item => item.id === id) ?? null
   }
 
   async update ({ where, data }: UpdateUserData): Promise<User> {
@@ -47,23 +39,21 @@ export class InMemoryUsersRepository implements UsersRepository {
   }
 
   async findByEmail (email: string): Promise<User | null> {
-    const user = this.items.find(item => item.email === email)
-    return user ?? null
+    return this.items.find(item => item.email === email) ?? null
   }
 
-  async findMany ({ page = 1, pageSize = 10, order = 'desc' }: PaginationParams): Promise<PaginatedItems<UserWithoutPassword>> {
+  async findMany ({ page = 1, pageSize = 10, order = 'desc' }: PaginationParams): Promise<PaginatedUsers> {
     const sortedItems = [...this.items].sort((a, b) =>
       order === 'asc' ? a.createdAt.getTime() - b.createdAt.getTime() : b.createdAt.getTime() - a.createdAt.getTime()
     )
-    const paginatedItems = sortedItems.slice((page - 1) * pageSize, page * pageSize)
+    const items = sortedItems.slice((page - 1) * pageSize, page * pageSize)
     const totalItems = this.items.length
-    const totalPages = Math.ceil(totalItems / pageSize)
     return {
       page,
       pageSize,
       totalItems,
-      totalPages,
-      items: paginatedItems.map(removePassword),
+      totalPages: Math.ceil(totalItems / pageSize),
+      items,
       order,
     }
   }
