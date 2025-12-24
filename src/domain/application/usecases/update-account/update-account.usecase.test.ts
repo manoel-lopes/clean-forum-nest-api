@@ -1,7 +1,7 @@
-import type { UsersRepository, UserWithoutPassword } from '@/domain/application/repositories/users.repository'
+import type { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { PasswordHasherStub } from '@/infra/adapters/security/stubs/password-hasher.stub'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
-import type { UserProps } from '@/domain/enterprise/entities/user.entity'
+import type { User, UserProps } from '@/domain/enterprise/entities/user.entity'
 import { UpdateAccountUseCase } from './update-account.usecase'
 import { makeUserData } from '@tests/factories/domain/make-user'
 
@@ -10,7 +10,7 @@ describe('UpdateAccountUseCase', () => {
   let usersRepository: UsersRepository
   let passwordHasherStub: PasswordHasherStub
   let userData: UserProps
-  let user: UserWithoutPassword
+  let user: User
 
   beforeEach(async () => {
     usersRepository = new InMemoryUsersRepository()
