@@ -11,15 +11,12 @@ export class EnvService {
   }
 
   getDatabaseUrl (): string {
-    const value = this.configService.get('DATABASE_URL', { infer: true })
-    if (value) {
-      return value
-    }
-    const dbUser = this.configService.get('DB_USER', { infer: true })
-    const dbPassword = this.configService.get('DB_PASSWORD', { infer: true })
-    const dbHost = this.configService.get('DB_HOST', { infer: true })
-    const dbPort = this.configService.get('DB_PORT', { infer: true })
-    const dbName = this.configService.get('DB_NAME', { infer: true })
-    return `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}?schema=public`
+    const dbUser = process.env.DB_USER
+    const dbPassword = process.env.DB_PASSWORD
+    const dbHost = process.env.DB_HOST
+    const dbPort = process.env.DB_PORT
+    const dbName = process.env.DB_NAME
+    const schema = process.env.DB_SCHEMA || 'public'
+    return `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}?schema=${schema}`
   }
 }
