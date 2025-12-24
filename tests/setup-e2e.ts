@@ -2,10 +2,14 @@ import { randomUUID } from 'node:crypto'
 import { config } from 'dotenv'
 import { DataSource } from 'typeorm'
 import { Answer } from '@/domain/enterprise/entities/answer.entity'
+import { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
+import { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
 import { Comment } from '@/domain/enterprise/entities/base/comment.entity'
 import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
 import { Question } from '@/domain/enterprise/entities/question.entity'
+import { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
+import { QuestionComment } from '@/domain/enterprise/entities/question-comment.entity'
 import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
 import { User } from '@/domain/enterprise/entities/user.entity'
 
@@ -24,25 +28,24 @@ const entities = [
   Question,
   Answer,
   Comment,
+  QuestionComment,
+  AnswerComment,
   Attachment,
+  QuestionAttachment,
+  AnswerAttachment,
   RefreshToken,
   EmailValidation,
 ]
 
-function generateUniqueDatabaseURL (schemaId: string) {
-  const databaseURL = process.env.DATABASE_URL
-  if (!databaseURL) {
-    throw new Error('Please provide a DATABASE_URL environment variable')
-  }
-  const url = new URL(databaseURL)
-  url.searchParams.set('schema', schemaId)
-  return url.toString()
+function buildDatabaseUrl (schema: string): string {
+  const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env
+  return `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?schema=${schema}`
 }
 
-function createDataSource (connectionString: string, schema: string): DataSource {
+function createDataSource (schema: string): DataSource {
   return new DataSource({
     type: 'postgres',
-    url: connectionString,
+    url: buildDatabaseUrl(schema),
     schema,
     entities,
     synchronize: true,
@@ -56,14 +59,11 @@ let baseDataSource: DataSource
 
 beforeAll(async () => {
   schemaId = randomUUID()
-  const databaseURL = generateUniqueDatabaseURL(schemaId)
-  process.env.DATABASE_URL = databaseURL
-
-  const baseDatabaseURL = process.env.DATABASE_URL?.replace(/\?schema=.*$/, '') || process.env.DATABASE_URL
+  process.env.DB_SCHEMA = schemaId
 
   baseDataSource = new DataSource({
     type: 'postgres',
-    url: baseDatabaseURL,
+    url: buildDatabaseUrl('public'),
     logging: false,
   })
 
@@ -71,7 +71,7 @@ beforeAll(async () => {
   await baseDataSource.query(`CREATE SCHEMA IF NOT EXISTS "${schemaId}"`)
   await baseDataSource.destroy()
 
-  dataSource = createDataSource(databaseURL, schemaId)
+  dataSource = createDataSource(schemaId)
   await dataSource.initialize()
 })
 
@@ -80,10 +80,9 @@ afterAll(async () => {
     await dataSource.destroy()
   }
 
-  const baseDatabaseURL = process.env.DATABASE_URL?.replace(/\?schema=.*$/, '') || process.env.DATABASE_URL
   baseDataSource = new DataSource({
     type: 'postgres',
-    url: baseDatabaseURL,
+    url: buildDatabaseUrl('public'),
     logging: false,
   })
 
