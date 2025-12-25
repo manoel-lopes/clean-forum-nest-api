@@ -32,9 +32,7 @@ export class UserBuilder {
   build (): UserTestData {
     const result: UserTestData = {}
     for (const [key, value] of Object.entries(this.userData)) {
-      if (value !== undefined) {
-        result[key as keyof UserTestData] = value
-      }
+      if (value) result[key as keyof UserTestData] = value
     }
     return result
   }
