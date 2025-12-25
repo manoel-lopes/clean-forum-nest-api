@@ -389,7 +389,7 @@ Most routes require authentication using an JWT Token.
 **Response:**
 
 *   **Status:** `201 Created`
-*   **Body:** `null`
+*   **Body:** No body
 
 ---
 
@@ -430,7 +430,7 @@ email=john.doe@example.com
 **Response:**
 
 *   **Status:** `204 No Content`
-*   **Body:** `null`
+*   **Body:** No body
 
 ---
 
@@ -537,7 +537,7 @@ pageSize=10
 **Response:**
 
 *   **Status:** `201 Created`
-*   **Body:** `null`
+*   **Body:** No body
 
 ---
 
@@ -694,7 +694,7 @@ questionId=b7a7b7e0-7e0a-4b0e-7b0a-7e0a7b0e7b0a
 **Response:**
 
 *   **Status:** `204 No Content`
-*   **Body:** `null`
+*   **Body:** No body
 
 ---
 
@@ -826,7 +826,7 @@ answerId=d9b9c9e0-9e0a-4b0e-9b0a-9e0a9b0e9b0a
 **Response:**
 
 *   **Status:** `204 No Content`
-*   **Body:** `null`
+*   **Body:** No body
 
 ---
 
@@ -1019,7 +1019,7 @@ commentId=f2b2d2e0-2e0a-4b0e-2b0a-2e0a2b0e2b0a
 **Response:**
 
 *   **Status:** `204 No Content`
-*   **Body:** `null`
+*   **Body:** No body
 
 ---
 
@@ -1039,7 +1039,7 @@ commentId=e1a1c1e0-1e0a-4b0e-1b0a-1e0a1b0e1b0a
 **Response:**
 
 *   **Status:** `204 No Content`
-*   **Body:** `null`
+*   **Body:** No body
 
 ## Attachments
 
@@ -1217,7 +1217,7 @@ attachmentId=a1b1c1d1-1e1a-4b1e-1b1a-1e1a1b1e1b1a
 **Response:**
 
 *   **Status:** `204 No Content`
-*   **Body:** `null`
+*   **Body:** No body
 
 ---
 
@@ -1237,7 +1237,7 @@ attachmentId=b2c2d2e2-2e2a-4b2e-2b2a-2e2a2b2e2b2a
 **Response:**
 
 *   **Status:** `204 No Content`
-*   **Body:** `null`
+*   **Body:** No body
 
 ## Email Validation
 
@@ -1257,16 +1257,10 @@ attachmentId=b2c2d2e2-2e2a-4b2e-2b2a-2e2a2b2e2b2a
 }
 ```
 
-**Success Response:**
+**Response:**
 
 *   **Status:** `204 No Content`
-*   **Body:** `null`
-
-**Error Responses:**
-
-*   **Status:** `400 Bad Request` - Email is missing
-*   **Status:** `422 Unprocessable Entity` - Invalid email format
-*   **Status:** `503 Service Unavailable` - Email service unavailable
+*   **Body:** No body
 
 ---
 
@@ -1287,16 +1281,10 @@ attachmentId=b2c2d2e2-2e2a-4b2e-2b2a-2e2a2b2e2b2a
 }
 ```
 
-**Success Response:**
+**Response:**
 
 *   **Status:** `204 No Content`
-*   **Body:** `null`
-
-**Error Responses:**
-
-*   **Status:** `404 Not Found` - Email validation not found
-*   **Status:** `400 Bad Request` - Invalid code, expired code, or email already verified
-*   **Status:** `422 Unprocessable Entity` - Invalid request format
+*   **Body:** No body
 
 ## License
 
