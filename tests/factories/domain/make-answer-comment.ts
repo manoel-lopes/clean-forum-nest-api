@@ -6,7 +6,6 @@ export function makeAnswerComment (override: Partial<AnswerComment> = {}): Answe
     content: faker.lorem.sentence(),
     authorId: faker.string.uuid(),
     answerId: faker.string.uuid(),
-    questionId: undefined,
     ...override,
   }
   return AnswerComment.create(props)
