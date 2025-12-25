@@ -29,7 +29,7 @@ export class TypeOrmUsersRepository extends BaseTypeOrmRepository<User> implemen
   }: PaginationParams): Promise<PaginatedUsers> {
     const pagination = this.formatPagination(page, pageSize)
     const [items, totalItems] = await this.findAndCount({
-      order: { createdAt: order === 'desc' ? 'DESC' : 'ASC' },
+      order: { createdAt: order },
       skip: pagination.offset,
       take: pagination.limit,
     })

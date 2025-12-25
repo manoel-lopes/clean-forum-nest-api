@@ -43,7 +43,7 @@ export class TypeOrmQuestionsRepository
   }: FindManyQuestionsParams): Promise<PaginatedQuestions> {
     const pagination = this.formatPagination(page, pageSize)
     const [items, totalItems] = await this.findAndCount({
-      order: { createdAt: order === 'desc' ? 'DESC' : 'ASC' },
+      order: { createdAt: order },
       skip: pagination.offset,
       take: pagination.limit,
       relations: include,
@@ -70,7 +70,7 @@ export class TypeOrmQuestionsRepository
     const pagination = this.formatPagination(page, pageSize)
     const [items, totalItems] = await this.findAndCount({
       where: { authorId: userId },
-      order: { createdAt: order === 'desc' ? 'DESC' : 'ASC' },
+      order: { createdAt: order },
       skip: pagination.offset,
       take: pagination.limit,
     })

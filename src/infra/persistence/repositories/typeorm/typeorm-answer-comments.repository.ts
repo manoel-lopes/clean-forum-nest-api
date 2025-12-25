@@ -25,7 +25,7 @@ export class TypeOrmAnswerCommentsRepository
     const pagination = this.formatPagination(page, pageSize)
     const [items, totalItems] = await this.findAndCount({
       where: { answerId },
-      order: { createdAt: order === 'desc' ? 'DESC' : 'ASC' },
+      order: { createdAt: order },
       skip: pagination.offset,
       take: pagination.limit,
     })
