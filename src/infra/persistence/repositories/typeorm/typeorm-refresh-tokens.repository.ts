@@ -18,9 +18,6 @@ export class TypeOrmRefreshTokensRepository
   }
 
   async deleteManyByUserId (userId: string): Promise<void> {
-    const tokens = await this.find({ where: { userId } })
-    for (const token of tokens) {
-      await this.delete(token.id)
-    }
+    await this.deleteManyBy('userId', userId)
   }
 }
