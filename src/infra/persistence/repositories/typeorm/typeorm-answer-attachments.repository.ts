@@ -47,11 +47,4 @@ export class TypeOrmAnswerAttachmentsRepository
     const updated = await this.updateOne({ id: attachmentId, ...data })
     return updated
   }
-
-  async deleteMany (attachmentIds: string[]): Promise<void> {
-    if (attachmentIds.length === 0) return
-    for (const id of attachmentIds) {
-      await this.delete(id)
-    }
-  }
 }
