@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "nest build && rm -rf dist/shared/types",
     "check-types": "tsc --noEmit",
     "start": "nest start",
     "start:dev": "nest start --watch --exec 'node --env-file=.env.development'",
