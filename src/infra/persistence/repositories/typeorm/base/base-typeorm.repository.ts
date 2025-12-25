@@ -21,8 +21,14 @@ export abstract class BaseTypeOrmRepository<T extends BaseEntity> {
     return entity
   }
 
-  async delete (id: string): Promise<void> {
+  async delete (id: string | string[]): Promise<void> {
     await this.repository.delete(id)
+  }
+
+  protected async deleteManyBy (key: keyof T, value: string | string[]): Promise<void> {
+    await this.repository.delete({
+      [key]: value,
+    } as FindOptionsWhere<T>)
   }
 
   protected async updateOne (data: UpdateEntityData<T> & { id: string }): Promise<T> {

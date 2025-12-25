@@ -20,8 +20,9 @@ export abstract class BaseInMemoryRepository<Item extends BaseEntity> {
     return this.items.find((item) => item.id === id) || null
   }
 
-  async delete (id: string) {
-    this.items = this.items.filter((item) => item.id !== id)
+  async delete (id: string | string[]) {
+    const ids = Array.isArray(id) ? id : [id]
+    this.items = this.items.filter((item) => !ids.includes(item.id))
   }
 
   protected async findManyItems ({
@@ -76,8 +77,9 @@ export abstract class BaseInMemoryRepository<Item extends BaseEntity> {
     return this.items.find((item) => item[key] === value) || null
   }
 
-  protected async deleteOneBy<Value>(key: keyof Item, value: Value) {
-    this.items = this.items.filter((item) => item[key] !== value)
+  protected async deleteManyBy<Value>(key: keyof Item, value: Value | Value[]) {
+    const values = Array.isArray(value) ? value : [value]
+    this.items = this.items.filter((item) => !values.includes(item[key] as Value))
   }
 
   async updateOne (data: { id: string } & Record<string, unknown>): Promise<Item> {
