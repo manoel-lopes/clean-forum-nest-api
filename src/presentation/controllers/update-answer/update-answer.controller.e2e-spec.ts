@@ -60,7 +60,6 @@ describe('UpdateAnswer', () => {
 
     const response = await updateAnswer(app, token, {
       answerId: '123e4567-e89b-12d3-a456-426614174000',
-      content: undefined,
     })
 
     expect(response.statusCode).toBe(400)
