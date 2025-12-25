@@ -8,6 +8,6 @@ export class InMemoryRefreshTokensRepository extends BaseRepository<RefreshToken
   }
 
   async deleteManyByUserId (userId: string) {
-    this.items = this.items.filter((item) => item.userId !== userId)
+    await this.deleteManyBy('userId', userId)
   }
 }

@@ -13,8 +13,4 @@ export class InMemoryAttachmentsRepository<T extends Attachment = Attachment> ex
     const updatedAttachment = await this.updateOne({ id: attachmentId, ...data })
     return updatedAttachment
   }
-
-  async deleteMany (attachmentIds: string[]) {
-    this.items = this.items.filter((item) => !attachmentIds.includes(item.id))
-  }
 }
