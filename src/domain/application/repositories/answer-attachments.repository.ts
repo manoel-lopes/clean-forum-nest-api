@@ -11,8 +11,7 @@ export type AnswerAttachmentsRepository = {
   findById(attachmentId: string): Promise<AnswerAttachment | null>
   findManyByAnswerId(answerId: string, params: PaginationParams): Promise<PaginatedAnswerAttachments>
   update(attachmentId: string, data: UpdateAttachmentData): Promise<AnswerAttachment>
-  delete(attachmentId: string): Promise<void>
-  deleteMany(attachmentIds: string[]): Promise<void>
+  delete(attachmentId: string | string[]): Promise<void>
 }
 
 export const AnswerAttachmentsRepository = Symbol('AnswerAttachmentsRepository')
