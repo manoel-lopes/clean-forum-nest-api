@@ -16,26 +16,12 @@ import { User } from '@/domain/enterprise/entities/user.entity'
 config({ path: '.env', override: true })
 config({ path: '.env.test', override: true })
 
-process.on('unhandledRejection', (reason) => {
-  if (reason instanceof Error && reason.message === 'Connection is closed.') {
+process.on('unhandledRejection', (err) => {
+  if (err instanceof Error && err.message === 'Connection is closed.') {
     return
   }
-  throw reason
+  throw err
 })
-
-const entities = [
-  User,
-  Question,
-  Answer,
-  Comment,
-  QuestionComment,
-  AnswerComment,
-  Attachment,
-  QuestionAttachment,
-  AnswerAttachment,
-  RefreshToken,
-  EmailValidation,
-]
 
 function buildDatabaseUrl (schema: string): string {
   const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env
@@ -47,7 +33,19 @@ function createDataSource (schema: string): DataSource {
     type: 'postgres',
     url: buildDatabaseUrl(schema),
     schema,
-    entities,
+    entities: [
+      User,
+      Question,
+      Answer,
+      Comment,
+      QuestionComment,
+      AnswerComment,
+      Attachment,
+      QuestionAttachment,
+      AnswerAttachment,
+      RefreshToken,
+      EmailValidation,
+    ],
     synchronize: true,
     logging: false,
   })
