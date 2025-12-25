@@ -4,6 +4,7 @@
   "exclude": [
     "node_modules",
     "dist",
+    "types",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
     "src/**/*.e2e-spec.ts",
