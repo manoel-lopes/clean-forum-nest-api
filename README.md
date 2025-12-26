@@ -88,6 +88,30 @@ it('should do something', async () => {
 
 ---
 
+## 📦 Package by Feature
+
+This project follows the **Package by Feature** organizational pattern, where code is grouped by business capability rather than technical layer. Each feature contains all related files (controller, schema, tests) in a single directory.
+
+### Why Package by Feature?
+
+- **Cohesion**: All files for a feature live together
+- **Maintainability**: Changes to a feature affect only one directory
+- **Discoverability**: Easy to find all code related to a feature
+- **Reduced coupling**: Features are self-contained units
+
+### Example: Create Question Feature
+
+```
+src/infra/http/presentation/controllers/create-question/
+├── create-question.controller.ts      # NestJS controller
+├── create-question.schema.ts          # Zod validation schema
+└── create-question.controller.e2e-spec.ts  # E2E tests
+```
+
+All files related to creating a question are co-located, making the feature easy to understand, modify, and test.
+
+---
+
 ## 📂 Project Structure
 
 ```
@@ -104,49 +128,46 @@ clean-forum-node-api/
 │   │   └── enterprise/             # 💎 Enterprise Business Rules
 │   │       ├── entities/           # 🎭 Entities domain objects with unique identity
 │   │       └── value-objects/      # 💠 Value Objects immutable domain concepts
-│   │ 
-│   ├── presentation/               # 🎨 Process API endpoints
-│   │   ├── controllers/            # 🎮 Web controllers to handle HTTP requests invoking business operations
-│   │   └── helpers/                # 📤 HTTP response builders
 │   │
-│   ├── infra/                      # ⚙️ External dependencies
+│   ├── infra/                      # ⚙️ External dependencies (frameworks, drivers)
+│   │   │
+│   │   ├── http/                   # 🌐 HTTP layer (Package by Feature)
+│   │   │   ├── presentation/       # 🎨 API endpoints
+│   │   │   │   ├── controllers/    # 🎮 Feature-based controllers
+│   │   │   │   │   ├── create-question/
+│   │   │   │   │   │   ├── create-question.controller.ts
+│   │   │   │   │   │   ├── create-question.schema.ts
+│   │   │   │   │   │   └── create-question.controller.e2e-spec.ts
+│   │   │   │   │   └── .../        # Other feature controllers
+│   │   │   │   ├── decorators/     # 🏷️ Custom decorators
+│   │   │   │   └── helpers/        # 📤 HTTP response builders
+│   │   │   ├── schemas/            # 📋 Shared Zod schemas
+│   │   │   │   ├── core/           # Pagination, error response
+│   │   │   │   └── domain/         # Entity DTOs
+│   │   │   ├── pipes/              # 🔧 Validation pipes
+│   │   │   └── errors/             # ❌ HTTP-specific errors
 │   │   │
 │   │   ├── adapters/               # 🛡️ Anti-corruption layer for external services
 │   │   │   ├── email/              # 📧 Email service (Nodemailer)
-│   │   │   └── security/           # 🔐 Password hashing (Bcrypt)
+│   │   │   ├── security/           # 🔐 Password hashing (Bcrypt)
+│   │   │   └── storage/            # 📁 File storage (S3)
 │   │   │
 │   │   ├── persistence/            # 💾 Data persistence layer
 │   │   │   ├── mappers/            # 🔄 Domain ↔ Persistence mapping
 │   │   │   └── repositories/       # 📦 Repository implementations
 │   │   │       ├── prisma/         # 🐘 PostgreSQL with Prisma ORM
+│   │   │       ├── typeorm/        # 🐘 PostgreSQL with TypeORM
 │   │   │       ├── in-memory/      # 🧪 In-memory for testing
 │   │   │       └── cached/         # ⚡ Redis caching decorator
 │   │   │
-│   │   ├── http/                   # 🌐 HTTP infrastructure
-│   │   │   ├── errors/             # ❌ HTTP-specific errors 
-│   │   │   ├── fallback/           # 🚫 404 handler for unmatched routes
-│   │   │   └── helpers/            # 🛠️ HTTP utilities
-│   │   │
 │   │   ├── auth/                   # 🔒 JWT authentication
 │   │   ├── queues/                 # 📬 Background jobs (BullMQ)
-│   │   ├── providers/              # 🔌 External providers (Redis)
-│   │   ├── validation/             # ✅ Schema validation (Zod)
 │   │   └── doubles/                # 🎭 Test doubles (stubs, mocks)
 │   │
-│   ├── main/                       # 🔧 Dependency injection and application entry
-│   │   ├── factories/              # 🏭 Factory functions for controllers and use cases
-│   │   └── fastify/                # 🚀 Fastify application setup
-│   │       ├── helpers/            # 🔧 Route registration helpers
-│   │       ├── middlewares/        # 🛡️ Authentication and error handling
-│   │       ├── plugins/            # 🔌 Fastify plugins
-│   │       └── routes/             # 🛣️ Route definitions by domain
-│   │
 │   ├── shared/                     # 🔄 Cross-cutting concerns shared across layers
-│   ├── lib/                        # 📚 Reusable library utilities
-│   └── types/                      # 📝 Global TypeScript type definitions
+│   └── lib/                        # 📚 Reusable library utilities
 │
-├── tests/                          # 🧪 END-TO-END TESTS
-│   ├── e2e/                        # E2E test suites
+├── tests/                          # 🧪 Test utilities
 │   ├── builders/                   # Test Data Builders (Fluent API)
 │   └── helpers/                    # Test Helper Functions
 │
@@ -155,7 +176,7 @@ clean-forum-node-api/
 ├── docker-compose.test.yml         # Test containers config file
 ├── tsconfig.json                   # TypeScript configuration
 ├── eslint.config.mjs               # ESLint configuration
-├── vitest.config.ts                # Vitest test configuration
+├── vitest.config.mts               # Vitest test configuration
 ├── .lintstagedrc.mjs               # Lint-staged configuration
 ├── .husky/                         # Git hooks
 └── package.json                    # Dependencies and scripts
