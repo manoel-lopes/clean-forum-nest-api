@@ -9,6 +9,43 @@ import { QuestionCommentsRepository } from '@/domain/application/repositories/qu
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
+import { CacheModule } from '@/infra/cache/cache.module'
+import {
+  CachedAnswerAttachmentsRepository,
+  TypeOrmAnswerAttachmentsRepositoryToken,
+} from '@/infra/cache/repositories/cached-answer-attachments.repository'
+import {
+  CachedAnswerCommentsRepository,
+  TypeOrmAnswerCommentsRepositoryToken,
+} from '@/infra/cache/repositories/cached-answer-comments.repository'
+import {
+  CachedAnswersRepository,
+  TypeOrmAnswersRepositoryToken,
+} from '@/infra/cache/repositories/cached-answers.repository'
+import {
+  CachedEmailValidationsRepository,
+  TypeOrmEmailValidationsRepositoryToken,
+} from '@/infra/cache/repositories/cached-email-validations.repository'
+import {
+  CachedQuestionAttachmentsRepository,
+  TypeOrmQuestionAttachmentsRepositoryToken,
+} from '@/infra/cache/repositories/cached-question-attachments.repository'
+import {
+  CachedQuestionCommentsRepository,
+  TypeOrmQuestionCommentsRepositoryToken,
+} from '@/infra/cache/repositories/cached-question-comments.repository'
+import {
+  CachedQuestionsRepository,
+  TypeOrmQuestionsRepositoryToken,
+} from '@/infra/cache/repositories/cached-questions.repository'
+import {
+  CachedRefreshTokensRepository,
+  TypeOrmRefreshTokensRepositoryToken,
+} from '@/infra/cache/repositories/cached-refresh-tokens.repository'
+import {
+  CachedUsersRepository,
+  TypeOrmUsersRepositoryToken,
+} from '@/infra/cache/repositories/cached-users.repository'
 import { EnvService } from '@/infra/env/env.service'
 import { TypeOrmAnswerAttachmentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answer-attachments.repository'
 import { TypeOrmAnswerCommentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answer-comments.repository'
@@ -57,6 +94,7 @@ function extractSchemaFromUrl (databaseUrl: string): string | undefined {
 @Global()
 @Module({
   imports: [
+    CacheModule,
     TypeOrmModule.forRootAsync({
       inject: [EnvService],
       useFactory: (envService: EnvService) => {
@@ -75,15 +113,27 @@ function extractSchemaFromUrl (databaseUrl: string): string | undefined {
     TypeOrmModule.forFeature(entities),
   ],
   providers: [
-    { provide: UsersRepository, useClass: TypeOrmUsersRepository },
-    { provide: QuestionsRepository, useClass: TypeOrmQuestionsRepository },
-    { provide: AnswersRepository, useClass: TypeOrmAnswersRepository },
-    { provide: QuestionCommentsRepository, useClass: TypeOrmQuestionCommentsRepository },
-    { provide: AnswerCommentsRepository, useClass: TypeOrmAnswerCommentsRepository },
-    { provide: QuestionAttachmentsRepository, useClass: TypeOrmQuestionAttachmentsRepository },
-    { provide: AnswerAttachmentsRepository, useClass: TypeOrmAnswerAttachmentsRepository },
-    { provide: RefreshTokensRepository, useClass: TypeOrmRefreshTokensRepository },
-    { provide: EmailValidationsRepository, useClass: TypeOrmEmailValidationsRepository },
+    // TypeORM repositories (internal)
+    { provide: TypeOrmUsersRepositoryToken, useClass: TypeOrmUsersRepository },
+    { provide: TypeOrmQuestionsRepositoryToken, useClass: TypeOrmQuestionsRepository },
+    { provide: TypeOrmAnswersRepositoryToken, useClass: TypeOrmAnswersRepository },
+    { provide: TypeOrmQuestionCommentsRepositoryToken, useClass: TypeOrmQuestionCommentsRepository },
+    { provide: TypeOrmAnswerCommentsRepositoryToken, useClass: TypeOrmAnswerCommentsRepository },
+    { provide: TypeOrmQuestionAttachmentsRepositoryToken, useClass: TypeOrmQuestionAttachmentsRepository },
+    { provide: TypeOrmAnswerAttachmentsRepositoryToken, useClass: TypeOrmAnswerAttachmentsRepository },
+    { provide: TypeOrmRefreshTokensRepositoryToken, useClass: TypeOrmRefreshTokensRepository },
+    { provide: TypeOrmEmailValidationsRepositoryToken, useClass: TypeOrmEmailValidationsRepository },
+
+    // Cached repositories (public)
+    { provide: UsersRepository, useClass: CachedUsersRepository },
+    { provide: QuestionsRepository, useClass: CachedQuestionsRepository },
+    { provide: AnswersRepository, useClass: CachedAnswersRepository },
+    { provide: QuestionCommentsRepository, useClass: CachedQuestionCommentsRepository },
+    { provide: AnswerCommentsRepository, useClass: CachedAnswerCommentsRepository },
+    { provide: QuestionAttachmentsRepository, useClass: CachedQuestionAttachmentsRepository },
+    { provide: AnswerAttachmentsRepository, useClass: CachedAnswerAttachmentsRepository },
+    { provide: RefreshTokensRepository, useClass: CachedRefreshTokensRepository },
+    { provide: EmailValidationsRepository, useClass: CachedEmailValidationsRepository },
   ],
   exports: [
     UsersRepository,
