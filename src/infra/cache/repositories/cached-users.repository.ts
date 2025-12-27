@@ -16,11 +16,11 @@ export class CachedUsersRepository
   private readonly userIdToEmail = new Map<string, string>()
 
   constructor (
-    cacheService: RedisCacheService,
+    protected readonly redis: RedisCacheService,
     @Inject(PrismaUsersRepositoryToken)
     private readonly usersRepository: UsersRepository
   ) {
-    super(cacheService)
+    super(redis)
   }
 
   async create (userData: UserProps): Promise<User> {
