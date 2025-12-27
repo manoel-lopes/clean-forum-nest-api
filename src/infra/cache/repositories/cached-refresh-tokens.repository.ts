@@ -14,11 +14,11 @@ export class CachedRefreshTokensRepository
   private readonly userIdToTokenId = new Map<string, string>()
 
   constructor (
-    cacheService: RedisCacheService,
+    protected readonly redis: RedisCacheService,
     @Inject(PrismaRefreshTokensRepositoryToken)
     private readonly refreshTokensRepository: RefreshTokensRepository
   ) {
-    super(cacheService)
+    super(redis)
   }
 
   async create (refreshTokenData: RefreshTokenProps): Promise<RefreshToken> {
