@@ -8,6 +8,12 @@ import { QuestionCommentsRepository } from '@/domain/application/repositories/qu
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
+import { EnvService } from '@/infra/env/env.service'
+import { PrismaAnswerAttachmentMapper } from '@/infra/persistence/mappers/prisma/prisma-answer-attachment.mapper'
+import { PrismaAnswerCommentMapper } from '@/infra/persistence/mappers/prisma/prisma-answer-comment.mapper'
+import { PrismaQuestionAttachmentMapper } from '@/infra/persistence/mappers/prisma/prisma-question-attachment.mapper'
+import { PrismaQuestionCommentMapper } from '@/infra/persistence/mappers/prisma/prisma-question-comment.mapper'
+import { PrismaModule } from '@/infra/persistence/prisma.module'
 import { CacheModule } from '@/infra/persistence/repositories/cache/cache.module'
 import {
   CachedAnswerAttachmentsRepository,
@@ -45,12 +51,6 @@ import {
   CachedUsersRepository,
   PrismaUsersRepositoryToken,
 } from '@/infra/persistence/repositories/cache/repositories/cached-users.repository'
-import { EnvService } from '@/infra/env/env.service'
-import { PrismaAnswerAttachmentMapper } from '@/infra/persistence/mappers/prisma/prisma-answer-attachment.mapper'
-import { PrismaAnswerCommentMapper } from '@/infra/persistence/mappers/prisma/prisma-answer-comment.mapper'
-import { PrismaQuestionAttachmentMapper } from '@/infra/persistence/mappers/prisma/prisma-question-attachment.mapper'
-import { PrismaQuestionCommentMapper } from '@/infra/persistence/mappers/prisma/prisma-question-comment.mapper'
-import { PrismaModule } from '@/infra/persistence/prisma.module'
 import { PrismaAnswerAttachmentsRepository } from '@/infra/persistence/repositories/prisma/prisma-answer-attachments.repository'
 import { PrismaAnswerCommentsRepository } from '@/infra/persistence/repositories/prisma/prisma-answer-comments.repository'
 import { PrismaAnswersRepository } from '@/infra/persistence/repositories/prisma/prisma-answers.repository'
