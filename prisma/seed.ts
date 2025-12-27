@@ -1,8 +1,35 @@
-import { PrismaClient } from '@prisma/client'
+import { NestFactory } from '@nestjs/core'
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import type { Env } from '../src/infra/env/env'
+import type { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
+@Module({
+  imports: [ConfigModule.forRoot({ isGlobal: true })],
+})
+class SeedModule {}
+
+function getDatabaseUrl (config: ConfigService<Env, true>): string {
+  const value = config.get('DATABASE_URL', { infer: true })
+  if (value) return value
+  const dbUser = config.get('DB_USER', { infer: true })
+  const dbPassword = config.get('DB_PASSWORD', { infer: true })
+  const dbHost = config.get('DB_HOST', { infer: true })
+  const dbPort = config.get('DB_PORT', { infer: true })
+  const dbName = config.get('DB_NAME', { infer: true })
+  return `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}?schema=public`
+}
+
+let app: Awaited<ReturnType<typeof NestFactory.createApplicationContext>>
+let prisma: PrismaClient
 
 async function main () {
+  app = await NestFactory.createApplicationContext(SeedModule)
+  const config = app.get(ConfigService)
+  // Set DATABASE_URL before importing prisma client
+  process.env.DATABASE_URL = getDatabaseUrl(config)
+  prisma = (await import('../src/infra/persistence/prisma/client')).prisma
+
   console.log('🌱 Starting database seed...')
 
   // Clean up existing data
@@ -153,7 +180,7 @@ async function main () {
   await prisma.attachment.create({
     data: {
       title: 'NestJS Prisma Integration Guide',
-      link: 'https://docs.nestjs.com/recipes/prisma',
+      url: 'https://docs.nestjs.com/recipes/prisma',
       questionId: question1.id,
     },
   })
@@ -161,7 +188,7 @@ async function main () {
   await prisma.attachment.create({
     data: {
       title: 'Clean Architecture Diagram',
-      link: 'https://blog.cleancoder.com/uncle-bob/images/2012-08-13-the-clean-architecture/CleanArchitecture.jpg',
+      url: 'https://blog.cleancoder.com/uncle-bob/images/2012-08-13-the-clean-architecture/CleanArchitecture.jpg',
       questionId: question2.id,
     },
   })
@@ -177,5 +204,6 @@ main()
     process.exit(1)
   })
   .finally(async () => {
+    await app.close()
     await prisma.$disconnect()
   })
