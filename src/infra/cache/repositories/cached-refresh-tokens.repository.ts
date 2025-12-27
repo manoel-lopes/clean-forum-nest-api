@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
 import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
-import { CacheTTL } from '@/infra/cache/cache-ttl'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
 import type { RefreshToken, RefreshTokenProps } from '@/domain/enterprise/entities/refresh-token.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
@@ -11,10 +10,8 @@ export const PrismaRefreshTokensRepositoryToken = Symbol('PrismaRefreshTokensRep
 export class CachedRefreshTokensRepository
   extends BaseCachedRepository
   implements RefreshTokensRepository {
-  private readonly cacheKeys = {
-    refreshToken: (id: string) => `refresh-token:${id}`,
-    refreshTokenByUser: (userId: string) => `refresh-token:user:${userId}`,
-  }
+  private readonly REFRESH_TOKENS_TTL = 86400
+  private readonly userIdToTokenId = new Map<string, string>()
 
   constructor (
     cacheService: RedisCacheService,
@@ -24,35 +21,57 @@ export class CachedRefreshTokensRepository
     super(cacheService)
   }
 
-  async create (refreshToken: RefreshTokenProps): Promise<RefreshToken> {
-    const createdToken = await this.refreshTokensRepository.create(refreshToken)
-    await this.setCache(this.cacheKeys.refreshToken(createdToken.id), createdToken, CacheTTL.REFRESH_TOKEN)
-    await this.setCache(this.cacheKeys.refreshTokenByUser(createdToken.userId), createdToken, CacheTTL.REFRESH_TOKEN)
-    return createdToken
+  async create (refreshTokenData: RefreshTokenProps): Promise<RefreshToken> {
+    const refreshToken = await this.refreshTokensRepository.create(refreshTokenData)
+    this.userIdToTokenId.set(refreshToken.userId, refreshToken.id)
+    await this.setCache(this.getRefreshTokenCacheKey(refreshToken.id), refreshToken, this.REFRESH_TOKENS_TTL)
+    await this.setCache(this.getRefreshTokenByUserCacheKey(refreshToken.userId), refreshToken, this.REFRESH_TOKENS_TTL)
+    return refreshToken
   }
 
   async findById (id: string): Promise<RefreshToken | null> {
-    const cacheKey = this.cacheKeys.refreshToken(id)
+    const cacheKey = this.getRefreshTokenCacheKey(id)
     const cached = await this.getFromCache<RefreshToken>(cacheKey)
-    if (cached) return cached
+    if (cached) {
+      this.userIdToTokenId.set(cached.userId, cached.id)
+      return cached
+    }
     const token = await this.refreshTokensRepository.findById(id)
-    if (token) await this.setCache(cacheKey, token, CacheTTL.REFRESH_TOKEN)
+    if (token) {
+      this.userIdToTokenId.set(token.userId, token.id)
+      await this.setCache(cacheKey, token, this.REFRESH_TOKENS_TTL)
+    }
     return token
   }
 
   async findByUserId (userId: string): Promise<RefreshToken | null> {
-    const cacheKey = this.cacheKeys.refreshTokenByUser(userId)
+    const cacheKey = this.getRefreshTokenByUserCacheKey(userId)
     const cached = await this.getFromCache<RefreshToken>(cacheKey)
-    if (cached) return cached
+    if (cached) {
+      this.userIdToTokenId.set(cached.userId, cached.id)
+      return cached
+    }
     const token = await this.refreshTokensRepository.findByUserId(userId)
-    if (token) await this.setCache(cacheKey, token, CacheTTL.REFRESH_TOKEN)
+    if (token) {
+      this.userIdToTokenId.set(token.userId, token.id)
+      await this.setCache(cacheKey, token, this.REFRESH_TOKENS_TTL)
+    }
     return token
   }
 
   async deleteManyByUserId (userId: string): Promise<void> {
-    const token = await this.refreshTokensRepository.findByUserId(userId)
+    const tokenId = this.userIdToTokenId.get(userId)
     await this.refreshTokensRepository.deleteManyByUserId(userId)
-    await this.invalidateCache(this.cacheKeys.refreshTokenByUser(userId))
-    if (token) await this.invalidateCache(this.cacheKeys.refreshToken(token.id))
+    await this.invalidateCache(this.getRefreshTokenByUserCacheKey(userId))
+    if (tokenId) await this.invalidateCache(this.getRefreshTokenCacheKey(tokenId))
+    this.userIdToTokenId.delete(userId)
+  }
+
+  private getRefreshTokenCacheKey (id: string): string {
+    return `refresh-token:${id}`
+  }
+
+  private getRefreshTokenByUserCacheKey (userId: string): string {
+    return `refresh-token:user:${userId}`
   }
 }
