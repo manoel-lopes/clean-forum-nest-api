@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 import type { Env } from '../src/infra/env/env'
 
 @Module({
@@ -22,13 +24,15 @@ function getDatabaseUrl (config: ConfigService<Env, true>) {
 
 let app: Awaited<ReturnType<typeof NestFactory.createApplicationContext>>
 let prisma: PrismaClient
+let pool: Pool
 
 async function main () {
   app = await NestFactory.createApplicationContext(SeedModule)
   const config = app.get(ConfigService)
-  // Set DATABASE_URL env var for Prisma to read via prisma.config.ts
-  process.env.DATABASE_URL = getDatabaseUrl(config)
-  prisma = new PrismaClient({ log: ['query'] })
+  const databaseUrl = getDatabaseUrl(config)
+  pool = new Pool({ connectionString: databaseUrl })
+  const adapter = new PrismaPg(pool)
+  prisma = new PrismaClient({ adapter, log: ['query'] })
 
   console.log('🌱 Starting database seed...')
 
@@ -206,4 +210,5 @@ main()
   .finally(async () => {
     await app.close()
     await prisma.$disconnect()
+    await pool.end()
   })
