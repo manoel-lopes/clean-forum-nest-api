@@ -4,7 +4,6 @@ import type {
   PaginatedQuestionAttachments,
   QuestionAttachmentsRepository,
 } from '@/domain/application/repositories/question-attachments.repository'
-import { CacheTTL } from '@/infra/cache/cache-ttl'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
 import type {
   QuestionAttachment,
@@ -18,54 +17,66 @@ export const PrismaQuestionAttachmentsRepositoryToken = Symbol('PrismaQuestionAt
 export class CachedQuestionAttachmentsRepository
   extends BaseCachedRepository
   implements QuestionAttachmentsRepository {
-  private readonly cacheKeys = {
-    questionAttachment: (id: string) => `question-attachment:${id}`,
-    questionAttachmentsByQuestion: (questionId: string, page: number, size: number) =>
-      `question-attachments:question:${questionId}:page:${page}:size:${size}`,
-    questionAttachmentsByQuestionPattern: (questionId: string) =>
-      `question-attachments:question:${questionId}:*`,
-  }
+  private readonly ATTACHMENTS_TTL = 3600
+  private readonly ATTACHMENTS_LIST_TTL = 1800
+  private readonly attachmentIdToQuestionId = new Map<string, string>()
 
   constructor (
-    cacheService: RedisCacheService,
+    protected readonly redis: RedisCacheService,
     @Inject(PrismaQuestionAttachmentsRepositoryToken)
     private readonly questionAttachmentsRepository: QuestionAttachmentsRepository
   ) {
-    super(cacheService)
+    super(redis)
   }
 
-  async create (attachment: QuestionAttachmentProps): Promise<QuestionAttachment> {
-    const createdAttachment = await this.questionAttachmentsRepository.create(attachment)
-    await this.setCache(
-      this.cacheKeys.questionAttachment(createdAttachment.id),
-      createdAttachment,
-      CacheTTL.ATTACHMENT
-    )
-    if (createdAttachment.questionId) {
+  async create (attachmentData: QuestionAttachmentProps): Promise<QuestionAttachment> {
+    const attachment = await this.questionAttachmentsRepository.create(attachmentData)
+    if (attachment.questionId) {
+      this.attachmentIdToQuestionId.set(attachment.id, attachment.questionId)
       await this.invalidateCachePattern(
-        this.cacheKeys.questionAttachmentsByQuestionPattern(createdAttachment.questionId)
+        this.getAttachmentsByQuestionCachePattern(attachment.questionId)
       )
     }
-    return createdAttachment
+    await this.setCache(
+      this.getAttachmentCacheKey(attachment.id),
+      attachment,
+      this.ATTACHMENTS_TTL
+    )
+    return attachment
   }
 
-  async createMany (attachments: QuestionAttachmentProps[]): Promise<QuestionAttachment[]> {
-    const createdAttachments = await this.questionAttachmentsRepository.createMany(attachments)
-    for (const attachment of createdAttachments) {
-      await this.setCache(this.cacheKeys.questionAttachment(attachment.id), attachment, CacheTTL.ATTACHMENT)
+  async createMany (attachmentsData: QuestionAttachmentProps[]): Promise<QuestionAttachment[]> {
+    const attachments = await this.questionAttachmentsRepository.createMany(attachmentsData)
+    const questionIdsToInvalidate = new Set<string>()
+    for (const attachment of attachments) {
       if (attachment.questionId) {
-        await this.invalidateCachePattern(this.cacheKeys.questionAttachmentsByQuestionPattern(attachment.questionId))
+        this.attachmentIdToQuestionId.set(attachment.id, attachment.questionId)
+        questionIdsToInvalidate.add(attachment.questionId)
       }
     }
-    return createdAttachments
+    await Promise.all(
+      attachments
+        .map(attachment => this.setCache(
+          this.getAttachmentCacheKey(attachment.id),
+          attachment,
+          this.ATTACHMENTS_TTL))
+        .concat(Array.from(questionIdsToInvalidate, id => {
+          return this.invalidateCachePattern(this.getAttachmentsByQuestionCachePattern(id))
+        }))
+    )
+    return attachments
   }
 
   async findById (attachmentId: string): Promise<QuestionAttachment | null> {
-    const cacheKey = this.cacheKeys.questionAttachment(attachmentId)
+    const cacheKey = this.getAttachmentCacheKey(attachmentId)
     const cached = await this.getFromCache<QuestionAttachment>(cacheKey)
+    if (cached && cached.questionId) this.attachmentIdToQuestionId.set(cached.id, cached.questionId)
     if (cached) return cached
     const attachment = await this.questionAttachmentsRepository.findById(attachmentId)
-    if (attachment) await this.setCache(cacheKey, attachment, CacheTTL.ATTACHMENT)
+    if (attachment && attachment.questionId) {
+      this.attachmentIdToQuestionId.set(attachment.id, attachment.questionId)
+      await this.setCache(cacheKey, attachment, this.ATTACHMENTS_TTL)
+    }
     return attachment
   }
 
@@ -74,11 +85,11 @@ export class CachedQuestionAttachmentsRepository
     params: PaginationParams
   ): Promise<PaginatedQuestionAttachments> {
     const { page = 1, pageSize = 10 } = params
-    const cacheKey = this.cacheKeys.questionAttachmentsByQuestion(questionId, page, pageSize)
+    const cacheKey = this.getAttachmentsByQuestionCacheKey(questionId, page, pageSize)
     const cached = await this.getFromCache<PaginatedQuestionAttachments>(cacheKey)
     if (cached) return cached
     const attachments = await this.questionAttachmentsRepository.findManyByQuestionId(questionId, params)
-    await this.setCache(cacheKey, attachments, CacheTTL.ATTACHMENTS_LIST)
+    await this.setCache(cacheKey, attachments, this.ATTACHMENTS_LIST_TTL)
     return attachments
   }
 
@@ -87,32 +98,49 @@ export class CachedQuestionAttachmentsRepository
     data: Partial<Pick<QuestionAttachment, 'title' | 'url'>>
   ): Promise<QuestionAttachment> {
     const attachment = await this.questionAttachmentsRepository.update(attachmentId, data)
-    await this.setCache(this.cacheKeys.questionAttachment(attachment.id), attachment, CacheTTL.ATTACHMENT)
     if (attachment.questionId) {
-      await this.invalidateCachePattern(this.cacheKeys.questionAttachmentsByQuestionPattern(attachment.questionId))
+      this.attachmentIdToQuestionId.set(attachment.id, attachment.questionId)
+      await this.invalidateCachePattern(this.getAttachmentsByQuestionCachePattern(attachment.questionId))
     }
+    await this.setCache(this.getAttachmentCacheKey(attachment.id), attachment, this.ATTACHMENTS_TTL)
     return attachment
   }
 
   async delete (attachmentId: string): Promise<void> {
-    const attachment = await this.questionAttachmentsRepository.findById(attachmentId)
+    const questionId = this.attachmentIdToQuestionId.get(attachmentId)
     await this.questionAttachmentsRepository.delete(attachmentId)
-    await this.invalidateCache(this.cacheKeys.questionAttachment(attachmentId))
-    if (attachment?.questionId) {
-      await this.invalidateCachePattern(this.cacheKeys.questionAttachmentsByQuestionPattern(attachment.questionId))
+    await this.invalidateCache(this.getAttachmentCacheKey(attachmentId))
+    if (questionId) {
+      await this.invalidateCachePattern(this.getAttachmentsByQuestionCachePattern(questionId))
     }
+    this.attachmentIdToQuestionId.delete(attachmentId)
   }
 
   async deleteMany (attachmentIds: string[]): Promise<void> {
+    const questionIdsToInvalidate = new Set<string>()
     for (const id of attachmentIds) {
-      const attachment = await this.questionAttachmentsRepository.findById(id)
-      if (attachment?.questionId) {
-        await this.invalidateCache(this.cacheKeys.questionAttachment(id))
-        await this.invalidateCachePattern(
-          this.cacheKeys.questionAttachmentsByQuestionPattern(attachment.questionId)
-        )
+      const questionId = this.attachmentIdToQuestionId.get(id)
+      if (questionId) {
+        questionIdsToInvalidate.add(questionId)
+        this.attachmentIdToQuestionId.delete(id)
       }
     }
-    await this.questionAttachmentsRepository.deleteMany(attachmentIds)
+    await Promise.all(
+      [this.questionAttachmentsRepository.deleteMany(attachmentIds)]
+        .concat(attachmentIds.map(id => this.invalidateCache(this.getAttachmentCacheKey(id))))
+        .concat(Array.from(questionIdsToInvalidate, id => this.invalidateCachePattern(this.getAttachmentsByQuestionCachePattern(id))))
+    )
+  }
+
+  private getAttachmentCacheKey (id: string): string {
+    return `question-attachment:${id}`
+  }
+
+  private getAttachmentsByQuestionCacheKey (questionId: string, page: number, size: number): string {
+    return `question-attachments:question:${questionId}:page:${page}:size:${size}`
+  }
+
+  private getAttachmentsByQuestionCachePattern (questionId: string): string {
+    return `question-attachments:question:${questionId}:*`
   }
 }
