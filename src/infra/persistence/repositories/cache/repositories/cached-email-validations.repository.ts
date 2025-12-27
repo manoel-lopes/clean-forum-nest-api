@@ -3,7 +3,7 @@ import type {
   EmailValidationsRepository,
   UpdateEmailValidationData,
 } from '@/domain/application/repositories/email-validations.repository'
-import { RedisCacheService } from '@/infra/cache/redis-cache.service'
+import { RedisCacheService } from '@/infra/persistence/repositories/cache/redis-cache.service'
 import type { EmailValidation, EmailValidationProps } from '@/domain/enterprise/entities/email-validation.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
 

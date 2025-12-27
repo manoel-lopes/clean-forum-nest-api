@@ -8,43 +8,43 @@ import { QuestionCommentsRepository } from '@/domain/application/repositories/qu
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
-import { CacheModule } from '@/infra/cache/cache.module'
+import { CacheModule } from '@/infra/persistence/repositories/cache/cache.module'
 import {
   CachedAnswerAttachmentsRepository,
   PrismaAnswerAttachmentsRepositoryToken,
-} from '@/infra/cache/repositories/cached-answer-attachments.repository'
+} from '@/infra/persistence/repositories/cache/repositories/cached-answer-attachments.repository'
 import {
   CachedAnswerCommentsRepository,
   PrismaAnswerCommentsRepositoryToken,
-} from '@/infra/cache/repositories/cached-answer-comments.repository'
+} from '@/infra/persistence/repositories/cache/repositories/cached-answer-comments.repository'
 import {
   CachedAnswersRepository,
   PrismaAnswersRepositoryToken,
-} from '@/infra/cache/repositories/cached-answers.repository'
+} from '@/infra/persistence/repositories/cache/repositories/cached-answers.repository'
 import {
   CachedEmailValidationsRepository,
   PrismaEmailValidationsRepositoryToken,
-} from '@/infra/cache/repositories/cached-email-validations.repository'
+} from '@/infra/persistence/repositories/cache/repositories/cached-email-validations.repository'
 import {
   CachedQuestionAttachmentsRepository,
   PrismaQuestionAttachmentsRepositoryToken,
-} from '@/infra/cache/repositories/cached-question-attachments.repository'
+} from '@/infra/persistence/repositories/cache/repositories/cached-question-attachments.repository'
 import {
   CachedQuestionCommentsRepository,
   PrismaQuestionCommentsRepositoryToken,
-} from '@/infra/cache/repositories/cached-question-comments.repository'
+} from '@/infra/persistence/repositories/cache/repositories/cached-question-comments.repository'
 import {
   CachedQuestionsRepository,
   PrismaQuestionsRepositoryToken,
-} from '@/infra/cache/repositories/cached-questions.repository'
+} from '@/infra/persistence/repositories/cache/repositories/cached-questions.repository'
 import {
   CachedRefreshTokensRepository,
   PrismaRefreshTokensRepositoryToken,
-} from '@/infra/cache/repositories/cached-refresh-tokens.repository'
+} from '@/infra/persistence/repositories/cache/repositories/cached-refresh-tokens.repository'
 import {
   CachedUsersRepository,
   PrismaUsersRepositoryToken,
-} from '@/infra/cache/repositories/cached-users.repository'
+} from '@/infra/persistence/repositories/cache/repositories/cached-users.repository'
 import { EnvService } from '@/infra/env/env.service'
 import { PrismaAnswerAttachmentMapper } from '@/infra/persistence/mappers/prisma/prisma-answer-attachment.mapper'
 import { PrismaAnswerCommentMapper } from '@/infra/persistence/mappers/prisma/prisma-answer-comment.mapper'

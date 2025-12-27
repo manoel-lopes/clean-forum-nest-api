@@ -5,7 +5,7 @@ import type {
   PaginatedAnswerComments,
 } from '@/domain/application/repositories/answer-comments.repository'
 import type { UpdateCommentData } from '@/domain/application/repositories/base/comments.repository'
-import { RedisCacheService } from '@/infra/cache/redis-cache.service'
+import { RedisCacheService } from '@/infra/persistence/repositories/cache/redis-cache.service'
 import type { AnswerComment, AnswerCommentProps } from '@/domain/enterprise/entities/answer-comment.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
 

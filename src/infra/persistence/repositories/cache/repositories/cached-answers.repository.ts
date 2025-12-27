@@ -5,7 +5,7 @@ import type {
   PaginatedAnswers,
   UpdateAnswerData,
 } from '@/domain/application/repositories/answers.repository'
-import { RedisCacheService } from '@/infra/cache/redis-cache.service'
+import { RedisCacheService } from '@/infra/persistence/repositories/cache/redis-cache.service'
 import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
 
