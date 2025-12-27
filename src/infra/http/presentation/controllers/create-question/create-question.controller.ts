@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import {
   Body,
   ConflictException,
@@ -7,7 +8,6 @@ import {
   Post,
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { z } from 'zod'
 import { CreateQuestionUseCase } from '@/domain/application/usecases/create-question/create-question.usecase'
 import { QuestionWithTitleAlreadyRegisteredException } from '@/domain/application/usecases/create-question/exceptions/question-with-title-already-registered.exception'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'

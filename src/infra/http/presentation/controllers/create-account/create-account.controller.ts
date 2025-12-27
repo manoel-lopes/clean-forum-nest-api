@@ -11,15 +11,15 @@ import { UserWithEmailAlreadyRegisteredException } from '@/domain/application/us
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
-  CreateAccountBodyDto,
-  createAccountBodySchema,
-} from '@/infra/http/ports/users/create-account.schema'
-import {
   ApiBadRequestResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import {
+  CreateAccountBodyDto,
+  createAccountBodySchema,
+} from '@/infra/http/ports/users/create-account.schema'
 
 @ApiTags('Users')
 @Controller('users')

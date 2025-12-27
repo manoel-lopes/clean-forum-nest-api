@@ -15,7 +15,7 @@ export const TypeOrmUsersRepositoryToken = Symbol('TypeOrmUsersRepositoryToken')
 @Injectable()
 export class CachedUsersRepository extends BaseCachedRepository implements UsersRepository {
   constructor (
-    cacheService: RedisCacheService,
+    protected readonly cacheService: RedisCacheService,
     @Inject(TypeOrmUsersRepositoryToken)
     private readonly usersRepository: UsersRepository
   ) {

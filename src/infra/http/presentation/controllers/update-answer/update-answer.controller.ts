@@ -12,12 +12,6 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
-  UpdateAnswerBodyDto,
-  updateAnswerBodySchema,
-  UpdateAnswerParamsDto,
-  updateAnswerParamsSchema,
-} from '@/infra/http/ports/answers/update-answer.schema'
-import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
@@ -26,6 +20,12 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import {
+  UpdateAnswerBodyDto,
+  updateAnswerBodySchema,
+  UpdateAnswerParamsDto,
+  updateAnswerParamsSchema,
+} from '@/infra/http/ports/answers/update-answer.schema'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 

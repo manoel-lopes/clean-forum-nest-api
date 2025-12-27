@@ -12,10 +12,6 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
-  DeleteQuestionParamsDto,
-  deleteQuestionParamsSchema,
-} from '@/infra/http/ports/questions/delete-question.schema'
-import {
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
@@ -23,6 +19,10 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import {
+  DeleteQuestionParamsDto,
+  deleteQuestionParamsSchema,
+} from '@/infra/http/ports/questions/delete-question.schema'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 

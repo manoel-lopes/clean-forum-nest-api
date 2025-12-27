@@ -11,15 +11,15 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
-  CommentOnQuestionBodyDto,
-  commentOnQuestionBodySchema,
-} from '@/infra/http/ports/comments/comment-on-question.schema'
-import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import {
+  CommentOnQuestionBodyDto,
+  commentOnQuestionBodySchema,
+} from '@/infra/http/ports/comments/comment-on-question.schema'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Comments')

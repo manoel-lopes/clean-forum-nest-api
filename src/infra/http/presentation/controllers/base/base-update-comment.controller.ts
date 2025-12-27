@@ -10,13 +10,13 @@ import { UseCase } from '@/core/domain/use-case'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiUnauthorizedResponse, ApiUnprocessableEntityResponse } from '@/infra/http/presentation/decorators/api-responses.decorator'
 import {
   UpdateCommentBodyDto,
   updateCommentBodySchema,
   UpdateCommentParamsDto,
   updateCommentParamsSchema,
 } from '@/infra/http/ports/comments/update-comment.schema'
-import { ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiUnauthorizedResponse, ApiUnprocessableEntityResponse } from '@/infra/http/presentation/decorators/api-responses.decorator'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 

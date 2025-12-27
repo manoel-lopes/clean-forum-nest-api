@@ -33,7 +33,7 @@ export class CachedQuestionsRepository extends BaseCachedRepository implements Q
   }
 
   constructor (
-    cacheService: RedisCacheService,
+    protected readonly cacheService: RedisCacheService,
     @Inject(TypeOrmQuestionsRepositoryToken)
     private readonly questionsRepository: QuestionsRepository
   ) {

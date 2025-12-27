@@ -24,7 +24,7 @@ export class CachedAnswersRepository extends BaseCachedRepository implements Ans
   }
 
   constructor (
-    cacheService: RedisCacheService,
+    protected readonly cacheService: RedisCacheService,
     @Inject(TypeOrmAnswersRepositoryToken)
     private readonly answersRepository: AnswersRepository
   ) {

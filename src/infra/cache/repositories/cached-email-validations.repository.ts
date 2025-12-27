@@ -20,7 +20,7 @@ export class CachedEmailValidationsRepository
   }
 
   constructor (
-    cacheService: RedisCacheService,
+    protected readonly cacheService: RedisCacheService,
     @Inject(TypeOrmEmailValidationsRepositoryToken)
     private readonly emailValidationsRepository: EmailValidationsRepository
   ) {

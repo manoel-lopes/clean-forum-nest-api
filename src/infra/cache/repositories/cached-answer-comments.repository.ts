@@ -25,7 +25,7 @@ export class CachedAnswerCommentsRepository
   }
 
   constructor (
-    cacheService: RedisCacheService,
+    protected readonly cacheService: RedisCacheService,
     @Inject(TypeOrmAnswerCommentsRepositoryToken)
     private readonly answerCommentsRepository: AnswerCommentsRepository
   ) {

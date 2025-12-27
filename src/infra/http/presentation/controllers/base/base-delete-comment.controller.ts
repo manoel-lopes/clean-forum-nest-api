@@ -11,10 +11,6 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
-  DeleteCommentParamsDto,
-  deleteCommentParamsSchema,
-} from '@/infra/http/ports/comments/delete-comment.schema'
-import {
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
@@ -22,6 +18,10 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import {
+  DeleteCommentParamsDto,
+  deleteCommentParamsSchema,
+} from '@/infra/http/ports/comments/delete-comment.schema'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 

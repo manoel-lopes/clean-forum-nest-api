@@ -25,7 +25,7 @@ export class CachedAnswerAttachmentsRepository
   }
 
   constructor (
-    cacheService: RedisCacheService,
+    protected readonly cacheService: RedisCacheService,
     @Inject(TypeOrmAnswerAttachmentsRepositoryToken)
     private readonly answerAttachmentsRepository: AnswerAttachmentsRepository
   ) {

@@ -10,12 +10,6 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AttachToAnswerUseCase } from '@/domain/application/usecases/attach-to-answer/attach-to-answer.usecase'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
-  AttachToAnswerBodyDto,
-  attachToAnswerBodySchema,
-  AttachToAnswerParamsDto,
-  attachToAnswerParamsSchema,
-} from '@/infra/http/ports/attachments/attach-to-answer.schema'
-import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -23,6 +17,12 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import {
+  AttachToAnswerBodyDto,
+  attachToAnswerBodySchema,
+  AttachToAnswerParamsDto,
+  attachToAnswerParamsSchema,
+} from '@/infra/http/ports/attachments/attach-to-answer.schema'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Attachments')

@@ -17,7 +17,7 @@ export class CachedRefreshTokensRepository
   }
 
   constructor (
-    cacheService: RedisCacheService,
+    protected readonly cacheService: RedisCacheService,
     @Inject(TypeOrmRefreshTokensRepositoryToken)
     private readonly refreshTokensRepository: RefreshTokensRepository
   ) {
