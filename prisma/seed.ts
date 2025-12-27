@@ -1,15 +1,15 @@
 import { NestFactory } from '@nestjs/core'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { PrismaClient } from '@prisma/client'
 import type { Env } from '../src/infra/env/env'
-import type { PrismaClient } from '@prisma/client'
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true })],
 })
 class SeedModule {}
 
-function getDatabaseUrl (config: ConfigService<Env, true>): string {
+function getDatabaseUrl (config: ConfigService<Env, true>) {
   const value = config.get('DATABASE_URL', { infer: true })
   if (value) return value
   const dbUser = config.get('DB_USER', { infer: true })
@@ -26,9 +26,9 @@ let prisma: PrismaClient
 async function main () {
   app = await NestFactory.createApplicationContext(SeedModule)
   const config = app.get(ConfigService)
-  // Set DATABASE_URL before importing prisma client
+  // Set DATABASE_URL env var for Prisma to read via prisma.config.ts
   process.env.DATABASE_URL = getDatabaseUrl(config)
-  prisma = (await import('../src/infra/persistence/prisma/client')).prisma
+  prisma = new PrismaClient({ log: ['query'] })
 
   console.log('🌱 Starting database seed...')
 
