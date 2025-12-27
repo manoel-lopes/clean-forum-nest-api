@@ -5,7 +5,6 @@ import type {
   PaginatedAnswers,
   UpdateAnswerData,
 } from '@/domain/application/repositories/answers.repository'
-import { CacheTTL } from '@/infra/cache/cache-ttl'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
 import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
@@ -16,60 +15,78 @@ export const PrismaAnswersRepositoryToken = Symbol('PrismaAnswersRepositoryToken
 export class CachedAnswersRepository
   extends BaseCachedRepository
   implements AnswersRepository {
-  private readonly cacheKeys = {
-    answer: (id: string) => `answer:${id}`,
-    answersByQuestion: (questionId: string, page: number, size: number) =>
-      `answers:question:${questionId}:page:${page}:size:${size}`,
-    answersByQuestionPattern: (questionId: string) => `answers:question:${questionId}:*`,
-  }
+  private readonly ANSWERS_TTL = 3600
+  private readonly ANSWERS_LIST_TTL = 1800
+  private readonly answerIdToQuestionId = new Map<string, string>()
 
   constructor (
-    cacheService: RedisCacheService,
+    protected readonly redis: RedisCacheService,
     @Inject(PrismaAnswersRepositoryToken)
     private readonly answersRepository: AnswersRepository
   ) {
-    super(cacheService)
+    super(redis)
   }
 
-  async create (answer: AnswerProps): Promise<Answer> {
-    const createdAnswer = await this.answersRepository.create(answer)
-    await this.setCache(this.cacheKeys.answer(createdAnswer.id), createdAnswer, CacheTTL.ANSWER)
-    await this.invalidateCachePattern(this.cacheKeys.answersByQuestionPattern(createdAnswer.questionId))
-    return createdAnswer
+  async create (answerData: AnswerProps): Promise<Answer> {
+    const answer = await this.answersRepository.create(answerData)
+    this.answerIdToQuestionId.set(answer.id, answer.questionId)
+    await this.setCache(this.getAnswerCacheKey(answer.id), answer, this.ANSWERS_TTL)
+    await this.invalidateCachePattern(this.getAnswersByQuestionCachePattern(answer.questionId))
+    return answer
   }
 
   async findById (answerId: string): Promise<Answer | null> {
-    const cacheKey = this.cacheKeys.answer(answerId)
+    const cacheKey = this.getAnswerCacheKey(answerId)
     const cached = await this.getFromCache<Answer>(cacheKey)
-    if (cached) return cached
+    if (cached) {
+      this.answerIdToQuestionId.set(cached.id, cached.questionId)
+      return cached
+    }
     const answer = await this.answersRepository.findById(answerId)
-    if (answer) await this.setCache(cacheKey, answer, CacheTTL.ANSWER)
+    if (answer) {
+      this.answerIdToQuestionId.set(answer.id, answer.questionId)
+      await this.setCache(cacheKey, answer, this.ANSWERS_TTL)
+    }
     return answer
   }
 
   async findManyByQuestionId (params: FindManyByQuestionIdParams): Promise<PaginatedAnswers> {
     const { questionId, page = 1, pageSize = 20 } = params
-    const cacheKey = this.cacheKeys.answersByQuestion(questionId, page, pageSize)
+    const cacheKey = this.getAnswersByQuestionCacheKey(questionId, page, pageSize)
     const cached = await this.getFromCache<PaginatedAnswers>(cacheKey)
     if (cached) return cached
     const answers = await this.answersRepository.findManyByQuestionId(params)
-    await this.setCache(cacheKey, answers, CacheTTL.ANSWERS_LIST)
+    await this.setCache(cacheKey, answers, this.ANSWERS_LIST_TTL)
     return answers
   }
 
   async update ({ answerId, data }: UpdateAnswerData): Promise<Answer> {
     const answer = await this.answersRepository.update({ answerId, data })
-    await this.setCache(this.cacheKeys.answer(answer.id), answer, CacheTTL.ANSWER)
-    await this.invalidateCachePattern(this.cacheKeys.answersByQuestionPattern(answer.questionId))
+    this.answerIdToQuestionId.set(answer.id, answer.questionId)
+    await this.setCache(this.getAnswerCacheKey(answer.id), answer, this.ANSWERS_TTL)
+    await this.invalidateCachePattern(this.getAnswersByQuestionCachePattern(answer.questionId))
     return answer
   }
 
   async delete (answerId: string): Promise<void> {
-    const answer = await this.answersRepository.findById(answerId)
+    const questionId = this.answerIdToQuestionId.get(answerId)
     await this.answersRepository.delete(answerId)
-    await this.invalidateCache(this.cacheKeys.answer(answerId))
-    if (answer) {
-      await this.invalidateCachePattern(this.cacheKeys.answersByQuestionPattern(answer.questionId))
+    await this.invalidateCache(this.getAnswerCacheKey(answerId))
+    if (questionId) {
+      await this.invalidateCachePattern(this.getAnswersByQuestionCachePattern(questionId))
     }
+    this.answerIdToQuestionId.delete(answerId)
+  }
+
+  private getAnswerCacheKey (id: string): string {
+    return `answer:${id}`
+  }
+
+  private getAnswersByQuestionCacheKey (questionId: string, page: number, size: number): string {
+    return `answers:question:${questionId}:page:${page}:size:${size}`
+  }
+
+  private getAnswersByQuestionCachePattern (questionId: string): string {
+    return `answers:question:${questionId}:*`
   }
 }
