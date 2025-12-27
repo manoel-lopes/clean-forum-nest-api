@@ -15,22 +15,14 @@ import { BaseCachedRepository } from './base/base-cached.repository'
 
 export const TypeOrmQuestionsRepositoryToken = Symbol('TypeOrmQuestionsRepositoryToken')
 
+type QuestionMetadata = {
+  authorId: string
+  slug?: string
+}
+
 @Injectable()
 export class CachedQuestionsRepository extends BaseCachedRepository implements QuestionsRepository {
-  private readonly cacheKeys = {
-    question: (id: string) => `question:${id}`,
-    questionBySlug: (slug: string) => `question:slug:${slug}`,
-    questionsList: (page: number, size: number) => `questions:list:page:${page}:size:${size}`,
-    questionsListPattern: () => 'questions:list:*',
-    questionsByUser: (userId: string, page: number, size: number) =>
-      `questions:user:${userId}:page:${page}:size:${size}`,
-    questionsByUserPattern: (userId: string) => `questions:user:${userId}:*`,
-    answersByQuestionPattern: (questionId: string) => `answers:question:${questionId}:*`,
-    questionCommentsByQuestionPattern: (questionId: string) =>
-      `question-comments:question:${questionId}:*`,
-    questionAttachmentsByQuestionPattern: (questionId: string) =>
-      `question-attachments:question:${questionId}:*`,
-  }
+  private readonly questionIdToMetadata = new Map<string, QuestionMetadata>()
 
   constructor (
     protected readonly cacheService: RedisCacheService,
@@ -42,67 +34,96 @@ export class CachedQuestionsRepository extends BaseCachedRepository implements Q
 
   async save (question: Question): Promise<void> {
     await this.questionsRepository.save(question)
-    await this.setCache(this.cacheKeys.question(question.id), question, CacheTTL.QUESTION)
-    await this.invalidateCachePattern(this.cacheKeys.questionsListPattern())
-    await this.invalidateCachePattern(this.cacheKeys.questionsByUserPattern(question.authorId))
+    this.questionIdToMetadata.set(question.id, { authorId: question.authorId, slug: question.slug })
+    await Promise.all([
+      this.setCache(this.getQuestionCacheKey(question.id), question, CacheTTL.QUESTION),
+      this.invalidateCachePattern(this.getQuestionsListCachePattern()),
+      this.invalidateCachePattern(this.getQuestionsByUserCachePattern(question.authorId)),
+    ])
   }
 
   async findById (questionId: string): Promise<Question | null> {
-    const cacheKey = this.cacheKeys.question(questionId)
+    const cacheKey = this.getQuestionCacheKey(questionId)
     const cached = await this.getFromCache<Question>(cacheKey)
-    if (cached) return cached
+    if (cached) {
+      this.questionIdToMetadata.set(cached.id, { authorId: cached.authorId, slug: cached.slug })
+      return cached
+    }
     const question = await this.questionsRepository.findById(questionId)
-    if (question) await this.setCache(cacheKey, question, CacheTTL.QUESTION)
+    if (question) {
+      this.questionIdToMetadata.set(question.id, { authorId: question.authorId, slug: question.slug })
+      await this.setCache(cacheKey, question, CacheTTL.QUESTION)
+    }
     return question
   }
 
   async findByTitle (questionTitle: string): Promise<Question | null> {
-    return this.questionsRepository.findByTitle(questionTitle)
+    const question = await this.questionsRepository.findByTitle(questionTitle)
+    if (question) {
+      this.questionIdToMetadata.set(question.id, { authorId: question.authorId, slug: question.slug })
+    }
+    return question
   }
 
   async findBySlug (params: FindQuestionBySlugParams): Promise<FindQuestionsResult | null> {
-    const cacheKey = this.cacheKeys.questionBySlug(params.slug)
+    const cacheKey = this.getQuestionBySlugCacheKey(params.slug)
     const cached = await this.getFromCache<FindQuestionsResult>(cacheKey)
-    if (cached) return cached
+    if (cached) {
+      this.questionIdToMetadata.set(cached.id, { authorId: cached.authorId, slug: cached.slug })
+      return cached
+    }
     const result = await this.questionsRepository.findBySlug(params)
-    if (result) await this.setCache(cacheKey, result, CacheTTL.QUESTION)
+    if (result) {
+      this.questionIdToMetadata.set(result.id, { authorId: result.authorId, slug: result.slug })
+      await this.setCache(cacheKey, result, CacheTTL.QUESTION)
+    }
     return result
   }
 
   async delete (questionId: string): Promise<void> {
-    const question = await this.questionsRepository.findById(questionId)
+    const metadata = this.questionIdToMetadata.get(questionId)
     await this.questionsRepository.delete(questionId)
-    await this.invalidateCache(this.cacheKeys.question(questionId))
-    if (question?.slug) {
-      await this.invalidateCache(this.cacheKeys.questionBySlug(question.slug))
+    const invalidations: Promise<void>[] = [
+      this.invalidateCache(this.getQuestionCacheKey(questionId)),
+      this.invalidateCachePattern(this.getQuestionsListCachePattern()),
+      this.invalidateCachePattern(this.getAnswersByQuestionCachePattern(questionId)),
+      this.invalidateCachePattern(this.getQuestionCommentsByQuestionCachePattern(questionId)),
+      this.invalidateCachePattern(this.getQuestionAttachmentsByQuestionCachePattern(questionId)),
+    ]
+    if (metadata?.slug) {
+      invalidations.push(this.invalidateCache(this.getQuestionBySlugCacheKey(metadata.slug)))
     }
-    await this.invalidateCachePattern(this.cacheKeys.questionsListPattern())
-    if (question?.authorId) {
-      await this.invalidateCachePattern(this.cacheKeys.questionsByUserPattern(question.authorId))
+    if (metadata?.authorId) {
+      invalidations.push(this.invalidateCachePattern(this.getQuestionsByUserCachePattern(metadata.authorId)))
     }
-    await this.invalidateCachePattern(this.cacheKeys.answersByQuestionPattern(questionId))
-    await this.invalidateCachePattern(this.cacheKeys.questionCommentsByQuestionPattern(questionId))
-    await this.invalidateCachePattern(this.cacheKeys.questionAttachmentsByQuestionPattern(questionId))
+    await Promise.all(invalidations)
+    this.questionIdToMetadata.delete(questionId)
   }
 
   async update (questionData: UpdateQuestionData): Promise<Question> {
     const question = await this.questionsRepository.update(questionData)
-    await this.setCache(this.cacheKeys.question(question.id), question, CacheTTL.QUESTION)
+    this.questionIdToMetadata.set(question.id, { authorId: question.authorId, slug: question.slug })
+    const cacheOperations: Promise<void>[] = [
+      this.setCache(this.getQuestionCacheKey(question.id), question, CacheTTL.QUESTION),
+      this.invalidateCachePattern(this.getQuestionsListCachePattern()),
+      this.invalidateCachePattern(this.getQuestionsByUserCachePattern(question.authorId)),
+    ]
     if (question.slug) {
-      await this.setCache(this.cacheKeys.questionBySlug(question.slug), question, CacheTTL.QUESTION)
+      cacheOperations.push(
+        this.setCache(this.getQuestionBySlugCacheKey(question.slug), question, CacheTTL.QUESTION)
+      )
     }
-    await this.invalidateCachePattern(this.cacheKeys.questionsListPattern())
-    await this.invalidateCachePattern(this.cacheKeys.questionsByUserPattern(question.authorId))
+    await Promise.all(cacheOperations)
     return question
   }
 
   async findMany (params: FindManyQuestionsParams): Promise<PaginatedQuestions> {
     const { page = 1, pageSize = 20 } = params
-    const cacheKey = this.cacheKeys.questionsList(page, pageSize)
+    const cacheKey = this.getQuestionsListCacheKey(page, pageSize)
     const cached = await this.getFromCache<PaginatedQuestions>(cacheKey)
     if (cached) return cached
     const questions = await this.questionsRepository.findMany(params)
-    if (questions) await this.setCache(cacheKey, questions, CacheTTL.QUESTIONS_LIST)
+    await this.setCache(cacheKey, questions, CacheTTL.QUESTIONS_LIST)
     return questions
   }
 
@@ -111,11 +132,47 @@ export class CachedQuestionsRepository extends BaseCachedRepository implements Q
     paginationParams: PaginationParams
   ): Promise<PaginatedQuestions> {
     const { page = 1, pageSize = 10 } = paginationParams
-    const cacheKey = this.cacheKeys.questionsByUser(userId, page, pageSize)
+    const cacheKey = this.getQuestionsByUserCacheKey(userId, page, pageSize)
     const cached = await this.getFromCache<PaginatedQuestions>(cacheKey)
     if (cached) return cached
     const questions = await this.questionsRepository.findManyByUserId(userId, paginationParams)
-    if (questions) await this.setCache(cacheKey, questions, CacheTTL.QUESTIONS_LIST)
+    await this.setCache(cacheKey, questions, CacheTTL.QUESTIONS_LIST)
     return questions
+  }
+
+  private getQuestionCacheKey (id: string): string {
+    return `question:${id}`
+  }
+
+  private getQuestionBySlugCacheKey (slug: string): string {
+    return `question:slug:${slug}`
+  }
+
+  private getQuestionsListCacheKey (page: number, size: number): string {
+    return `questions:list:page:${page}:size:${size}`
+  }
+
+  private getQuestionsListCachePattern (): string {
+    return 'questions:list:*'
+  }
+
+  private getQuestionsByUserCacheKey (userId: string, page: number, size: number): string {
+    return `questions:user:${userId}:page:${page}:size:${size}`
+  }
+
+  private getQuestionsByUserCachePattern (userId: string): string {
+    return `questions:user:${userId}:*`
+  }
+
+  private getAnswersByQuestionCachePattern (questionId: string): string {
+    return `answers:question:${questionId}:*`
+  }
+
+  private getQuestionCommentsByQuestionCachePattern (questionId: string): string {
+    return `question-comments:question:${questionId}:*`
+  }
+
+  private getQuestionAttachmentsByQuestionCachePattern (questionId: string): string {
+    return `question-attachments:question:${questionId}:*`
   }
 }

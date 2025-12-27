@@ -16,13 +16,7 @@ export const TypeOrmQuestionCommentsRepositoryToken = Symbol('TypeOrmQuestionCom
 export class CachedQuestionCommentsRepository
   extends BaseCachedRepository
   implements QuestionCommentsRepository {
-  private readonly cacheKeys = {
-    questionComment: (id: string) => `question-comment:${id}`,
-    questionCommentsByQuestion: (questionId: string, page: number, size: number) =>
-      `question-comments:question:${questionId}:page:${page}:size:${size}`,
-    questionCommentsByQuestionPattern: (questionId: string) =>
-      `question-comments:question:${questionId}:*`,
-  }
+  private readonly commentIdToQuestionId = new Map<string, string>()
 
   constructor (
     protected readonly cacheService: RedisCacheService,
@@ -34,35 +28,28 @@ export class CachedQuestionCommentsRepository
 
   async save (comment: Comment): Promise<void> {
     await this.questionCommentsRepository.save(comment)
-    await this.setCache(this.cacheKeys.questionComment(comment.id), comment, CacheTTL.COMMENT)
     if (comment.questionId) {
-      await this.invalidateCachePattern(this.cacheKeys.questionCommentsByQuestionPattern(comment.questionId))
+      this.commentIdToQuestionId.set(comment.id, comment.questionId)
+      await Promise.all([
+        this.setCache(this.getCommentCacheKey(comment.id), comment, CacheTTL.COMMENT),
+        this.invalidateCachePattern(this.getCommentsByQuestionCachePattern(comment.questionId)),
+      ])
+    } else {
+      await this.setCache(this.getCommentCacheKey(comment.id), comment, CacheTTL.COMMENT)
     }
   }
 
   async findById (commentId: string): Promise<Comment | null> {
-    const cacheKey = this.cacheKeys.questionComment(commentId)
+    const cacheKey = this.getCommentCacheKey(commentId)
     const cached = await this.getFromCache<Comment>(cacheKey)
-    if (cached) return cached
-    const comment = await this.questionCommentsRepository.findById(commentId)
-    if (comment) await this.setCache(cacheKey, comment, CacheTTL.COMMENT)
-    return comment
-  }
-
-  async delete (commentId: string): Promise<void> {
-    const comment = await this.questionCommentsRepository.findById(commentId)
-    await this.questionCommentsRepository.delete(commentId)
-    await this.invalidateCache(this.cacheKeys.questionComment(commentId))
-    if (comment?.questionId) {
-      await this.invalidateCachePattern(this.cacheKeys.questionCommentsByQuestionPattern(comment.questionId))
+    if (cached) {
+      if (cached.questionId) this.commentIdToQuestionId.set(cached.id, cached.questionId)
+      return cached
     }
-  }
-
-  async update (commentData: UpdateCommentData): Promise<Comment> {
-    const comment = await this.questionCommentsRepository.update(commentData)
-    await this.setCache(this.cacheKeys.questionComment(comment.id), comment, CacheTTL.COMMENT)
-    if (comment.questionId) {
-      await this.invalidateCachePattern(this.cacheKeys.questionCommentsByQuestionPattern(comment.questionId))
+    const comment = await this.questionCommentsRepository.findById(commentId)
+    if (comment) {
+      if (comment.questionId) this.commentIdToQuestionId.set(comment.id, comment.questionId)
+      await this.setCache(cacheKey, comment, CacheTTL.COMMENT)
     }
     return comment
   }
@@ -72,11 +59,47 @@ export class CachedQuestionCommentsRepository
     params: PaginationParams
   ): Promise<PaginatedQuestionComments> {
     const { page = 1, pageSize = 10 } = params
-    const cacheKey = this.cacheKeys.questionCommentsByQuestion(questionId, page, pageSize)
+    const cacheKey = this.getCommentsByQuestionCacheKey(questionId, page, pageSize)
     const cached = await this.getFromCache<PaginatedQuestionComments>(cacheKey)
     if (cached) return cached
     const comments = await this.questionCommentsRepository.findManyByQuestionId(questionId, params)
-    if (comments) await this.setCache(cacheKey, comments, CacheTTL.COMMENTS_LIST)
+    await this.setCache(cacheKey, comments, CacheTTL.COMMENTS_LIST)
     return comments
+  }
+
+  async update (commentData: UpdateCommentData): Promise<Comment> {
+    const comment = await this.questionCommentsRepository.update(commentData)
+    if (comment.questionId) {
+      this.commentIdToQuestionId.set(comment.id, comment.questionId)
+      await Promise.all([
+        this.setCache(this.getCommentCacheKey(comment.id), comment, CacheTTL.COMMENT),
+        this.invalidateCachePattern(this.getCommentsByQuestionCachePattern(comment.questionId)),
+      ])
+    } else {
+      await this.setCache(this.getCommentCacheKey(comment.id), comment, CacheTTL.COMMENT)
+    }
+    return comment
+  }
+
+  async delete (commentId: string): Promise<void> {
+    const questionId = this.commentIdToQuestionId.get(commentId)
+    await this.questionCommentsRepository.delete(commentId)
+    await this.invalidateCache(this.getCommentCacheKey(commentId))
+    if (questionId) {
+      await this.invalidateCachePattern(this.getCommentsByQuestionCachePattern(questionId))
+    }
+    this.commentIdToQuestionId.delete(commentId)
+  }
+
+  private getCommentCacheKey (id: string): string {
+    return `question-comment:${id}`
+  }
+
+  private getCommentsByQuestionCacheKey (questionId: string, page: number, size: number): string {
+    return `question-comments:question:${questionId}:page:${page}:size:${size}`
+  }
+
+  private getCommentsByQuestionCachePattern (questionId: string): string {
+    return `question-comments:question:${questionId}:*`
   }
 }

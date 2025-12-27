@@ -14,10 +14,7 @@ export const TypeOrmEmailValidationsRepositoryToken = Symbol('TypeOrmEmailValida
 export class CachedEmailValidationsRepository
   extends BaseCachedRepository
   implements EmailValidationsRepository {
-  private readonly cacheKeys = {
-    emailValidation: (id: string) => `email-validation:${id}`,
-    emailValidationByEmail: (email: string) => `email-validation:email:${email}`,
-  }
+  private readonly validationIdToEmail = new Map<string, string>()
 
   constructor (
     protected readonly cacheService: RedisCacheService,
@@ -29,49 +26,79 @@ export class CachedEmailValidationsRepository
 
   async save (emailValidation: EmailValidation): Promise<void> {
     await this.emailValidationsRepository.save(emailValidation)
-    await this.setCache(this.cacheKeys.emailValidation(emailValidation.id), emailValidation, CacheTTL.EMAIL_VALIDATION)
-    await this.setCache(
-      this.cacheKeys.emailValidationByEmail(emailValidation.email),
-      emailValidation,
-      CacheTTL.EMAIL_VALIDATION
-    )
+    this.validationIdToEmail.set(emailValidation.id, emailValidation.email)
+    await Promise.all([
+      this.setCache(
+        this.getEmailValidationCacheKey(emailValidation.id), emailValidation, CacheTTL.EMAIL_VALIDATION
+      ),
+      this.setCache(
+        this.getEmailValidationByEmailCacheKey(emailValidation.email), emailValidation, CacheTTL.EMAIL_VALIDATION
+      ),
+    ])
   }
 
   async update (emailValidationData: UpdateEmailValidationData): Promise<EmailValidation> {
     const emailValidation = await this.emailValidationsRepository.update(emailValidationData)
-    await this.setCache(this.cacheKeys.emailValidation(emailValidation.id), emailValidation, CacheTTL.EMAIL_VALIDATION)
-    await this.setCache(
-      this.cacheKeys.emailValidationByEmail(emailValidation.email),
-      emailValidation,
-      CacheTTL.EMAIL_VALIDATION
-    )
+    this.validationIdToEmail.set(emailValidation.id, emailValidation.email)
+    await Promise.all([
+      this.setCache(
+        this.getEmailValidationCacheKey(emailValidation.id), emailValidation, CacheTTL.EMAIL_VALIDATION
+      ),
+      this.setCache(
+        this.getEmailValidationByEmailCacheKey(emailValidation.email), emailValidation, CacheTTL.EMAIL_VALIDATION
+      ),
+    ])
     return emailValidation
   }
 
   async findByEmail (email: string): Promise<EmailValidation | null> {
-    const cacheKey = this.cacheKeys.emailValidationByEmail(email)
+    const cacheKey = this.getEmailValidationByEmailCacheKey(email)
     const cached = await this.getFromCache<EmailValidation>(cacheKey)
-    if (cached) return cached
+    if (cached) {
+      this.validationIdToEmail.set(cached.id, cached.email)
+      return cached
+    }
     const validation = await this.emailValidationsRepository.findByEmail(email)
-    if (validation) await this.setCache(cacheKey, validation, CacheTTL.EMAIL_VALIDATION)
+    if (validation) {
+      this.validationIdToEmail.set(validation.id, validation.email)
+      await this.setCache(cacheKey, validation, CacheTTL.EMAIL_VALIDATION)
+    }
     return validation
   }
 
   async findById (id: string): Promise<EmailValidation | null> {
-    const cacheKey = this.cacheKeys.emailValidation(id)
+    const cacheKey = this.getEmailValidationCacheKey(id)
     const cached = await this.getFromCache<EmailValidation>(cacheKey)
-    if (cached) return cached
+    if (cached) {
+      this.validationIdToEmail.set(cached.id, cached.email)
+      return cached
+    }
     const validation = await this.emailValidationsRepository.findById(id)
-    if (validation) await this.setCache(cacheKey, validation, CacheTTL.EMAIL_VALIDATION)
+    if (validation) {
+      this.validationIdToEmail.set(validation.id, validation.email)
+      await this.setCache(cacheKey, validation, CacheTTL.EMAIL_VALIDATION)
+    }
     return validation
   }
 
   async delete (id: string): Promise<void> {
-    const emailValidation = await this.emailValidationsRepository.findById(id)
+    const email = this.validationIdToEmail.get(id)
     await this.emailValidationsRepository.delete(id)
-    await this.invalidateCache(this.cacheKeys.emailValidation(id))
-    if (emailValidation?.email) {
-      await this.invalidateCache(this.cacheKeys.emailValidationByEmail(emailValidation.email))
+    const invalidations: Promise<void>[] = [
+      this.invalidateCache(this.getEmailValidationCacheKey(id)),
+    ]
+    if (email) {
+      invalidations.push(this.invalidateCache(this.getEmailValidationByEmailCacheKey(email)))
     }
+    await Promise.all(invalidations)
+    this.validationIdToEmail.delete(id)
+  }
+
+  private getEmailValidationCacheKey (id: string): string {
+    return `email-validation:${id}`
+  }
+
+  private getEmailValidationByEmailCacheKey (email: string): string {
+    return `email-validation:email:${email}`
   }
 }

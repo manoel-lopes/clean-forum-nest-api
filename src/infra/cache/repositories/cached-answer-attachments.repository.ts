@@ -16,13 +16,7 @@ export const TypeOrmAnswerAttachmentsRepositoryToken = Symbol('TypeOrmAnswerAtta
 export class CachedAnswerAttachmentsRepository
   extends BaseCachedRepository
   implements AnswerAttachmentsRepository {
-  private readonly cacheKeys = {
-    answerAttachment: (id: string) => `answer-attachment:${id}`,
-    answerAttachmentsByAnswer: (answerId: string, page: number, size: number) =>
-      `answer-attachments:answer:${answerId}:page:${page}:size:${size}`,
-    answerAttachmentsByAnswerPattern: (answerId: string) =>
-      `answer-attachments:answer:${answerId}:*`,
-  }
+  private readonly attachmentIdToAnswerId = new Map<string, string>()
 
   constructor (
     protected readonly cacheService: RedisCacheService,
@@ -34,24 +28,42 @@ export class CachedAnswerAttachmentsRepository
 
   async save (attachment: AnswerAttachment): Promise<void> {
     await this.answerAttachmentsRepository.save(attachment)
-    await this.setCache(this.cacheKeys.answerAttachment(attachment.id), attachment, CacheTTL.ATTACHMENT)
-    await this.invalidateCachePattern(this.cacheKeys.answerAttachmentsByAnswerPattern(attachment.answerId))
+    this.attachmentIdToAnswerId.set(attachment.id, attachment.answerId)
+    await Promise.all([
+      this.setCache(this.getAttachmentCacheKey(attachment.id), attachment, CacheTTL.ATTACHMENT),
+      this.invalidateCachePattern(this.getAttachmentsByAnswerCachePattern(attachment.answerId)),
+    ])
   }
 
   async saveMany (attachments: AnswerAttachment[]): Promise<void> {
     await this.answerAttachmentsRepository.saveMany(attachments)
+    const answerIdsToInvalidate = new Set<string>()
     for (const attachment of attachments) {
-      await this.setCache(this.cacheKeys.answerAttachment(attachment.id), attachment, CacheTTL.ATTACHMENT)
-      await this.invalidateCachePattern(this.cacheKeys.answerAttachmentsByAnswerPattern(attachment.answerId))
+      this.attachmentIdToAnswerId.set(attachment.id, attachment.answerId)
+      answerIdsToInvalidate.add(attachment.answerId)
     }
+    await Promise.all([
+      ...attachments.map(attachment =>
+        this.setCache(this.getAttachmentCacheKey(attachment.id), attachment, CacheTTL.ATTACHMENT)
+      ),
+      ...Array.from(answerIdsToInvalidate, answerId =>
+        this.invalidateCachePattern(this.getAttachmentsByAnswerCachePattern(answerId))
+      ),
+    ])
   }
 
   async findById (attachmentId: string): Promise<AnswerAttachment | null> {
-    const cacheKey = this.cacheKeys.answerAttachment(attachmentId)
+    const cacheKey = this.getAttachmentCacheKey(attachmentId)
     const cached = await this.getFromCache<AnswerAttachment>(cacheKey)
-    if (cached) return cached
+    if (cached) {
+      this.attachmentIdToAnswerId.set(cached.id, cached.answerId)
+      return cached
+    }
     const attachment = await this.answerAttachmentsRepository.findById(attachmentId)
-    if (attachment) await this.setCache(cacheKey, attachment, CacheTTL.ATTACHMENT)
+    if (attachment) {
+      this.attachmentIdToAnswerId.set(attachment.id, attachment.answerId)
+      await this.setCache(cacheKey, attachment, CacheTTL.ATTACHMENT)
+    }
     return attachment
   }
 
@@ -60,32 +72,52 @@ export class CachedAnswerAttachmentsRepository
     params: PaginationParams
   ): Promise<PaginatedAnswerAttachments> {
     const { page = 1, pageSize = 10 } = params
-    const cacheKey = this.cacheKeys.answerAttachmentsByAnswer(answerId, page, pageSize)
+    const cacheKey = this.getAttachmentsByAnswerCacheKey(answerId, page, pageSize)
     const cached = await this.getFromCache<PaginatedAnswerAttachments>(cacheKey)
     if (cached) return cached
     const attachments = await this.answerAttachmentsRepository.findManyByAnswerId(answerId, params)
-    if (attachments) await this.setCache(cacheKey, attachments, CacheTTL.ATTACHMENTS_LIST)
+    await this.setCache(cacheKey, attachments, CacheTTL.ATTACHMENTS_LIST)
     return attachments
   }
 
   async update (attachmentId: string, data: UpdateAttachmentData): Promise<AnswerAttachment> {
     const attachment = await this.answerAttachmentsRepository.update(attachmentId, data)
-    await this.setCache(this.cacheKeys.answerAttachment(attachment.id), attachment, CacheTTL.ATTACHMENT)
-    await this.invalidateCachePattern(this.cacheKeys.answerAttachmentsByAnswerPattern(attachment.answerId))
+    this.attachmentIdToAnswerId.set(attachment.id, attachment.answerId)
+    await Promise.all([
+      this.setCache(this.getAttachmentCacheKey(attachment.id), attachment, CacheTTL.ATTACHMENT),
+      this.invalidateCachePattern(this.getAttachmentsByAnswerCachePattern(attachment.answerId)),
+    ])
     return attachment
   }
 
   async delete (attachmentId: string | string[]): Promise<void> {
     const ids = Array.isArray(attachmentId) ? attachmentId : [attachmentId]
+    const answerIdsToInvalidate = new Set<string>()
     for (const id of ids) {
-      const attachment = await this.answerAttachmentsRepository.findById(id)
-      if (attachment) {
-        await this.invalidateCache(this.cacheKeys.answerAttachment(id))
-        await this.invalidateCachePattern(
-          this.cacheKeys.answerAttachmentsByAnswerPattern(attachment.answerId)
-        )
+      const answerId = this.attachmentIdToAnswerId.get(id)
+      if (answerId) {
+        answerIdsToInvalidate.add(answerId)
+        this.attachmentIdToAnswerId.delete(id)
       }
     }
-    await this.answerAttachmentsRepository.delete(attachmentId)
+    await Promise.all([
+      this.answerAttachmentsRepository.delete(attachmentId),
+      ...ids.map(id => this.invalidateCache(this.getAttachmentCacheKey(id))),
+      ...Array.from(answerIdsToInvalidate, answerId =>
+        this.invalidateCachePattern(this.getAttachmentsByAnswerCachePattern(answerId))
+      ),
+    ])
+  }
+
+  private getAttachmentCacheKey (id: string): string {
+    return `answer-attachment:${id}`
+  }
+
+  private getAttachmentsByAnswerCacheKey (answerId: string, page: number, size: number): string {
+    return `answer-attachments:answer:${answerId}:page:${page}:size:${size}`
+  }
+
+  private getAttachmentsByAnswerCachePattern (answerId: string): string {
+    return `answer-attachments:answer:${answerId}:*`
   }
 }
