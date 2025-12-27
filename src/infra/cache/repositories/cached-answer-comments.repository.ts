@@ -1,0 +1,83 @@
+import { Inject, Injectable } from '@nestjs/common'
+import type { PaginationParams } from '@/core/domain/application/pagination-params'
+import type {
+  AnswerCommentsRepository,
+  PaginatedAnswerComments,
+} from '@/domain/application/repositories/answer-comments.repository'
+import type { UpdateCommentData } from '@/domain/application/repositories/base/comments.repository'
+import { CacheTTL } from '@/infra/cache/cache-ttl'
+import { RedisCacheService } from '@/infra/cache/redis-cache.service'
+import type { AnswerComment, AnswerCommentProps } from '@/domain/enterprise/entities/answer-comment.entity'
+import { BaseCachedRepository } from './base/base-cached.repository'
+
+export const PrismaAnswerCommentsRepositoryToken = Symbol('PrismaAnswerCommentsRepositoryToken')
+
+@Injectable()
+export class CachedAnswerCommentsRepository
+  extends BaseCachedRepository
+  implements AnswerCommentsRepository {
+  private readonly cacheKeys = {
+    answerComment: (id: string) => `answer-comment:${id}`,
+    answerCommentsByAnswer: (answerId: string, page: number, size: number) =>
+      `answer-comments:answer:${answerId}:page:${page}:size:${size}`,
+    answerCommentsByAnswerPattern: (answerId: string) =>
+      `answer-comments:answer:${answerId}:*`,
+  }
+
+  constructor (
+    cacheService: RedisCacheService,
+    @Inject(PrismaAnswerCommentsRepositoryToken)
+    private readonly answerCommentsRepository: AnswerCommentsRepository
+  ) {
+    super(cacheService)
+  }
+
+  async create (comment: AnswerCommentProps): Promise<AnswerComment> {
+    const createdComment = await this.answerCommentsRepository.create(comment)
+    await this.setCache(this.cacheKeys.answerComment(createdComment.id), createdComment, CacheTTL.COMMENT)
+    if (createdComment.answerId) {
+      await this.invalidateCachePattern(this.cacheKeys.answerCommentsByAnswerPattern(createdComment.answerId))
+    }
+    return createdComment
+  }
+
+  async findById (commentId: string): Promise<AnswerComment | null> {
+    const cacheKey = this.cacheKeys.answerComment(commentId)
+    const cached = await this.getFromCache<AnswerComment>(cacheKey)
+    if (cached) return cached
+    const comment = await this.answerCommentsRepository.findById(commentId)
+    if (comment) await this.setCache(cacheKey, comment, CacheTTL.COMMENT)
+    return comment
+  }
+
+  async delete (commentId: string): Promise<void> {
+    const comment = await this.answerCommentsRepository.findById(commentId)
+    await this.answerCommentsRepository.delete(commentId)
+    await this.invalidateCache(this.cacheKeys.answerComment(commentId))
+    if (comment?.answerId) {
+      await this.invalidateCachePattern(this.cacheKeys.answerCommentsByAnswerPattern(comment.answerId))
+    }
+  }
+
+  async update (commentData: UpdateCommentData): Promise<AnswerComment> {
+    const comment = await this.answerCommentsRepository.update(commentData)
+    await this.setCache(this.cacheKeys.answerComment(comment.id), comment, CacheTTL.COMMENT)
+    if (comment.answerId) {
+      await this.invalidateCachePattern(this.cacheKeys.answerCommentsByAnswerPattern(comment.answerId))
+    }
+    return comment
+  }
+
+  async findManyByAnswerId (
+    answerId: string,
+    params: PaginationParams
+  ): Promise<PaginatedAnswerComments> {
+    const { page = 1, pageSize = 10 } = params
+    const cacheKey = this.cacheKeys.answerCommentsByAnswer(answerId, page, pageSize)
+    const cached = await this.getFromCache<PaginatedAnswerComments>(cacheKey)
+    if (cached) return cached
+    const comments = await this.answerCommentsRepository.findManyByAnswerId(answerId, params)
+    await this.setCache(cacheKey, comments, CacheTTL.COMMENTS_LIST)
+    return comments
+  }
+}
