@@ -17,7 +17,7 @@ export class CachedEmailValidationsRepository
   private readonly validationIdToEmail = new Map<string, string>()
 
   constructor (
-    redis: RedisCacheService,
+    protected readonly redis: RedisCacheService,
     @Inject(PrismaEmailValidationsRepositoryToken)
     private readonly emailValidationsRepository: EmailValidationsRepository
   ) {
