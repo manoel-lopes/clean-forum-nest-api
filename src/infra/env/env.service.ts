@@ -10,7 +10,7 @@ export class EnvService {
     return this.configService.get(key, { infer: true })
   }
 
-  getDatabaseUrl (): string {
+  getDatabaseUrl () {
     const value = this.configService.get('DATABASE_URL', { infer: true })
     if (value) {
       return value

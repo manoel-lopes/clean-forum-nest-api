@@ -38,7 +38,7 @@ export class QueuedEmailService implements EmailService {
     return this.template
   }
 
-  private getPath (): string {
+  private getPath () {
     const paths = ['src', 'infra', 'adapters', 'email', 'templates', 'email-validation.hbs']
     return join(process.cwd(), ...paths)
   }
