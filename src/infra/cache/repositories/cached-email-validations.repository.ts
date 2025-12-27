@@ -3,7 +3,6 @@ import type {
   EmailValidationsRepository,
   UpdateEmailValidationData,
 } from '@/domain/application/repositories/email-validations.repository'
-import { CacheTTL } from '@/infra/cache/cache-ttl'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
 import type { EmailValidation, EmailValidationProps } from '@/domain/enterprise/entities/email-validation.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
@@ -14,73 +13,94 @@ export const PrismaEmailValidationsRepositoryToken = Symbol('PrismaEmailValidati
 export class CachedEmailValidationsRepository
   extends BaseCachedRepository
   implements EmailValidationsRepository {
-  private readonly cacheKeys = {
-    emailValidation: (id: string) => `email-validation:${id}`,
-    emailValidationByEmail: (email: string) => `email-validation:email:${email}`,
-  }
+  private readonly EMAIL_VALIDATIONS_TTL = 3600
+  private readonly validationIdToEmail = new Map<string, string>()
 
   constructor (
-    cacheService: RedisCacheService,
+    redis: RedisCacheService,
     @Inject(PrismaEmailValidationsRepositoryToken)
     private readonly emailValidationsRepository: EmailValidationsRepository
   ) {
-    super(cacheService)
+    super(redis)
   }
 
-  async create (emailValidation: EmailValidationProps): Promise<EmailValidation> {
-    const createdValidation = await this.emailValidationsRepository.create(emailValidation)
+  async create (emailValidationData: EmailValidationProps): Promise<EmailValidation> {
+    const emailValidation = await this.emailValidationsRepository.create(emailValidationData)
+    this.validationIdToEmail.set(emailValidation.id, emailValidation.email)
     await this.setCache(
-      this.cacheKeys.emailValidation(createdValidation.id),
-      createdValidation,
-      CacheTTL.EMAIL_VALIDATION
+      this.getEmailValidationCacheKey(emailValidation.id),
+      emailValidation,
+      this.EMAIL_VALIDATIONS_TTL
     )
     await this.setCache(
-      this.cacheKeys.emailValidationByEmail(createdValidation.email),
-      createdValidation,
-      CacheTTL.EMAIL_VALIDATION
+      this.getEmailValidationByEmailCacheKey(emailValidation.email),
+      emailValidation,
+      this.EMAIL_VALIDATIONS_TTL
     )
-    return createdValidation
+    return emailValidation
   }
 
   async update ({ where, data }: UpdateEmailValidationData): Promise<EmailValidation> {
     const emailValidation = await this.emailValidationsRepository.update({ where, data })
+    this.validationIdToEmail.set(emailValidation.id, emailValidation.email)
     await this.setCache(
-      this.cacheKeys.emailValidation(emailValidation.id),
+      this.getEmailValidationCacheKey(emailValidation.id),
       emailValidation,
-      CacheTTL.EMAIL_VALIDATION
+      this.EMAIL_VALIDATIONS_TTL
     )
     await this.setCache(
-      this.cacheKeys.emailValidationByEmail(emailValidation.email),
+      this.getEmailValidationByEmailCacheKey(emailValidation.email),
       emailValidation,
-      CacheTTL.EMAIL_VALIDATION
+      this.EMAIL_VALIDATIONS_TTL
     )
     return emailValidation
   }
 
   async findByEmail (email: string): Promise<EmailValidation | null> {
-    const cacheKey = this.cacheKeys.emailValidationByEmail(email)
+    const cacheKey = this.getEmailValidationByEmailCacheKey(email)
     const cached = await this.getFromCache<EmailValidation>(cacheKey)
-    if (cached) return cached
+    if (cached) {
+      this.validationIdToEmail.set(cached.id, cached.email)
+      return cached
+    }
     const validation = await this.emailValidationsRepository.findByEmail(email)
-    if (validation) await this.setCache(cacheKey, validation, CacheTTL.EMAIL_VALIDATION)
+    if (validation) {
+      this.validationIdToEmail.set(validation.id, validation.email)
+      await this.setCache(cacheKey, validation, this.EMAIL_VALIDATIONS_TTL)
+    }
     return validation
   }
 
   async findById (id: string): Promise<EmailValidation | null> {
-    const cacheKey = this.cacheKeys.emailValidation(id)
+    const cacheKey = this.getEmailValidationCacheKey(id)
     const cached = await this.getFromCache<EmailValidation>(cacheKey)
-    if (cached) return cached
+    if (cached) {
+      this.validationIdToEmail.set(cached.id, cached.email)
+      return cached
+    }
     const validation = await this.emailValidationsRepository.findById(id)
-    if (validation) await this.setCache(cacheKey, validation, CacheTTL.EMAIL_VALIDATION)
+    if (validation) {
+      this.validationIdToEmail.set(validation.id, validation.email)
+      await this.setCache(cacheKey, validation, this.EMAIL_VALIDATIONS_TTL)
+    }
     return validation
   }
 
   async delete (id: string): Promise<void> {
-    const emailValidation = await this.emailValidationsRepository.findById(id)
+    const email = this.validationIdToEmail.get(id)
     await this.emailValidationsRepository.delete(id)
-    await this.invalidateCache(this.cacheKeys.emailValidation(id))
-    if (emailValidation?.email) {
-      await this.invalidateCache(this.cacheKeys.emailValidationByEmail(emailValidation.email))
+    await this.invalidateCache(this.getEmailValidationCacheKey(id))
+    if (email) {
+      await this.invalidateCache(this.getEmailValidationByEmailCacheKey(email))
     }
+    this.validationIdToEmail.delete(id)
+  }
+
+  private getEmailValidationCacheKey (id: string): string {
+    return `email-validation:${id}`
+  }
+
+  private getEmailValidationByEmailCacheKey (email: string): string {
+    return `email-validation:email:${email}`
   }
 }
