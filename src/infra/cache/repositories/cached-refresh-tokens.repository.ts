@@ -67,11 +67,11 @@ export class CachedRefreshTokensRepository
     this.userIdToTokenId.delete(userId)
   }
 
-  private getRefreshTokenCacheKey (id: string): string {
+  private getRefreshTokenCacheKey (id: string) {
     return `refresh-token:${id}`
   }
 
-  private getRefreshTokenByUserCacheKey (userId: string): string {
+  private getRefreshTokenByUserCacheKey (userId: string) {
     return `refresh-token:user:${userId}`
   }
 }

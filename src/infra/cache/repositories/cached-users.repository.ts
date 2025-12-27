@@ -90,19 +90,19 @@ export class CachedUsersRepository
     this.userIdToEmail.delete(userId)
   }
 
-  private getUserCacheKey (id: string): string {
+  private getUserCacheKey (id: string) {
     return `user:${id}`
   }
 
-  private getUserByEmailCacheKey (email: string): string {
+  private getUserByEmailCacheKey (email: string) {
     return `user:email:${email}`
   }
 
-  private getUsersListCacheKey (page: number, size: number): string {
+  private getUsersListCacheKey (page: number, size: number) {
     return `users:list:page:${page}:size:${size}`
   }
 
-  private getUsersListCachePattern (): string {
+  private getUsersListCachePattern () {
     return 'users:list:*'
   }
 }

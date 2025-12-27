@@ -128,19 +128,21 @@ export class CachedQuestionAttachmentsRepository
     await Promise.all(
       [this.questionAttachmentsRepository.deleteMany(attachmentIds)]
         .concat(attachmentIds.map(id => this.invalidateCache(this.getAttachmentCacheKey(id))))
-        .concat(Array.from(questionIdsToInvalidate, id => this.invalidateCachePattern(this.getAttachmentsByQuestionCachePattern(id))))
+        .concat(Array.from(questionIdsToInvalidate, id => {
+          return this.invalidateCachePattern(this.getAttachmentsByQuestionCachePattern(id))
+        }))
     )
   }
 
-  private getAttachmentCacheKey (id: string): string {
+  private getAttachmentCacheKey (id: string) {
     return `question-attachment:${id}`
   }
 
-  private getAttachmentsByQuestionCacheKey (questionId: string, page: number, size: number): string {
+  private getAttachmentsByQuestionCacheKey (questionId: string, page: number, size: number) {
     return `question-attachments:question:${questionId}:page:${page}:size:${size}`
   }
 
-  private getAttachmentsByQuestionCachePattern (questionId: string): string {
+  private getAttachmentsByQuestionCachePattern (questionId: string) {
     return `question-attachments:question:${questionId}:*`
   }
 }

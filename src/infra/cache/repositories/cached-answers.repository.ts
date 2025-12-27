@@ -78,15 +78,15 @@ export class CachedAnswersRepository
     this.answerIdToQuestionId.delete(answerId)
   }
 
-  private getAnswerCacheKey (id: string): string {
+  private getAnswerCacheKey (id: string) {
     return `answer:${id}`
   }
 
-  private getAnswersByQuestionCacheKey (questionId: string, page: number, size: number): string {
+  private getAnswersByQuestionCacheKey (questionId: string, page: number, size: number) {
     return `answers:question:${questionId}:page:${page}:size:${size}`
   }
 
-  private getAnswersByQuestionCachePattern (questionId: string): string {
+  private getAnswersByQuestionCachePattern (questionId: string) {
     return `answers:question:${questionId}:*`
   }
 }

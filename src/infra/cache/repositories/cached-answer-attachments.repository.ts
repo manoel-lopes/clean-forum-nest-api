@@ -116,15 +116,15 @@ export class CachedAnswerAttachmentsRepository
     )
   }
 
-  private getAttachmentCacheKey (id: string): string {
+  private getAttachmentCacheKey (id: string) {
     return `answer-attachment:${id}`
   }
 
-  private getAttachmentsByAnswerCacheKey (answerId: string, page: number, size: number): string {
+  private getAttachmentsByAnswerCacheKey (answerId: string, page: number, size: number) {
     return `answer-attachments:answer:${answerId}:page:${page}:size:${size}`
   }
 
-  private getAttachmentsByAnswerCachePattern (answerId: string): string {
+  private getAttachmentsByAnswerCachePattern (answerId: string) {
     return `answer-attachments:answer:${answerId}:*`
   }
 }

@@ -96,11 +96,11 @@ export class CachedEmailValidationsRepository
     this.validationIdToEmail.delete(id)
   }
 
-  private getEmailValidationCacheKey (id: string): string {
+  private getEmailValidationCacheKey (id: string) {
     return `email-validation:${id}`
   }
 
-  private getEmailValidationByEmailCacheKey (email: string): string {
+  private getEmailValidationByEmailCacheKey (email: string) {
     return `email-validation:email:${email}`
   }
 }

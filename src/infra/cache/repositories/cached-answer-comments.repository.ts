@@ -81,15 +81,15 @@ export class CachedAnswerCommentsRepository
     return comments
   }
 
-  private getCommentCacheKey (id: string): string {
+  private getCommentCacheKey (id: string) {
     return `answer-comment:${id}`
   }
 
-  private getCommentsByAnswerCacheKey (answerId: string, page: number, size: number): string {
+  private getCommentsByAnswerCacheKey (answerId: string, page: number, size: number) {
     return `answer-comments:answer:${answerId}:page:${page}:size:${size}`
   }
 
-  private getCommentsByAnswerCachePattern (answerId: string): string {
+  private getCommentsByAnswerCachePattern (answerId: string) {
     return `answer-comments:answer:${answerId}:*`
   }
 }

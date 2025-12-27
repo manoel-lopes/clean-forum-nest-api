@@ -114,27 +114,27 @@ export class CachedQuestionsRepository
     this.questionIdToAuthorId.delete(questionId)
   }
 
-  private getQuestionCacheKey (id: string): string {
+  private getQuestionCacheKey (id: string) {
     return `question:${id}`
   }
 
-  private getQuestionByTitleCacheKey (title: string): string {
+  private getQuestionByTitleCacheKey (title: string) {
     return `question:title:${title}`
   }
 
-  private getQuestionsListCacheKey (page: number, size: number): string {
+  private getQuestionsListCacheKey (page: number, size: number) {
     return `questions:list:page:${page}:size:${size}`
   }
 
-  private getQuestionsListCachePattern (): string {
+  private getQuestionsListCachePattern () {
     return 'questions:list:*'
   }
 
-  private getQuestionsByUserCacheKey (userId: string, page: number, size: number): string {
+  private getQuestionsByUserCacheKey (userId: string, page: number, size: number) {
     return `questions:user:${userId}:page:${page}:size:${size}`
   }
 
-  private getQuestionsByUserCachePattern (userId: string): string {
+  private getQuestionsByUserCachePattern (userId: string) {
     return `questions:user:${userId}:*`
   }
 }
