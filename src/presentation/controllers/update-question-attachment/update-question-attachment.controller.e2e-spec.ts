@@ -138,7 +138,7 @@ describe('UpdateQuestionAttachment', () => {
     expect(response.body).toEqual({
       statusCode: 422,
       error: 'Unprocessable Entity',
-      message: "The 'url' must be a valid URL",
+      message: "The 'url' is invalid",
     })
   })
 
