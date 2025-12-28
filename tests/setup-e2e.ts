@@ -14,12 +14,22 @@ process.on('unhandledRejection', (reason) => {
   throw reason
 })
 
-function generateUniqueDatabaseURL (schemaId: string) {
-  const databaseURL = process.env.DATABASE_URL
-  if (!databaseURL) {
-    throw new Error('Please provide a DATABASE_URL environment variable')
+function getBaseDatabaseUrl (): string {
+  const databaseUrl = process.env.DATABASE_URL
+  if (databaseUrl?.startsWith('postgresql://')) {
+    return databaseUrl
   }
-  const url = new URL(databaseURL)
+  const dbUser = process.env.DB_USER
+  const dbPassword = process.env.DB_PASSWORD
+  const dbHost = process.env.DB_HOST ?? 'localhost'
+  const dbPort = process.env.DB_PORT ?? '5432'
+  const dbName = process.env.DB_NAME
+  return `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}?schema=public`
+}
+
+function generateUniqueDatabaseURL (schemaId: string) {
+  const baseDatabaseURL = getBaseDatabaseUrl()
+  const url = new URL(baseDatabaseURL)
   url.searchParams.set('schema', schemaId)
   return url.toString()
 }
@@ -33,10 +43,10 @@ let schemaId: string
 let prisma: PrismaClient
 beforeAll(async () => {
   schemaId = randomUUID()
+  const baseDatabaseURL = getBaseDatabaseUrl()
   const databaseURL = generateUniqueDatabaseURL(schemaId)
   process.env.DATABASE_URL = databaseURL
-  const baseDatabaseURL = process.env.DATABASE_URL?.replace(/\?schema=.*$/, '') || process.env.DATABASE_URL
-  const tempPrisma = createPrismaClient(baseDatabaseURL)
+  const tempPrisma = createPrismaClient(baseDatabaseURL.replace(/\?schema=.*$/, ''))
   await tempPrisma.$executeRawUnsafe(`CREATE SCHEMA IF NOT EXISTS "${schemaId}"`)
   await tempPrisma.$disconnect()
   execSync(`DATABASE_URL="${databaseURL}" pnpm prisma migrate deploy`, { stdio: 'pipe' })
