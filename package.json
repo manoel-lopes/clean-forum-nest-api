@@ -25,8 +25,6 @@
     "test:dir": "vitest --run --silent --reporter verbose --dir",
     "test:mutation": "stryker run",
     "db:seed": "dotenv -e .env.development -- tsx src/infra/persistence/seeds/seed.ts",
-    "db:seed:dev": "dotenv -e .env.development -- tsx src/infra/persistence/seeds/seed.ts",
-    "db:seed:test": "dotenv -e .env.test -- tsx src/infra/persistence/seeds/seed.ts",
     "db:up:dev": "dotenv -e .env.development -- docker-compose -p forum_dev -f docker-compose.development.yml up --build -d",
     "db:up:test": "dotenv -e .env.test -- docker-compose -p forum_test -f docker-compose.test.yml up --build -d",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
