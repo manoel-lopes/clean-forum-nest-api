@@ -13,7 +13,7 @@ export async function createUser (app: INestApplication, userData: CreateUserDat
   return response
 }
 
-export async function deleteUser (app: INestApplication, authToken: string | undefined) {
+export async function deleteUser (app: INestApplication, authToken: string ) {
   const req = request(app.getHttpServer()).delete('/users')
   if (authToken) {
     req.set('Authorization', `Bearer ${authToken}`)
@@ -33,7 +33,7 @@ export async function fetchUsers (app: INestApplication, authToken: string, para
 
 export async function getUserByEmail (
   app: INestApplication,
-  authToken: string | undefined,
+  authToken: string ,
   {
     email,
   }: {

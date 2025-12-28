@@ -3,7 +3,6 @@ import { PasswordHasherStub } from '@/infra/adapters/security/stubs/password-has
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
 import type { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
 import { CreateAccountUseCase } from './create-account.usecase'
-import { UserWithEmailAlreadyRegisteredException } from './exceptions/user-with-email-already-registered.exception'
 
 describe('CreateAccountUseCase', () => {
   let sut: CreateAccountUseCase
@@ -24,7 +23,7 @@ describe('CreateAccountUseCase', () => {
   it('should not create a user account if the email is already registered', async () => {
     await sut.execute(request)
 
-    await expect(sut.execute(request)).rejects.toThrowError(new UserWithEmailAlreadyRegisteredException())
+    await expect(sut.execute(request)).rejects.toThrow('User with email already registered')
   })
 
   it('should correctly create a user account', async () => {

@@ -7,7 +7,8 @@ import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion, updateQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createQuestion, getQuestionByTile, updateQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { uuidv7 } from 'uuidv7'
 
 describe('UpdateQuestion', () => {
   let app: INestApplication
@@ -21,7 +22,7 @@ describe('UpdateQuestion', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await updateQuestion(app, undefined, {
+    const response = await updateQuestion(app, '', {
       questionId: 'any-id',
       title: 'Title',
       content: 'Content',
@@ -60,7 +61,7 @@ describe('UpdateQuestion', () => {
     const token = authResponse.body.token
 
     const response = await updateQuestion(app, token, {
-      questionId: '123e4567-e89b-12d3-a456-426614174000',
+      questionId: uuidv7(),
       title: 'Updated Title',
       content: 'Updated Content',
     })
@@ -82,8 +83,8 @@ describe('UpdateQuestion', () => {
     })
     const authorToken = authorAuthResponse.body.token
     const questionData = aQuestion().build()
-    const createResponse = await createQuestion(app, authorToken, questionData)
-    const questionId = createResponse.body.id
+    await createQuestion(app, authorToken, questionData)
+    const question = await getQuestionByTile(app, authorToken, questionData.title)
     const otherUserData = aUser().build()
     await createUser(app, otherUserData)
     const otherUserAuthResponse = await authenticateUser(app, {
@@ -93,7 +94,7 @@ describe('UpdateQuestion', () => {
     const otherUserToken = otherUserAuthResponse.body.token
 
     const response = await updateQuestion(app, otherUserToken, {
-      questionId,
+      questionId: question.id,
       title: 'Updated Title',
       content: 'Updated Content',
     })
@@ -118,11 +119,11 @@ describe('UpdateQuestion', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createResponse = await createQuestion(appWithError, token, questionData)
-    const questionId = createResponse.body.id
+    await createQuestion(appWithError, token, questionData)
+    const question = await getQuestionByTile(appWithError, token, questionData.title)
 
     const response = await updateQuestion(appWithError, token, {
-      questionId,
+      questionId: question.id,
       title: 'Updated Title',
       content: 'Updated Content',
     })
@@ -144,18 +145,26 @@ describe('UpdateQuestion', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createResponse = await createQuestion(app, token, questionData)
-    const questionId = createResponse.body.id
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
 
     const response = await updateQuestion(app, token, {
-      questionId,
-      title: 'Updated Title',
-      content: 'Updated Content',
+      questionId: question.id,
+      title: 'updated title',
+      content: 'updated content',
     })
 
-    expect(response.statusCode).toBe(200)
-    expect(response.body).toHaveProperty('question')
-    expect(response.body.question.title).toBe('Updated Title')
-    expect(response.body.question.content).toBe('Updated Content')
+    const { statusCode, body } = response
+    expect(statusCode).toBe(200)
+    expect(body).toHaveProperty('question')
+    expect(body.question.title).toBe('updated title')
+    expect(body.question.content).toBe('updated content')
+    expect(body.question.updatedAt).toBeDefined()
+    expect(new Date(body.question.updatedAt).getTime())
+    .toBeGreaterThan(new Date(question.updatedAt).getTime())
+    expect(body.question.createdAt).toBe(question.createdAt)
+    expect(body.question.authorId).toBe(question.authorId)
+    expect(body.question.slug).toBe(question.slug)
+    expect(body.question.id).toBe(question.id)
   })
 })

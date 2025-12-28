@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import type { PaginatedItems } from '@/core/domain/application/paginated-items'
-import type { PaginationParams } from '@/core/domain/application/pagination-params'
+import { PaginationParams } from '@/core/domain/application/pagination-params'
 import type {
   FindManyQuestionsParams,
   FindQuestionBySlugParams,
@@ -9,16 +8,15 @@ import type {
   QuestionsRepository,
   UpdateQuestionData,
 } from '@/domain/application/repositories/questions.repository'
+import { formatPagination } from '@/infra/persistence/helpers/format-pagination.helper'
+import { PrismaAnswerMapper } from '@/infra/persistence/mappers/prisma/prisma-answer.mapper'
 import { PrismaQuestionMapper } from '@/infra/persistence/mappers/prisma/prisma-question.mapper'
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import type { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
-import { BasePrismaRepository } from './base/base-prisma.repository'
 
 @Injectable()
-export class PrismaQuestionsRepository extends BasePrismaRepository implements QuestionsRepository {
-  constructor (private readonly prisma: PrismaService) {
-    super()
-  }
+export class PrismaQuestionsRepository implements QuestionsRepository {
+  constructor (private readonly prisma: PrismaService) {}
 
   async create (data: QuestionProps): Promise<Question> {
     const question = await this.prisma.question.create({ data })
@@ -46,60 +44,54 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
     page = 1,
     pageSize = 10,
     order = 'desc',
-    include = [],
-    answerIncludes = [],
+    include,
+    answerIncludes,
   }: FindQuestionBySlugParams): Promise<FindQuestionsResult> {
-    const pagination = this.sanitizePagination(page, pageSize)
-    const authorSelect = { id: true, name: true, email: true, createdAt: true, updatedAt: true }
-    const [question, totalAnswers] = await this.prisma.$transaction([
+    const pagination = formatPagination(page, pageSize)
+    const [question, totalAnswers] = await Promise.all([
       this.prisma.question.findUnique({
         where: { slug },
         include: {
+          ...include,
           answers: {
             take: pagination.take,
             skip: pagination.skip,
             orderBy: { createdAt: order },
             include: {
-              author: { select: authorSelect },
-              comments: answerIncludes.includes('comments') ? { orderBy: { createdAt: 'desc' } } : false,
-              attachments: answerIncludes.includes('attachments') ? { orderBy: { createdAt: 'desc' } } : false,
+              author: true,
+              ...answerIncludes,
             },
           },
-          comments: include.includes('comments') ? { orderBy: { createdAt: 'desc' } } : false,
-          attachments: include.includes('attachments') ? { orderBy: { createdAt: 'desc' } } : false,
-          author: include.includes('author') ? { select: authorSelect } : false,
-        },
+        }
       }),
       this.prisma.answer.count({ where: { question: { slug } } }),
     ])
     if (!question) return null
-    return PrismaQuestionMapper.toDomain(question, {
+    const result = PrismaQuestionMapper.toDomain(question)
+    result.answers = {
+      items: question.answers.map(PrismaAnswerMapper.toDomain),
       page: pagination.page,
-      pageSize: Math.min(pagination.pageSize, totalAnswers),
+      pageSize: pagination.pageSize,
       totalItems: totalAnswers,
       totalPages: Math.ceil(totalAnswers / pagination.pageSize),
       order,
-    })
+    }
+    return result
   }
 
   async findMany ({
     page = 1,
     pageSize = 20,
     order = 'desc',
-    include = [],
+    include,
   }: FindManyQuestionsParams): Promise<PaginatedQuestions> {
-    const pagination = this.sanitizePagination(page, pageSize)
-    const authorSelect = { id: true, name: true, email: true, createdAt: true, updatedAt: true }
-    const [questions, totalItems] = await this.prisma.$transaction([
+    const pagination = formatPagination(page, pageSize)
+    const [questions, totalItems] = await Promise.all([
       this.prisma.question.findMany({
         skip: pagination.skip,
         take: pagination.take,
         orderBy: { createdAt: order },
-        include: {
-          comments: include.includes('comments') ? { orderBy: { createdAt: 'desc' } } : false,
-          attachments: include.includes('attachments') ? { orderBy: { createdAt: 'desc' } } : false,
-          author: include.includes('author') ? { select: authorSelect } : false,
-        },
+        include,
       }),
       this.prisma.question.count(),
     ])
@@ -109,7 +101,7 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: questions.map(PrismaQuestionMapper.toQuestion),
+      items: questions.map(PrismaQuestionMapper.toDomain),
     }
   }
 
@@ -119,11 +111,9 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
     })
   }
 
-  async update ({ data, where }: UpdateQuestionData): Promise<Question> {
+  async update ({ questionId, data }: UpdateQuestionData): Promise<Question> {
     const updatedQuestion = await this.prisma.question.update({
-      where: {
-        id: where.id,
-      },
+      where: { id: questionId },
       data,
     })
     return updatedQuestion
@@ -132,18 +122,16 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
   async findManyByUserId (
     userId: string,
     { page = 1, pageSize = 10, order = 'desc' }: PaginationParams
-  ): Promise<PaginatedItems<Omit<Question, 'answers'>>> {
-    const pagination = this.sanitizePagination(page, pageSize)
-    const [questions, totalItems] = await this.prisma.$transaction([
+  ): Promise<PaginatedQuestions> {
+    const pagination = formatPagination(page, pageSize)
+    const [questions, totalItems] = await Promise.all([
       this.prisma.question.findMany({
         where: { authorId: userId },
         skip: pagination.skip,
         take: pagination.take,
         orderBy: { createdAt: order },
       }),
-      this.prisma.question.count({
-        where: { authorId: userId },
-      }),
+      this.prisma.question.count({ where: { authorId: userId }, }),
     ])
     return {
       page: pagination.page,
@@ -151,7 +139,7 @@ export class PrismaQuestionsRepository extends BasePrismaRepository implements Q
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
       order,
-      items: questions,
+      items: questions.map(PrismaQuestionMapper.toDomain),
     }
   }
 }

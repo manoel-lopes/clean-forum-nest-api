@@ -6,14 +6,13 @@ export class PrismaAnswerCommentMapper {
     if (!raw.answerId) {
       throw new Error('Comment is not an answer comment')
     }
-    const comment: AnswerComment = {
+    return {
       id: raw.id,
       content: raw.content,
       authorId: raw.authorId,
       answerId: raw.answerId,
       createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt || raw.createdAt,
+      updatedAt: raw.updatedAt,
     }
-    return comment
   }
 }

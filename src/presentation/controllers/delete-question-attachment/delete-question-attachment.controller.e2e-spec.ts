@@ -5,7 +5,7 @@ import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createQuestion, getQuestionBySlug, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createQuestionAttachment, deleteQuestionAttachment } from '@tests/helpers/domain/enterprise/questions/question-attachment-requests'
 
 describe('DeleteQuestionAttachment', () => {
@@ -20,7 +20,7 @@ describe('DeleteQuestionAttachment', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await deleteQuestionAttachment(app, undefined, 'any-id')
+    const response = await deleteQuestionAttachment(app, '', 'any-id')
 
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
@@ -69,14 +69,15 @@ describe('DeleteQuestionAttachment', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAttachmentResponse = await createQuestionAttachment(app, token, {
-      questionId,
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createQuestionAttachment(app, token, {
+      questionId: question.id,
       title: 'Attachment title',
       url: 'https://example.com/file.pdf',
     })
-    const attachmentId = createAttachmentResponse.body.id
+    const questionWithAttachments = await getQuestionBySlug(app, question.slug, token, { include: 'attachments' })
+    const attachmentId = questionWithAttachments.body.attachments[0].id
 
     const response = await deleteQuestionAttachment(app, token, attachmentId)
 

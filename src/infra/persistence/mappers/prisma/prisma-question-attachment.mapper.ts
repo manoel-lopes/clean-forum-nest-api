@@ -6,14 +6,13 @@ export class PrismaQuestionAttachmentMapper {
     if (!raw.questionId) {
       throw new Error('Attachment is not a question attachment')
     }
-    const attachment: QuestionAttachment = {
+    return {
       id: raw.id,
       title: raw.title,
-      url: raw.link,
+      url: raw.url,
       questionId: raw.questionId,
       createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt || raw.createdAt,
+      updatedAt: raw.updatedAt,
     }
-    return attachment
   }
 }

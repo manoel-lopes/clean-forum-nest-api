@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config'
 import { UseCasesModule } from './domain/application/usecases/usecases.module'
 import { EmailModule } from './infra/adapters/email/email.module'
 import { SecurityModule } from './infra/adapters/security/security.module'
+import { StorageModule } from './infra/adapters/storage/storage.module'
 import { AuthModule } from './infra/auth/auth.module'
 import { envSchema } from './infra/env/env'
 import { EnvModule } from './infra/env/env.module'
@@ -38,6 +39,7 @@ import { UpdateAnswerCommentController } from './presentation/controllers/update
 import { UpdateQuestionController } from './presentation/controllers/update-question/update-question.controller'
 import { UpdateQuestionAttachmentController } from './presentation/controllers/update-question-attachment/update-question-attachment.controller'
 import { UpdateQuestionCommentController } from './presentation/controllers/update-question-comment/update-question-comment.controller'
+import { UploadAttachmentController } from './presentation/controllers/upload-attachment/upload-attachment.controller'
 import { VerifyEmailValidationController } from './presentation/controllers/verify-email-validation/verify-email-validation.controller'
 
 @Module({
@@ -50,6 +52,7 @@ import { VerifyEmailValidationController } from './presentation/controllers/veri
     RepositoriesModule,
     EmailModule,
     SecurityModule,
+    StorageModule,
     AuthModule,
     UseCasesModule,
     BullBoardConfigModule,
@@ -85,6 +88,7 @@ import { VerifyEmailValidationController } from './presentation/controllers/veri
     UpdateQuestionController,
     UpdateQuestionAttachmentController,
     UpdateQuestionCommentController,
+    UploadAttachmentController,
     VerifyEmailValidationController,
   ],
 })

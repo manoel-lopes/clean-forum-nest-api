@@ -5,5 +5,12 @@ export default mergeConfig(baseConfig, defineConfig({
   test: {
     include: ['**/*.e2e-spec.ts'],
     setupFiles: ['./tests/setup-e2e.ts'],
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
+    fileParallelism: false,
   },
 }))

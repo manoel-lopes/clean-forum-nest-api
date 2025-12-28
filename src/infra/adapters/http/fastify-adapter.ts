@@ -1,3 +1,4 @@
+import multipart from '@fastify/multipart'
 import type { INestApplication } from '@nestjs/common'
 import { FastifyAdapter as NestFastifyAdapter } from '@nestjs/platform-fastify'
 import { Env } from '@/infra/env/env'
@@ -10,7 +11,7 @@ export class FastifyAdapter extends NestFastifyAdapter {
     super({ logger: false })
   }
 
-  configure (app: INestApplication): void {
+  async configure (app: INestApplication): Promise<void> {
     const envService = app.get(EnvService)
     const nodeEnv = envService.get('NODE_ENV')
     if (nodeEnv !== 'development') {
@@ -22,5 +23,10 @@ export class FastifyAdapter extends NestFastifyAdapter {
       production: 'error',
     }
     this.getInstance().log.level = logLevels[nodeEnv]
+    await this.getInstance().register(multipart, {
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB
+      },
+    })
   }
 }

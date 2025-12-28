@@ -5,16 +5,14 @@ import type {
   PaginatedAnswers,
   UpdateAnswerData,
 } from '@/domain/application/repositories/answers.repository'
+import { formatPagination } from '@/infra/persistence/helpers/format-pagination.helper'
 import { PrismaAnswerMapper } from '@/infra/persistence/mappers/prisma/prisma-answer.mapper'
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
-import { BasePrismaRepository } from './base/base-prisma.repository'
 
 @Injectable()
-export class PrismaAnswersRepository extends BasePrismaRepository implements AnswersRepository {
-  constructor (private readonly prisma: PrismaService) {
-    super()
-  }
+export class PrismaAnswersRepository implements AnswersRepository {
+  constructor (private readonly prisma: PrismaService) {}
 
   async create (data: AnswerProps): Promise<Answer> {
     const answer = await this.prisma.answer.create({ data })
@@ -34,8 +32,11 @@ export class PrismaAnswersRepository extends BasePrismaRepository implements Ans
     })
   }
 
-  async update ({ where, data }: UpdateAnswerData): Promise<Answer> {
-    const updatedAnswer = await this.prisma.answer.update({ where, data })
+  async update ({ answerId, data }: UpdateAnswerData): Promise<Answer> {
+    const updatedAnswer = await this.prisma.answer.update({
+      where: { id: answerId },
+      data,
+    })
     return updatedAnswer
   }
 
@@ -44,20 +45,16 @@ export class PrismaAnswersRepository extends BasePrismaRepository implements Ans
     page = 1,
     pageSize = 20,
     order = 'desc',
-    include = [],
+    include,
   }: FindManyByQuestionIdParams): Promise<PaginatedAnswers> {
-    const pagination = this.sanitizePagination(page, pageSize)
-    const [rawAnswers, totalItems] = await this.prisma.$transaction([
+    const pagination = formatPagination(page, pageSize)
+    const [rawAnswers, totalItems] = await Promise.all([
       this.prisma.answer.findMany({
         where: { questionId },
         skip: pagination.skip,
         take: pagination.take,
         orderBy: { createdAt: order },
-        include: {
-          comments: include.includes('comments') ? { orderBy: { createdAt: 'desc' } } : false,
-          attachments: include.includes('attachments') ? { orderBy: { createdAt: 'desc' } } : false,
-          author: include.includes('author') ? { select: { id: true, name: true, email: true, createdAt: true, updatedAt: true } } : false,
-        },
+        include,
       }),
       this.prisma.answer.count({ where: { questionId } }),
     ])

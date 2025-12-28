@@ -1,1 +1,5 @@
-export type ForumIncludeOption = 'comments' | 'attachments' | 'author'
+export type ForumIncludeOptions = {
+  comments?: boolean
+  attachments?: boolean
+  author?: boolean
+}

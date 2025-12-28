@@ -6,7 +6,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "library"
 }
 
 // ========================================
@@ -78,7 +79,7 @@ model Comment {
   questionId String?
   answerId   String?
   createdAt  DateTime  @default(now())
-  updatedAt  DateTime? @updatedAt
+  updatedAt  DateTime  @default(now()) @updatedAt
 
   author   User      @relation(fields: [authorId], references: [id])
   question Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
@@ -96,11 +97,11 @@ model Comment {
 model Attachment {
   id         String    @id @default(uuid(7))
   title      String
-  link       String
+  url        String
   questionId String?
   answerId   String?
   createdAt  DateTime  @default(now())
-  updatedAt  DateTime? @updatedAt
+  updatedAt  DateTime  @default(now()) @updatedAt
 
   question Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
   answer   Answer?   @relation(fields: [answerId], references: [id], onDelete: Cascade)

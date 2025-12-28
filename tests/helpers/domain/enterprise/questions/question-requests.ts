@@ -22,7 +22,7 @@ export function generateUniqueQuestionData (): CreateQuestionData {
   }
 }
 
-export async function createQuestion (app: INestApplication, token: string | undefined, questionData: CreateQuestionData) {
+export async function createQuestion (app: INestApplication, token: string , questionData: CreateQuestionData) {
   const req = request(app.getHttpServer()).post('/questions')
   if (token) {
     req.set('Authorization', `Bearer ${token}`)
@@ -74,7 +74,7 @@ export async function getQuestionByTile (
   return createdQuestion
 }
 
-export async function updateQuestion (app: INestApplication, token: string | undefined, updateData: UpdateQuestionData) {
+export async function updateQuestion (app: INestApplication, token: string , updateData: UpdateQuestionData) {
   const req = request(app.getHttpServer()).put(`/questions/${updateData.questionId}`)
   if (token) {
     req.set('Authorization', `Bearer ${token}`)
@@ -87,7 +87,7 @@ export async function updateQuestion (app: INestApplication, token: string | und
 
 export async function deleteQuestion (
   app: INestApplication,
-  token: string | undefined,
+  token: string ,
   {
     questionId,
   }: {
@@ -103,7 +103,7 @@ export async function deleteQuestion (
 
 export async function chooseQuestionBestAnswer (
   app: INestApplication,
-  token: string | undefined,
+  token: string ,
   {
     answerId,
   }: {

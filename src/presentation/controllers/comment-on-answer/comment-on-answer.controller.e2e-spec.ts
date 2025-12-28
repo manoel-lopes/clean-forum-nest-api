@@ -8,8 +8,8 @@ import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
+import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 
 describe('CommentOnAnswer', () => {
   let app: INestApplication
@@ -86,16 +86,17 @@ describe('CommentOnAnswer', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(appWithError, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(appWithError, token, { questionId, content: 'Answer content' })
-    const answerId = createAnswerResponse.body.id
+    await createQuestion(appWithError, token, questionData)
+    const question = await getQuestionByTile(appWithError, token, questionData.title)
+    await createAnswer(appWithError, token, { questionId: question.id, content: 'Answer content' })
+    const answersResponse = await fetchQuestionAnswers(appWithError, question.id, token)
+    const answer = answersResponse.body.items[0]
 
     const response = await request(appWithError.getHttpServer())
       .post('/comments/answers')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        answerId,
+        answerId: answer.id,
         content: 'This is a comment',
       })
 
@@ -116,22 +117,20 @@ describe('CommentOnAnswer', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, token, { questionId, content: 'Answer content' })
-    const answerId = createAnswerResponse.body.id
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
+    const answer = answersResponse.body.items[0]
 
     const response = await request(app.getHttpServer())
       .post('/comments/answers')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        answerId,
+        answerId: answer.id,
         content: 'This is a comment',
       })
 
     expect(response.statusCode).toBe(201)
-    expect(response.body).toHaveProperty('id')
-    expect(response.body).toHaveProperty('content')
-    expect(response.body.content).toBe('This is a comment')
   })
 })

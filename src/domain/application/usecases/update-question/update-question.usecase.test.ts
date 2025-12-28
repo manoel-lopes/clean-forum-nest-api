@@ -22,6 +22,19 @@ describe('UpdateQuestionUseCase', () => {
     ).rejects.toThrowError(new ResourceNotFoundException('Question'))
   })
 
+  it('should not update a question if the user is not the author', async () => {
+    const questionData = makeQuestionData({ authorId: 'original-author' })
+    const question = await questionsRepository.create(questionData)
+
+    const request = {
+      questionId: question.id,
+      authorId: 'different-author',
+      title: 'new_title',
+    }
+
+    await expect(sut.execute(request)).rejects.toThrow('The user is not the author')
+  })
+
   it('should update the question title', async () => {
     const question = await questionsRepository.create(makeQuestionData())
 

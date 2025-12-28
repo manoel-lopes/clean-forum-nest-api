@@ -7,8 +7,8 @@ import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { createAnswer, updateAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
+import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createAnswer, updateAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 
 describe('UpdateAnswer', () => {
   let app: INestApplication
@@ -22,7 +22,7 @@ describe('UpdateAnswer', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await updateAnswer(app, undefined, {
+    const response = await updateAnswer(app, '', {
       answerId: 'any-id',
       content: 'Content',
     })
@@ -124,10 +124,11 @@ describe('UpdateAnswer', () => {
     })
     const authorToken = authorAuthResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, authorToken, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, authorToken, { questionId, content: 'Original content' })
-    const answerId = createAnswerResponse.body.id
+    await createQuestion(app, authorToken, questionData)
+    const question = await getQuestionByTile(app, authorToken, questionData.title)
+    await createAnswer(app, authorToken, { questionId: question.id, content: 'Original content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, authorToken)
+    const answer = answersResponse.body.items[0]
     const otherUserData = aUser().build()
     await createUser(app, otherUserData)
     const otherUserAuthResponse = await authenticateUser(app, {
@@ -137,7 +138,7 @@ describe('UpdateAnswer', () => {
     const otherUserToken = otherUserAuthResponse.body.token
 
     const response = await updateAnswer(app, otherUserToken, {
-      answerId,
+      answerId: answer.id,
       content: 'Updated content',
     })
 
@@ -161,13 +162,14 @@ describe('UpdateAnswer', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(appWithError, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(appWithError, token, { questionId, content: 'Original content' })
-    const answerId = createAnswerResponse.body.id
+    await createQuestion(appWithError, token, questionData)
+    const question = await getQuestionByTile(appWithError, token, questionData.title)
+    await createAnswer(appWithError, token, { questionId: question.id, content: 'Original content' })
+    const answersResponse = await fetchQuestionAnswers(appWithError, question.id, token)
+    const answer = answersResponse.body.items[0]
 
     const response = await updateAnswer(appWithError, token, {
-      answerId,
+      answerId: answer.id,
       content: 'Updated content',
     })
 
@@ -188,18 +190,25 @@ describe('UpdateAnswer', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, token, { questionId, content: 'Original content' })
-    const answerId = createAnswerResponse.body.id
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Original content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
+    const answer = answersResponse.body.items[0]
 
     const response = await updateAnswer(app, token, {
-      answerId,
+      answerId: answer.id,
       content: 'Updated content',
     })
 
-    expect(response.statusCode).toBe(200)
-    expect(response.body).toHaveProperty('answer')
-    expect(response.body.answer.content).toBe('Updated content')
+    const { statusCode, body } = response
+    expect(statusCode).toBe(200)
+    expect(body).toHaveProperty('answer')
+    expect(body.answer.content).toBe('Updated content')
+    expect(body.answer.updatedAt).toBeDefined()
+    expect(new Date(body.answer.updatedAt).getTime()).toBeGreaterThan(new Date(answer.updatedAt).getTime())
+    expect(body.answer.createdAt).toBe(answer.createdAt)
+    expect(body.answer.authorId).toBe(answer.authorId)
+    expect(body.answer.id).toBe(answer.id)
   })
 })

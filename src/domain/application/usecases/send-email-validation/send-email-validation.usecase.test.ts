@@ -55,4 +55,19 @@ describe('SendEmailValidationUseCase', () => {
     expect(savedEmailValidation?.code).toHaveLength(6)
     expect(savedEmailValidation?.isVerified).toBe(false)
   })
+
+  it('should update existing validation when email already has one', async () => {
+    const request = { email: 'jhondoe@example.com' }
+
+    await sut.execute(request)
+    const firstValidation = await emailValidationsRepository.findByEmail(request.email)
+    const firstCode = firstValidation?.code
+
+    await sut.execute(request)
+    const updatedValidation = await emailValidationsRepository.findByEmail(request.email)
+
+    expect(updatedValidation?.id).toBe(firstValidation?.id)
+    expect(updatedValidation?.code).not.toBe(firstCode)
+    expect(updatedValidation?.isVerified).toBe(false)
+  })
 })

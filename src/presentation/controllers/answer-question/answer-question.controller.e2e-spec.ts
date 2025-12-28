@@ -9,7 +9,7 @@ import { aQuestion } from '@tests/builders/question.builder'
 import { anAnswer } from '@tests/builders/answer.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
 
 describe('AnswerQuestion', () => {
   let app: INestApplication
@@ -83,12 +83,12 @@ describe('AnswerQuestion', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(appWithError, token, questionData)
-    const questionId = createQuestionResponse.body.id
+    await createQuestion(appWithError, token, questionData)
+    const question = await getQuestionByTile(appWithError, token, questionData.title)
     const answerData = anAnswer().build()
 
     const response = await request(appWithError.getHttpServer())
-      .post(`/questions/${questionId}/answers`)
+      .post(`/questions/${question.id}/answers`)
       .set('Authorization', `Bearer ${token}`)
       .send({ content: answerData.content })
 
@@ -109,19 +109,15 @@ describe('AnswerQuestion', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
     const answerData = anAnswer().build()
 
     const response = await request(app.getHttpServer())
-      .post(`/questions/${questionId}/answers`)
+      .post(`/questions/${question.id}/answers`)
       .set('Authorization', `Bearer ${token}`)
       .send({ content: answerData.content })
 
     expect(response.statusCode).toBe(201)
-    expect(response.body).toHaveProperty('id')
-    expect(response.body).toHaveProperty('content')
-    expect(response.body).toHaveProperty('questionId')
-    expect(response.body.questionId).toBe(questionId)
   })
 })

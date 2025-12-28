@@ -21,6 +21,18 @@ describe('UpdateAnswerUseCase', () => {
     await expect(sut.execute(request)).rejects.toThrow('Answer not found')
   })
 
+  it('should not update an answer if the user is not the author', async () => {
+    const answer = await answersRepository.create(makeAnswerData({ authorId: 'original-author' }))
+
+    const request = {
+      answerId: answer.id,
+      authorId: 'different-author',
+      content: 'Updated content',
+    }
+
+    await expect(sut.execute(request)).rejects.toThrow('The user is not the author')
+  })
+
   it('should update the answer content', async () => {
     const answer = await answersRepository.create(makeAnswerData({ content: 'Original content' }))
 

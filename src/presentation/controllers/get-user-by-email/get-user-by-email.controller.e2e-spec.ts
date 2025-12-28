@@ -17,7 +17,7 @@ describe('GetUserByEmail', () => {
   })
 
   it('should return 422 when email is not a valid email format', async () => {
-    const response = await getUserByEmail(app, undefined, { email: 'invalid-email' })
+    const response = await getUserByEmail(app, '', { email: 'invalid-email' })
 
     expect(response.statusCode).toBe(422)
     expect(response.body).toEqual({

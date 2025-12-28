@@ -6,14 +6,13 @@ export class PrismaQuestionCommentMapper {
     if (!raw.questionId) {
       throw new Error('Comment is not a question comment')
     }
-    const comment: QuestionComment = {
+    return {
       id: raw.id,
       content: raw.content,
       authorId: raw.authorId,
       questionId: raw.questionId,
       createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt || raw.createdAt,
+      updatedAt: raw.updatedAt,
     }
-    return comment
   }
 }

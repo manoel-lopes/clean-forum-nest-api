@@ -18,6 +18,10 @@ export const envSchema = z.object({
   EMAIL_USER: z.string(),
   EMAIL_PASS: z.string(),
   EMAIL_FROM: z.string(),
+  AWS_ACCESS_KEY_ID: z.string().optional(),
+  AWS_SECRET_ACCESS_KEY: z.string().optional(),
+  AWS_BUCKET_NAME: z.string().optional(),
+  AWS_REGION: z.string().optional().default('us-east-1'),
 })
 
 export type Env = z.infer<typeof envSchema>

@@ -3,12 +3,26 @@ import { INestApplication } from '@nestjs/common'
 import { aQuestion } from '@tests/builders/question.builder'
 import { aUser } from '@tests/builders/user.builder'
 import { makeApp } from '@tests/helpers/app/make-app'
-import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
+import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { commentOnAnswer } from '@tests/helpers/domain/enterprise/answers/answer-comment-requests'
 import { updateAnswerComment } from '@tests/helpers/domain/enterprise/comments/comment-requests'
-import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
+
+type Answer = {
+  id: string
+  content: string
+  comments?: { items: Comment[] }
+}
+
+type Comment = {
+  id: string
+  content: string
+  authorId: string
+  answerId: string
+  createdAt: string
+}
 
 describe('UpdateAnswerComment', () => {
   let app: INestApplication
@@ -22,7 +36,7 @@ describe('UpdateAnswerComment', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await updateAnswerComment(app, undefined, { commentId: 'any-id' }, { content: 'Content' })
+    const response = await updateAnswerComment(app, '', { commentId: 'any-id' }, { content: 'Content' })
 
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
@@ -76,15 +90,18 @@ describe('UpdateAnswerComment', () => {
     })
     const authorToken = authorAuthResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, authorToken, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, authorToken, { questionId, content: 'Answer content' })
-    const answerId = createAnswerResponse.body.id
-    const createCommentResponse = await commentOnAnswer(app, authorToken, {
-      answerId,
+    await createQuestion(app, authorToken, questionData)
+    const question = await getQuestionByTile(app, authorToken, questionData.title)
+    await createAnswer(app, authorToken, { questionId: question.id, content: 'Answer content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, authorToken)
+    const answer = answersResponse.body.items.find((a: Answer) => a.content === 'Answer content')
+    await commentOnAnswer(app, authorToken, {
+      answerId: answer.id,
       content: 'Original comment',
     })
-    const commentId = createCommentResponse.body.id
+    const answersWithComments = await fetchQuestionAnswers(app, question.id, authorToken, { include: 'comments' })
+    const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
+    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Original comment')
     const otherUserData = aUser().build()
     await createUser(app, otherUserData)
     const otherUserAuthResponse = await authenticateUser(app, {
@@ -96,7 +113,7 @@ describe('UpdateAnswerComment', () => {
     const response = await updateAnswerComment(
       app,
       otherUserToken,
-      { commentId },
+      { commentId: comment.id },
       { content: 'Updated comment' }
     )
 
@@ -117,24 +134,28 @@ describe('UpdateAnswerComment', () => {
     })
     const token = authResponse.body.token
     const questionData = aQuestion().build()
-    const createQuestionResponse = await createQuestion(app, token, questionData)
-    const questionId = createQuestionResponse.body.id
-    const createAnswerResponse = await createAnswer(app, token, { questionId, content: 'Answer content' })
-    const answerId = createAnswerResponse.body.id
-    const createCommentResponse = await commentOnAnswer(app, token, {
-      answerId,
+    await createQuestion(app, token, questionData)
+    const question = await getQuestionByTile(app, token, questionData.title)
+    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
+    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
+    const answer = answersResponse.body.items.find((a: Answer) => a.content === 'Answer content')
+    await commentOnAnswer(app, token, {
+      answerId: answer.id,
       content: 'Original comment',
     })
-    const { id: commentId, authorId, createdAt } = createCommentResponse.body
+    const answersWithComments = await fetchQuestionAnswers(app, question.id, token, { include: 'comments' })
+    const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
+    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Original comment')
 
-    const response = await updateAnswerComment(app, token, { commentId }, { content: 'Updated comment' })
+    const response = await updateAnswerComment(app, token, { commentId: comment.id }, { content: 'Updated comment' })
 
     expect(response.statusCode).toBe(200)
-    expect(response.body.id).toBe(commentId)
+    expect(response.body.id).toBe(comment.id)
     expect(response.body.content).toBe('Updated comment')
-    expect(response.body.authorId).toBe(authorId)
-    expect(response.body.answerId).toBe(answerId)
-    expect(response.body.createdAt).toBe(createdAt)
+    expect(response.body.authorId).toBe(comment.authorId)
+    expect(response.body.answerId).toBe(answer.id)
+    expect(response.body.createdAt).toBe(comment.createdAt)
     expect(response.body.updatedAt).toBeDefined()
+    expect(new Date(response.body.updatedAt).getTime()).toBeGreaterThan(new Date(comment.updatedAt).getTime())
   })
 })

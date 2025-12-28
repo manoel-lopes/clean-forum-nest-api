@@ -6,14 +6,13 @@ export class PrismaAnswerAttachmentMapper {
     if (!raw.answerId) {
       throw new Error('Attachment is not an answer attachment')
     }
-    const attachment: AnswerAttachment = {
+    return {
       id: raw.id,
       title: raw.title,
-      url: raw.link,
+      url: raw.url,
       answerId: raw.answerId,
       createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt || raw.createdAt,
+      updatedAt: raw.updatedAt,
     }
-    return attachment
   }
 }

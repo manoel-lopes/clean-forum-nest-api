@@ -4,15 +4,15 @@ import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.en
 import type { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
 import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 import type { User } from '@/domain/enterprise/entities/user.entity'
-import type { ForumIncludeOption } from '@/shared/types/forum/include-option'
+import type { ForumIncludeOptions } from '@/shared/types/forum/include-option'
 
 export type FindManyByQuestionIdParams = PaginationParams & {
   questionId: string
-  include?: ForumIncludeOption[]
+  include?: ForumIncludeOptions
 }
 
 export type UpdateAnswerData = {
-  where: { id: string }
+  answerId: string
   data: Partial<Omit<Answer, 'id' | 'createdAt' | 'updatedAt'>>
 }
 

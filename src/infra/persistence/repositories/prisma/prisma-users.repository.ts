@@ -1,52 +1,37 @@
 import { Injectable } from '@nestjs/common'
-import type { PaginatedItems } from '@/core/domain/application/paginated-items'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
-import type { UpdateUserData, UsersRepository } from '@/domain/application/repositories/users.repository'
+import type { PaginatedUsers, UpdateUserData, UsersRepository } from '@/domain/application/repositories/users.repository'
+import { formatPagination } from '@/infra/persistence/helpers/format-pagination.helper'
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import type { User, UserProps } from '@/domain/enterprise/entities/user.entity'
-import { BasePrismaRepository } from './base/base-prisma.repository'
 
 @Injectable()
-export class PrismaUsersRepository extends BasePrismaRepository implements UsersRepository {
-  constructor (private readonly prisma: PrismaService) {
-    super()
-  }
+export class PrismaUsersRepository implements UsersRepository {
+  constructor (private readonly prisma: PrismaService) {}
 
   async create (data: UserProps): Promise<User> {
-    const user = await this.prisma.user.create({ data })
-    return user
+    return this.prisma.user.create({ data })
   }
 
   async update ({ where, data }: UpdateUserData): Promise<User> {
-    const updatedUser = await this.prisma.user.update({ where, data })
-    return updatedUser
+    return this.prisma.user.update({ where, data })
   }
 
   async findById (userId: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    })
-    if (!user) return null
-    return user
+    return this.prisma.user.findUnique({ where: { id: userId } })
   }
 
   async delete (userId: string): Promise<void> {
-    await this.prisma.user.delete({
-      where: { id: userId },
-    })
+    await this.prisma.user.delete({ where: { id: userId } })
   }
 
   async findByEmail (userEmail: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { email: userEmail },
-    })
-    if (!user) return null
-    return user
+    return this.prisma.user.findUnique({ where: { email: userEmail } })
   }
 
-  async findMany ({ page = 1, pageSize = 10, order = 'desc' }: PaginationParams): Promise<PaginatedItems<User>> {
-    const pagination = this.sanitizePagination(page, pageSize)
-    const [users, totalItems] = await this.prisma.$transaction([
+  async findMany ({ page = 1, pageSize = 10, order = 'desc' }: PaginationParams): Promise<PaginatedUsers> {
+    const pagination = formatPagination(page, pageSize)
+    const [items, totalItems] = await Promise.all([
       this.prisma.user.findMany({
         skip: pagination.skip,
         take: pagination.take,
@@ -54,13 +39,12 @@ export class PrismaUsersRepository extends BasePrismaRepository implements Users
       }),
       this.prisma.user.count(),
     ])
-    const totalPages = Math.ceil(totalItems / pagination.pageSize)
     return {
       page: pagination.page,
       pageSize: pagination.pageSize,
       totalItems,
-      totalPages,
-      items: users,
+      totalPages: Math.ceil(totalItems / pagination.pageSize),
+      items,
       order,
     }
   }

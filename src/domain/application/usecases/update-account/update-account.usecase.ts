@@ -9,6 +9,8 @@ type UpdateAccountRequest = UpdateUserData['data'] & {
   userId: string
 }
 
+type UpdateAccountResponse = Omit<User, 'password'>
+
 @Injectable()
 export class UpdateAccountUseCase implements UseCase {
   constructor (
@@ -16,7 +18,7 @@ export class UpdateAccountUseCase implements UseCase {
     @Inject(PasswordHasher) private readonly passwordHasher: PasswordHasher
   ) {}
 
-  async execute (req: UpdateAccountRequest): Promise<User> {
+  async execute (req: UpdateAccountRequest): Promise<UpdateAccountResponse> {
     const { userId, name, email, password } = req
     const user = await this.usersRepository.findById(userId)
     if (!user) {
@@ -30,6 +32,7 @@ export class UpdateAccountUseCase implements UseCase {
         password: password && (await this.passwordHasher.hash(password)),
       },
     })
-    return updatedUser
+    const { password: _, ...userWithoutPassword } = updatedUser
+    return userWithoutPassword
   }
 }

@@ -7,7 +7,7 @@ export type UpdateCommentData = {
 
 export async function deleteQuestionComment (
   app: INestApplication,
-  token: string | undefined,
+  token: string ,
   {
     commentId,
   }: {
@@ -23,7 +23,7 @@ export async function deleteQuestionComment (
 
 export async function deleteAnswerComment (
   app: INestApplication,
-  token: string | undefined,
+  token: string ,
   {
     commentId,
   }: {
@@ -39,7 +39,7 @@ export async function deleteAnswerComment (
 
 export async function updateQuestionComment (
   app: INestApplication,
-  token: string | undefined,
+  token: string ,
   {
     commentId,
   }: {
@@ -56,7 +56,7 @@ export async function updateQuestionComment (
 
 export async function updateAnswerComment (
   app: INestApplication,
-  token: string | undefined,
+  token: string ,
   {
     commentId,
   }: {

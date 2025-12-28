@@ -15,7 +15,7 @@ services:
     image: redis:7-alpine
     container_name: forum_redis_dev
     ports:
-      - '${REDIS_PORT}:6379'
+      - '${REDIS_PORT:-6380}:6379'
     env_file:
       - .env.development
     environment:
@@ -27,5 +27,5 @@ services:
     image: mailhog/mailhog:latest
     container_name: forum_mailhog_dev
     ports:
-      - '1026:1025'  # SMTP port (different from test)
-      - '8026:8025'  # Web UI port (different from test)
+      - '${EMAIL_PORT:-1026}:1025'  # SMTP port
+      - '${MAILHOG_UI_PORT:-8026}:8025'  # Web UI port

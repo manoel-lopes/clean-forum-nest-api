@@ -7,18 +7,19 @@ export class EnvService {
   constructor (private configService: ConfigService<Env, true>) {}
 
   get<T extends keyof Env> (key: T): Env[T] {
-    if (key === 'DATABASE_URL') {
-      const value = this.configService.get(key, { infer: true })
-      if (!value) {
-        const dbUser = this.configService.get('DB_USER', { infer: true })
-        const dbPassword = this.configService.get('DB_PASSWORD', { infer: true })
-        const dbHost = this.configService.get('DB_HOST', { infer: true })
-        const dbPort = this.configService.get('DB_PORT', { infer: true })
-        const dbName = this.configService.get('DB_NAME', { infer: true })
-        return `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}?schema=public` as Env[T]
-      }
+    return this.configService.get(key, { infer: true })
+  }
+
+  getDatabaseUrl () {
+    const value = this.configService.get('DATABASE_URL', { infer: true })
+    if (value) {
       return value
     }
-    return this.configService.get(key, { infer: true })
+    const dbUser = this.configService.get('DB_USER', { infer: true })
+    const dbPassword = this.configService.get('DB_PASSWORD', { infer: true })
+    const dbHost = this.configService.get('DB_HOST', { infer: true })
+    const dbPort = this.configService.get('DB_PORT', { infer: true })
+    const dbName = this.configService.get('DB_NAME', { infer: true })
+    return `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}?schema=public`
   }
 }

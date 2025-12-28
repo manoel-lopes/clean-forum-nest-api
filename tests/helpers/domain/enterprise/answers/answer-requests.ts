@@ -11,7 +11,7 @@ export type UpdateAnswerData = {
   content?: unknown
 }
 
-export async function createAnswer (app: INestApplication, token: string | undefined, answerData: CreateAnswerData) {
+export async function createAnswer (app: INestApplication, token: string , answerData: CreateAnswerData) {
   const req = request(app.getHttpServer()).post(`/questions/${answerData.questionId}/answers`)
   if (token) {
     req.set('Authorization', `Bearer ${token}`)
@@ -19,7 +19,7 @@ export async function createAnswer (app: INestApplication, token: string | undef
   return req.send(answerData)
 }
 
-export async function updateAnswer (app: INestApplication, token: string | undefined, updateData: UpdateAnswerData) {
+export async function updateAnswer (app: INestApplication, token: string , updateData: UpdateAnswerData) {
   const req = request(app.getHttpServer()).put(`/answers/${updateData.answerId}`)
   if (token) {
     req.set('Authorization', `Bearer ${token}`)
@@ -31,7 +31,7 @@ export async function updateAnswer (app: INestApplication, token: string | undef
 
 export async function deleteAnswer (
   app: INestApplication,
-  token: string | undefined,
+  token: string ,
   {
     answerId,
   }: {

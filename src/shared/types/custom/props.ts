@@ -1,1 +1,3 @@
-export type Props<T> = Omit<T, 'id' | 'createdAt' | 'updatedAt'>
+import { PrimitiveAndDates } from './primitive-and-dates'
+
+export type Props<T> = Omit<PrimitiveAndDates<T>, 'id' | 'createdAt' | 'updatedAt'>

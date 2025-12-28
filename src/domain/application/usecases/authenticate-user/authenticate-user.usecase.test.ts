@@ -70,6 +70,7 @@ describe('AuthenticateUserUseCase', () => {
     const response = await sut.execute(request)
 
     expect(response.token).toBeDefined()
+    expect(jwtService.sign).toHaveBeenCalledWith({ sub: user.id })
     const sevenDaysFromNow = new Date()
     sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7)
     const refreshToken = await refreshTokensRepository.findByUserId(user.id)

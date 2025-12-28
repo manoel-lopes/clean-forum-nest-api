@@ -11,27 +11,23 @@ export class PrismaEmailValidationsRepository implements EmailValidationsReposit
   constructor (private readonly prisma: PrismaService) {}
 
   async create (data: EmailValidationProps): Promise<EmailValidation> {
-    const emailValidation = await this.prisma.emailValidation.create({ data })
-    return emailValidation
+    return this.prisma.emailValidation.create({ data })
   }
 
   async update ({ where, data }: UpdateEmailValidationData): Promise<EmailValidation> {
-    const updatedEmailValidation = await this.prisma.emailValidation.update({ where, data })
-    return updatedEmailValidation
+    return this.prisma.emailValidation.update({ where, data })
   }
 
   async findByEmail (email: string): Promise<EmailValidation | null> {
-    const emailValidation = await this.prisma.emailValidation.findUnique({
+    return this.prisma.emailValidation.findUnique({
       where: { email },
     })
-    return emailValidation
   }
 
   async findById (emailValidationId: string): Promise<EmailValidation | null> {
-    const emailValidation = await this.prisma.emailValidation.findUnique({
+    return this.prisma.emailValidation.findUnique({
       where: { id: emailValidationId },
     })
-    return emailValidation
   }
 
   async delete (emailValidationId: string): Promise<void> {
