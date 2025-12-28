@@ -64,15 +64,16 @@ const isCacheEnabled = (envService: EnvService) => {
     { provide: PrismaAnswerCommentMapper, useValue: PrismaAnswerCommentMapper },
     { provide: PrismaQuestionAttachmentMapper, useValue: PrismaQuestionAttachmentMapper },
     { provide: PrismaAnswerAttachmentMapper, useValue: PrismaAnswerAttachmentMapper },
-    { provide: UsersRepository, useClass: PrismaUsersRepository },
-    { provide: QuestionsRepository, useClass: PrismaQuestionsRepository },
-    { provide: AnswersRepository, useClass: PrismaAnswersRepository },
-    { provide: QuestionCommentsRepository, useClass: PrismaQuestionCommentsRepository },
-    { provide: AnswerCommentsRepository, useClass: PrismaAnswerCommentsRepository },
-    { provide: QuestionAttachmentsRepository, useClass: PrismaQuestionAttachmentsRepository },
-    { provide: AnswerAttachmentsRepository, useClass: PrismaAnswerAttachmentsRepository },
-    { provide: RefreshTokensRepository, useClass: PrismaRefreshTokensRepository },
-    { provide: EmailValidationsRepository, useClass: PrismaEmailValidationsRepository },
+
+    PrismaUsersRepository,
+    PrismaQuestionsRepository,
+    PrismaAnswersRepository,
+    PrismaQuestionCommentsRepository,
+    PrismaAnswerCommentsRepository,
+    PrismaQuestionAttachmentsRepository,
+    PrismaAnswerAttachmentsRepository,
+    PrismaRefreshTokensRepository,
+    PrismaEmailValidationsRepository,
 
     {
       provide: UsersRepository,
@@ -81,7 +82,7 @@ const isCacheEnabled = (envService: EnvService) => {
         cached: CachedUsersRepository,
         prisma: PrismaUsersRepository
       ) => isCacheEnabled(envService) ? cached : prisma,
-      inject: [EnvService, CachedUsersRepository, UsersRepository],
+      inject: [EnvService, CachedUsersRepository, PrismaUsersRepository],
     },
     {
       provide: QuestionsRepository,
@@ -90,7 +91,7 @@ const isCacheEnabled = (envService: EnvService) => {
         cached: CachedQuestionsRepository,
         prisma: PrismaQuestionsRepository
       ) => isCacheEnabled(envService) ? cached : prisma,
-      inject: [EnvService, CachedQuestionsRepository, QuestionsRepository],
+      inject: [EnvService, CachedQuestionsRepository, PrismaQuestionsRepository],
     },
     {
       provide: AnswersRepository,
@@ -99,7 +100,7 @@ const isCacheEnabled = (envService: EnvService) => {
         cached: CachedAnswersRepository,
         prisma: PrismaAnswersRepository
       ) => isCacheEnabled(envService) ? cached : prisma,
-      inject: [EnvService, CachedAnswersRepository, AnswersRepository],
+      inject: [EnvService, CachedAnswersRepository, PrismaAnswersRepository],
     },
     {
       provide: QuestionCommentsRepository,
@@ -108,7 +109,7 @@ const isCacheEnabled = (envService: EnvService) => {
         cached: CachedQuestionCommentsRepository,
         prisma: PrismaQuestionCommentsRepository
       ) => isCacheEnabled(envService) ? cached : prisma,
-      inject: [EnvService, CachedQuestionCommentsRepository, QuestionCommentsRepository],
+      inject: [EnvService, CachedQuestionCommentsRepository, PrismaQuestionCommentsRepository],
     },
     {
       provide: AnswerCommentsRepository,
@@ -117,7 +118,7 @@ const isCacheEnabled = (envService: EnvService) => {
         cached: CachedAnswerCommentsRepository,
         prisma: PrismaAnswerCommentsRepository
       ) => isCacheEnabled(envService) ? cached : prisma,
-      inject: [EnvService, CachedAnswerCommentsRepository, AnswerCommentsRepository],
+      inject: [EnvService, CachedAnswerCommentsRepository, PrismaAnswerCommentsRepository],
     },
     {
       provide: QuestionAttachmentsRepository,
@@ -126,7 +127,7 @@ const isCacheEnabled = (envService: EnvService) => {
         cached: CachedQuestionAttachmentsRepository,
         prisma: PrismaQuestionAttachmentsRepository
       ) => isCacheEnabled(envService) ? cached : prisma,
-      inject: [EnvService, CachedQuestionAttachmentsRepository, QuestionAttachmentsRepository],
+      inject: [EnvService, CachedQuestionAttachmentsRepository, PrismaQuestionAttachmentsRepository],
     },
     {
       provide: AnswerAttachmentsRepository,
@@ -135,7 +136,7 @@ const isCacheEnabled = (envService: EnvService) => {
         cached: CachedAnswerAttachmentsRepository,
         prisma: PrismaAnswerAttachmentsRepository
       ) => isCacheEnabled(envService) ? cached : prisma,
-      inject: [EnvService, CachedAnswerAttachmentsRepository, AnswerAttachmentsRepository],
+      inject: [EnvService, CachedAnswerAttachmentsRepository, PrismaAnswerAttachmentsRepository],
     },
     {
       provide: RefreshTokensRepository,
@@ -144,7 +145,7 @@ const isCacheEnabled = (envService: EnvService) => {
         cached: CachedRefreshTokensRepository,
         prisma: PrismaRefreshTokensRepository
       ) => isCacheEnabled(envService) ? cached : prisma,
-      inject: [EnvService, CachedRefreshTokensRepository, RefreshTokensRepository],
+      inject: [EnvService, CachedRefreshTokensRepository, PrismaRefreshTokensRepository],
     },
     {
       provide: EmailValidationsRepository,
@@ -153,7 +154,7 @@ const isCacheEnabled = (envService: EnvService) => {
         cached: CachedEmailValidationsRepository,
         prisma: PrismaEmailValidationsRepository
       ) => isCacheEnabled(envService) ? cached : prisma,
-      inject: [EnvService, CachedEmailValidationsRepository, EmailValidationsRepository],
+      inject: [EnvService, CachedEmailValidationsRepository, PrismaEmailValidationsRepository],
     },
 
     CachedUsersRepository,
