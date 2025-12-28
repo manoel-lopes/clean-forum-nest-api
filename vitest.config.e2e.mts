@@ -4,6 +4,7 @@ import baseConfig from './vitest.config.mts'
 export default mergeConfig(baseConfig, defineConfig({
   test: {
     include: ['**/*.e2e-spec.ts'],
+    exclude: ['**/*.test.ts'],
     setupFiles: ['./tests/setup-e2e.ts'],
     pool: 'forks',
     poolOptions: {
