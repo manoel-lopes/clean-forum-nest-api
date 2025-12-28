@@ -1,12 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
-import {
+import type {
   AnswerCommentsRepository,
   PaginatedAnswerComments,
 } from '@/domain/application/repositories/answer-comments.repository'
 import type { UpdateCommentData } from '@/domain/application/repositories/base/comments.repository'
 import { RedisCacheService } from '@/infra/persistence/repositories/cache/redis-cache.service'
 import type { AnswerComment, AnswerCommentProps } from '@/domain/enterprise/entities/answer-comment.entity'
+import { PrismaAnswerCommentsRepository } from '../../prisma/prisma-answer-comments.repository'
 import { BaseCachedRepository } from './base/base-cached.repository'
 
 @Injectable()
@@ -19,8 +20,7 @@ export class CachedAnswerCommentsRepository
 
   constructor (
     protected readonly redis: RedisCacheService,
-    @Inject(AnswerCommentsRepository)
-    private readonly answerCommentsRepository: AnswerCommentsRepository
+    private readonly answerCommentsRepository: PrismaAnswerCommentsRepository
   ) {
     super(redis)
   }

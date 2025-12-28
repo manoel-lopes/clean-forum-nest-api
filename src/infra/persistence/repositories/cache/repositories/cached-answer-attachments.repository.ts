@@ -1,10 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
-import {
+import type {
   AnswerAttachmentsRepository,
   PaginatedAnswerAttachments,
 } from '@/domain/application/repositories/answer-attachments.repository'
 import { RedisCacheService } from '@/infra/persistence/repositories/cache/redis-cache.service'
+import { PrismaAnswerAttachmentsRepository } from '@/infra/persistence/repositories/prisma/prisma-answer-attachments.repository'
 import type { AnswerAttachment, AnswerAttachmentProps } from '@/domain/enterprise/entities/answer-attachment.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
 
@@ -18,8 +19,7 @@ export class CachedAnswerAttachmentsRepository
 
   constructor (
     protected readonly redis: RedisCacheService,
-    @Inject(AnswerAttachmentsRepository)
-    private readonly answerAttachmentsRepository: AnswerAttachmentsRepository
+    private readonly answerAttachmentsRepository: PrismaAnswerAttachmentsRepository
   ) {
     super(redis)
   }
