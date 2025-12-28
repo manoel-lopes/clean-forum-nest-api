@@ -1,10 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
+import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { RedisCacheService } from '@/infra/persistence/repositories/cache/redis-cache.service'
 import type { RefreshToken, RefreshTokenProps } from '@/domain/enterprise/entities/refresh-token.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
-
-export const PrismaRefreshTokensRepositoryToken = Symbol('PrismaRefreshTokensRepositoryToken')
 
 @Injectable()
 export class CachedRefreshTokensRepository
@@ -15,7 +13,7 @@ export class CachedRefreshTokensRepository
 
   constructor (
     protected readonly redis: RedisCacheService,
-    @Inject(PrismaRefreshTokensRepositoryToken)
+    @Inject(RefreshTokensRepository)
     private readonly refreshTokensRepository: RefreshTokensRepository
   ) {
     super(redis)

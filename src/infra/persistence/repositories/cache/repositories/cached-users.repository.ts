@@ -1,11 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
-import type { PaginatedUsers, UpdateUserData, UsersRepository } from '@/domain/application/repositories/users.repository'
+import { PaginatedUsers, UpdateUserData, UsersRepository } from '@/domain/application/repositories/users.repository'
 import { RedisCacheService } from '@/infra/persistence/repositories/cache/redis-cache.service'
 import type { User, UserProps } from '@/domain/enterprise/entities/user.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
-
-export const PrismaUsersRepositoryToken = Symbol('PrismaUsersRepositoryToken')
 
 @Injectable()
 export class CachedUsersRepository
@@ -17,7 +15,7 @@ export class CachedUsersRepository
 
   constructor (
     protected readonly redis: RedisCacheService,
-    @Inject(PrismaUsersRepositoryToken)
+    @Inject(UsersRepository)
     private readonly usersRepository: UsersRepository
   ) {
     super(redis)

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type {
+import {
   AnswersRepository,
   FindManyByQuestionIdParams,
   PaginatedAnswers,
@@ -8,8 +8,6 @@ import type {
 import { RedisCacheService } from '@/infra/persistence/repositories/cache/redis-cache.service'
 import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
-
-export const PrismaAnswersRepositoryToken = Symbol('PrismaAnswersRepositoryToken')
 
 @Injectable()
 export class CachedAnswersRepository
@@ -21,7 +19,7 @@ export class CachedAnswersRepository
 
   constructor (
     protected readonly redis: RedisCacheService,
-    @Inject(PrismaAnswersRepositoryToken)
+    @Inject(AnswersRepository)
     private readonly answersRepository: AnswersRepository
   ) {
     super(redis)

@@ -1,13 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type {
+import {
   EmailValidationsRepository,
   UpdateEmailValidationData,
 } from '@/domain/application/repositories/email-validations.repository'
 import { RedisCacheService } from '@/infra/persistence/repositories/cache/redis-cache.service'
 import type { EmailValidation, EmailValidationProps } from '@/domain/enterprise/entities/email-validation.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
-
-export const PrismaEmailValidationsRepositoryToken = Symbol('PrismaEmailValidationsRepositoryToken')
 
 @Injectable()
 export class CachedEmailValidationsRepository
@@ -18,7 +16,7 @@ export class CachedEmailValidationsRepository
 
   constructor (
     protected readonly redis: RedisCacheService,
-    @Inject(PrismaEmailValidationsRepositoryToken)
+    @Inject(EmailValidationsRepository)
     private readonly emailValidationsRepository: EmailValidationsRepository
   ) {
     super(redis)
