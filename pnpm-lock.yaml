@@ -117,8 +117,8 @@ importers:
         specifier: ^4.1.13
         version: 4.1.13
       zod-error-map:
-        specifier: ^0.1.0
-        version: 0.1.0(zod@4.1.13)
+        specifier: ^0.2.2
+        version: 0.2.2(zod@4.1.13)
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.3.3
@@ -5877,8 +5877,8 @@ packages:
   zeptomatch@2.0.2:
     resolution: {integrity: sha512-H33jtSKf8Ijtb5BW6wua3G5DhnFjbFML36eFu+VdOoVY4HD9e7ggjqdM6639B+L87rjnR6Y+XeRzBXZdy52B/g==}
 
-  zod-error-map@0.1.0:
-    resolution: {integrity: sha512-cddfKzS3s0xOwHHeQytEFVkTxI4M9/XLKUAxTZuGGUrpYSM+JI/ZA4S7pyUMuCwebIJIRN7AoC33GhcQVnQizg==}
+  zod-error-map@0.2.2:
+    resolution: {integrity: sha512-qk/bS59mfUCEsd1F/azNHeD445knh5EIYXV17lnc7mzqXYPSx6DGdqG7UfK7HfKlVmtZ6wftRJTufDp3lnhGLA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.0.0 || ^4.0.0
@@ -12684,7 +12684,7 @@ snapshots:
     dependencies:
       grammex: 3.1.12
 
-  zod-error-map@0.1.0(zod@4.1.13):
+  zod-error-map@0.2.2(zod@4.1.13):
     dependencies:
       zod: 4.1.13
 
