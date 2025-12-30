@@ -1,13 +1,30 @@
-import type { CommentsRepository, UpdateCommentData } from '@/domain/application/repositories/base/comments.repository'
-import type { Comment } from '@/domain/enterprise/entities/base/comment.entity'
+import type { PaginationParams } from '@/core/domain/application/pagination-params'
+import type {
+  CommentsRepository,
+  PaginatedComments,
+  UpdateCommentData,
+} from '@/domain/application/repositories/comments.repository'
+import type { Comment } from '@/domain/enterprise/entities/comment.entity'
 import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.repository'
 
-export class InMemoryCommentsRepository<T extends Comment = Comment>
-  extends BaseRepository<T>
-  implements CommentsRepository<T> {
-  async update (commentData: UpdateCommentData): Promise<T> {
+export class InMemoryCommentsRepository
+  extends BaseRepository<Comment>
+  implements CommentsRepository {
+  async update (commentData: UpdateCommentData): Promise<Comment> {
     const { where, data } = commentData
     const updatedComment = await this.updateOne({ where, data })
     return updatedComment
+  }
+
+  async findManyByAnswerId (answerId: string, params: PaginationParams): Promise<PaginatedComments> {
+    const comments = await this.findManyItemsBy({
+      where: { answerId },
+      params: {
+        page: params.page,
+        pageSize: params.pageSize,
+        order: params.order,
+      },
+    })
+    return comments
   }
 }
