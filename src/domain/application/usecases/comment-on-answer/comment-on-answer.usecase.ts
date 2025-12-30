@@ -1,8 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
-import { AnswerCommentsRepository } from '@/domain/application/repositories/answer-comments.repository'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
-import { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
+import { CommentsRepository } from '@/domain/application/repositories/comments.repository'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 type CommentOnAnswerRequest = {
@@ -15,7 +14,7 @@ type CommentOnAnswerRequest = {
 export class CommentOnAnswerUseCase implements UseCase {
   constructor (
     @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository,
-    @Inject(AnswerCommentsRepository) private readonly answerCommentsRepository: AnswerCommentsRepository
+    @Inject(CommentsRepository) private readonly commentsRepository: CommentsRepository
   ) {}
 
   async execute (request: CommentOnAnswerRequest): Promise<void> {
@@ -24,11 +23,10 @@ export class CommentOnAnswerUseCase implements UseCase {
     if (!answer) {
       throw new ResourceNotFoundException('Answer')
     }
-    const comment = AnswerComment.create({
+    await this.commentsRepository.create({
       content,
       authorId,
       answerId,
     })
-    await this.answerCommentsRepository.save(comment)
   }
 }

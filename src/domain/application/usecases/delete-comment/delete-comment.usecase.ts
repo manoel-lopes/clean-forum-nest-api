@@ -1,25 +1,25 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
-import { AnswerCommentsRepository } from '@/domain/application/repositories/answer-comments.repository'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
+import { CommentsRepository } from '@/domain/application/repositories/comments.repository'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
-type DeleteAnswerCommentRequest = {
+type DeleteCommentRequest = {
   commentId: string
   authorId: string
 }
 
 @Injectable()
-export class DeleteAnswerCommentUseCase implements UseCase {
+export class DeleteCommentUseCase implements UseCase {
   constructor (
-    @Inject(AnswerCommentsRepository) private readonly answerCommentsRepository: AnswerCommentsRepository,
+    @Inject(CommentsRepository) private readonly commentsRepository: CommentsRepository,
     @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository
   ) {}
 
-  async execute (req: DeleteAnswerCommentRequest) {
+  async execute (req: DeleteCommentRequest) {
     const { commentId, authorId } = req
-    const comment = await this.answerCommentsRepository.findById(commentId)
+    const comment = await this.commentsRepository.findById(commentId)
     if (!comment) {
       throw new ResourceNotFoundException('Comment')
     }
@@ -32,6 +32,6 @@ export class DeleteAnswerCommentUseCase implements UseCase {
     if (!isCommentAuthor && !isAnswerAuthor) {
       throw new NotAuthorException('comment')
     }
-    await this.answerCommentsRepository.delete(commentId)
+    await this.commentsRepository.delete(commentId)
   }
 }

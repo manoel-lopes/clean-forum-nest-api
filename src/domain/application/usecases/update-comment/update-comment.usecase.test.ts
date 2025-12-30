@@ -1,14 +1,14 @@
-import { InMemoryQuestionCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-comments.repository'
-import { UpdateQuestionCommentUseCase } from './update-question-comment.usecase'
-import { makeQuestionComment } from '@tests/factories/domain/make-question-comment'
+import { InMemoryCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-comments.repository'
+import { UpdateCommentUseCase } from './update-comment.usecase'
+import { makeComment } from '@tests/factories/domain/make-comment'
 
-describe('UpdateQuestionCommentUseCase', () => {
-  let sut: UpdateQuestionCommentUseCase
-  let questionCommentsRepository: InMemoryQuestionCommentsRepository
+describe('UpdateCommentUseCase', () => {
+  let sut: UpdateCommentUseCase
+  let commentsRepository: InMemoryCommentsRepository
 
   beforeEach(() => {
-    questionCommentsRepository = new InMemoryQuestionCommentsRepository()
-    sut = new UpdateQuestionCommentUseCase(questionCommentsRepository)
+    commentsRepository = new InMemoryCommentsRepository()
+    sut = new UpdateCommentUseCase(commentsRepository)
   })
 
   it('should not update a nonexistent comment', async () => {
@@ -22,8 +22,8 @@ describe('UpdateQuestionCommentUseCase', () => {
   })
 
   it('should not update a comment if the user is not the author', async () => {
-    const comment = makeQuestionComment({ authorId: 'comment-author-id' })
-    await questionCommentsRepository.save(comment)
+    const comment = makeComment({ authorId: 'comment-author-id' })
+    await commentsRepository.create(comment)
 
     const request = {
       commentId: comment.id,
@@ -34,12 +34,12 @@ describe('UpdateQuestionCommentUseCase', () => {
     await expect(sut.execute(request)).rejects.toThrow('The user is not the author of the comment')
   })
 
-  it('should update a question comment', async () => {
-    const comment = makeQuestionComment({
+  it('should update a comment', async () => {
+    const comment = makeComment({
       authorId: 'comment-author-id',
-      content: 'original content',
+      content: 'Original content',
     })
-    await questionCommentsRepository.save(comment)
+    await commentsRepository.create(comment)
 
     const request = {
       commentId: comment.id,

@@ -1,19 +1,19 @@
-import type { AnswerCommentsRepository } from '@/domain/application/repositories/answer-comments.repository'
 import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
-import { InMemoryAnswerCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-comments.repository'
+import type { CommentsRepository } from '@/domain/application/repositories/comments.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
+import { InMemoryCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-comments.repository'
 import { CommentOnAnswerUseCase } from './comment-on-answer.usecase'
 import { makeAnswer } from '@tests/factories/domain/make-answer'
 
 describe('CommentOnAnswerUseCase', () => {
   let sut: CommentOnAnswerUseCase
   let answersRepository: AnswersRepository
-  let answerCommentsRepository: AnswerCommentsRepository
+  let commentsRepository: CommentsRepository
 
   beforeEach(() => {
     answersRepository = new InMemoryAnswersRepository()
-    answerCommentsRepository = new InMemoryAnswerCommentsRepository()
-    sut = new CommentOnAnswerUseCase(answersRepository, answerCommentsRepository)
+    commentsRepository = new InMemoryCommentsRepository()
+    sut = new CommentOnAnswerUseCase(answersRepository, commentsRepository)
   })
 
   it('should not comment on a inexistent answer', async () => {
@@ -38,7 +38,7 @@ describe('CommentOnAnswerUseCase', () => {
 
     await sut.execute(request)
 
-    const comments = await answerCommentsRepository.findManyByAnswerId(answer.id, {
+    const comments = await commentsRepository.findManyByAnswerId(answer.id, {
       page: 1,
       pageSize: 10,
     })
