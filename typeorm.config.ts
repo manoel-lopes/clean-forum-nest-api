@@ -26,9 +26,22 @@ const entities = [
   EmailValidation,
 ]
 
+function getDatabaseUrl (): string {
+  const databaseUrl = process.env.DATABASE_URL
+  if (databaseUrl?.startsWith('postgresql://')) {
+    return databaseUrl
+  }
+  const dbUser = process.env.DB_USER
+  const dbPassword = process.env.DB_PASSWORD
+  const dbHost = process.env.DB_HOST ?? 'localhost'
+  const dbPort = process.env.DB_PORT ?? '5432'
+  const dbName = process.env.DB_NAME
+  return `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`
+}
+
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
-  url: process.env.DATABASE_URL,
+  url: getDatabaseUrl(),
   entities,
   migrations: ['./migrations/*.ts'],
   synchronize: false,
