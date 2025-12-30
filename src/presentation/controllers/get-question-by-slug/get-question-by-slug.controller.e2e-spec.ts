@@ -6,7 +6,6 @@ import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion, getQuestionBySlug, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { commentOnQuestion } from '@tests/helpers/domain/enterprise/questions/question-comment-requests'
 import { attachToQuestion } from '@tests/helpers/domain/enterprise/questions/question-attachment-requests'
 import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { commentOnAnswer } from '@tests/helpers/domain/enterprise/answers/answer-comment-requests'
@@ -84,27 +83,6 @@ describe('GetQuestionBySlug', () => {
     expect(response.body.author).toHaveProperty('email')
   })
 
-  it('should return 200 and get question with include=comments', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
-    const question = await getQuestionByTile(app, token, questionData.title)
-    await commentOnQuestion(app, token, { questionId: question.id, content: 'Test comment' })
-
-    const response = await getQuestionBySlug(app, question.slug, token, { include: 'comments' })
-
-    expect(response.statusCode).toBe(200)
-    expect(response.body).toHaveProperty('comments')
-    expect(Array.isArray(response.body.comments)).toBe(true)
-    expect(response.body.comments.length).toBeGreaterThan(0)
-  })
-
   it('should return 200 and get question with include=attachments', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -137,14 +115,12 @@ describe('GetQuestionBySlug', () => {
     const questionData = aQuestion().build()
     await createQuestion(app, token, questionData)
     const question = await getQuestionByTile(app, token, questionData.title)
-    await commentOnQuestion(app, token, { questionId: question.id, content: 'Test comment' })
     await attachToQuestion(app, token, { questionId: question.id, title: 'Test attachment', url: 'https://example.com/file.pdf' })
 
-    const response = await getQuestionBySlug(app, question.slug, token, { include: 'author,comments,attachments' })
+    const response = await getQuestionBySlug(app, question.slug, token, { include: 'author,attachments' })
 
     expect(response.statusCode).toBe(200)
     expect(response.body).toHaveProperty('author')
-    expect(response.body).toHaveProperty('comments')
     expect(response.body).toHaveProperty('attachments')
   })
 
@@ -227,20 +203,18 @@ describe('GetQuestionBySlug', () => {
     const questionData = aQuestion().build()
     await createQuestion(app, token, questionData)
     const question = await getQuestionByTile(app, token, questionData.title)
-    await commentOnQuestion(app, token, { questionId: question.id, content: 'Question comment' })
     await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
     const answersResponse = await fetchQuestionAnswers(app, question.id, token)
     const answerId = answersResponse.body.items[0].id
     await commentOnAnswer(app, token, { answerId, content: 'Answer comment' })
 
     const response = await getQuestionBySlug(app, question.slug, token, {
-      include: 'author,comments',
+      include: 'author',
       answerIncludes: 'author,comments',
     })
 
     expect(response.statusCode).toBe(200)
     expect(response.body).toHaveProperty('author')
-    expect(response.body).toHaveProperty('comments')
     expect(response.body).toHaveProperty('answers')
     expect(response.body.answers.items[0]).toHaveProperty('author')
     expect(response.body.answers.items[0]).toHaveProperty('comments')
