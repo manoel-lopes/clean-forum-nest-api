@@ -2,29 +2,35 @@ import { Repository } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { PaginationParams } from '@/core/domain/pagination-params'
-import type { UpdateCommentData } from '@/domain/application/repositories/base/comments.repository'
 import type {
-  PaginatedQuestionComments,
-  QuestionCommentsRepository,
-} from '@/domain/application/repositories/question-comments.repository'
-import { QuestionComment } from '@/domain/enterprise/entities/question-comment.entity'
+  CommentsRepository,
+  PaginatedComments,
+  UpdateCommentData,
+} from '@/domain/application/repositories/comments.repository'
+import { Comment, CommentProps } from '@/domain/enterprise/entities/comment.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()
-export class TypeOrmQuestionCommentsRepository
-  extends BaseTypeOrmRepository<QuestionComment>
-  implements QuestionCommentsRepository {
-  constructor (@InjectRepository(QuestionComment) repository: Repository<QuestionComment>) {
+export class TypeOrmCommentsRepository
+  extends BaseTypeOrmRepository<Comment>
+  implements CommentsRepository {
+  constructor (@InjectRepository(Comment) repository: Repository<Comment>) {
     super(repository)
   }
 
-  async findManyByQuestionId (
-    questionId: string,
+  async create (data: CommentProps): Promise<Comment> {
+    const comment = Comment.create(data)
+    await this.save(comment)
+    return comment
+  }
+
+  async findManyByAnswerId (
+    answerId: string,
     { page = 1, pageSize = 10, order = 'desc' }: PaginationParams
-  ): Promise<PaginatedQuestionComments> {
+  ): Promise<PaginatedComments> {
     const pagination = this.formatPagination(page, pageSize)
     const [items, totalItems] = await this.findAndCount({
-      where: { questionId },
+      where: { answerId },
       order: { createdAt: order },
       skip: pagination.offset,
       take: pagination.limit,
@@ -39,8 +45,8 @@ export class TypeOrmQuestionCommentsRepository
     }
   }
 
-  async update ({ commentId, data }: UpdateCommentData): Promise<QuestionComment> {
-    const updated = await this.updateOne({ id: commentId, ...data })
+  async update ({ where, data }: UpdateCommentData): Promise<Comment> {
+    const updated = await this.updateOne({ id: where.id, ...data })
     return updated
   }
 }
