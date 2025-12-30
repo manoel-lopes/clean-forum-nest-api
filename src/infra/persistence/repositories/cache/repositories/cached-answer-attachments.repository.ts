@@ -45,8 +45,10 @@ export class CachedAnswerAttachmentsRepository
     }
     await Promise.all(
       attachments
-        .map(attachment => this.setCache(this.getAttachmentCacheKey(attachment.id), attachment, this.ATTACHMENTS_TTL))
-        .concat(Array.from(answerIdsToInvalidate, id => this.invalidateCachePattern(this.getAttachmentsByAnswerCachePattern(id))))
+        .map(a => this.setCache(this.getAttachmentCacheKey(a.id), a, this.ATTACHMENTS_TTL))
+        .concat(Array.from(answerIdsToInvalidate).map(id => {
+          return this.invalidateCachePattern(this.getAttachmentsByAnswerCachePattern(id))
+        }))
     )
     return attachments
   }
@@ -110,7 +112,9 @@ export class CachedAnswerAttachmentsRepository
     await Promise.all(
       [this.answerAttachmentsRepository.deleteMany(attachmentIds)]
         .concat(attachmentIds.map(id => this.invalidateCache(this.getAttachmentCacheKey(id))))
-        .concat(Array.from(answerIdsToInvalidate, id => this.invalidateCachePattern(this.getAttachmentsByAnswerCachePattern(id))))
+        .concat(Array.from(answerIdsToInvalidate).map(id => {
+          return this.invalidateCachePattern(this.getAttachmentsByAnswerCachePattern(id))
+        }))
     )
   }
 
