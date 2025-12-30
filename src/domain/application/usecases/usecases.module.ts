@@ -6,16 +6,14 @@ import { AttachToQuestionUseCase } from './attach-to-question/attach-to-question
 import { AuthenticateUserUseCase } from './authenticate-user/authenticate-user.usecase'
 import { ChooseQuestionBestAnswerUseCase } from './choose-question-best-answer/choose-question-best-answer.usecase'
 import { CommentOnAnswerUseCase } from './comment-on-answer/comment-on-answer.usecase'
-import { CommentOnQuestionUseCase } from './comment-on-question/comment-on-question.usecase'
 import { CreateAccountUseCase } from './create-account/create-account.usecase'
 import { CreateQuestionUseCase } from './create-question/create-question.usecase'
 import { DeleteAccountUseCase } from './delete-account/delete-account.usecase'
 import { DeleteAnswerUseCase } from './delete-answer/delete-answer.usecase'
 import { DeleteAnswerAttachmentUseCase } from './delete-answer-attachment/delete-answer-attachment.usecase'
-import { DeleteAnswerCommentUseCase } from './delete-answer-comment/delete-answer-comment.usecase'
+import { DeleteCommentUseCase } from './delete-comment/delete-comment.usecase'
 import { DeleteQuestionUseCase } from './delete-question/delete-question.usecase'
 import { DeleteQuestionAttachmentUseCase } from './delete-question-attachment/delete-question-attachment.usecase'
-import { DeleteQuestionCommentUseCase } from './delete-question-comment/delete-question-comment.usecase'
 import { FetchQuestionAnswersUseCase } from './fetch-question-answers/fetch-question-answers.usecase'
 import { FetchUserQuestionsUseCase } from './fetch-user-questions/fetch-user-questions.usecase'
 import { GetQuestionBySlugUseCase } from './get-question-by-slug/get-question-by-slug.usecase'
@@ -25,10 +23,9 @@ import { SendEmailValidationUseCase } from './send-email-validation/send-email-v
 import { UpdateAccountUseCase } from './update-account/update-account.usecase'
 import { UpdateAnswerUseCase } from './update-answer/update-answer.usecase'
 import { UpdateAnswerAttachmentUseCase } from './update-answer-attachment/update-answer-attachment.usecase'
-import { UpdateAnswerCommentUseCase } from './update-answer-comment/update-answer-comment.usecase'
+import { UpdateCommentUseCase } from './update-comment/update-comment.usecase'
 import { UpdateQuestionUseCase } from './update-question/update-question.usecase'
 import { UpdateQuestionAttachmentUseCase } from './update-question-attachment/update-question-attachment.usecase'
-import { UpdateQuestionCommentUseCase } from './update-question-comment/update-question-comment.usecase'
 import { UploadAttachmentUseCase } from './upload-attachment/upload-attachment.usecase'
 import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-email-validation.usecase'
 
@@ -42,16 +39,14 @@ import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-e
     AuthenticateUserUseCase,
     ChooseQuestionBestAnswerUseCase,
     CommentOnAnswerUseCase,
-    CommentOnQuestionUseCase,
     CreateAccountUseCase,
     CreateQuestionUseCase,
     DeleteAccountUseCase,
     DeleteAnswerUseCase,
     DeleteAnswerAttachmentUseCase,
-    DeleteAnswerCommentUseCase,
+    DeleteCommentUseCase,
     DeleteQuestionUseCase,
     DeleteQuestionAttachmentUseCase,
-    DeleteQuestionCommentUseCase,
     FetchQuestionAnswersUseCase,
     FetchUserQuestionsUseCase,
     GetQuestionBySlugUseCase,
@@ -61,8 +56,7 @@ import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-e
     UpdateAccountUseCase,
     UpdateAnswerUseCase,
     UpdateAnswerAttachmentUseCase,
-    UpdateAnswerCommentUseCase,
-    UpdateQuestionCommentUseCase,
+    UpdateCommentUseCase,
     UpdateQuestionUseCase,
     UpdateQuestionAttachmentUseCase,
     UploadAttachmentUseCase,
@@ -75,16 +69,14 @@ import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-e
     AuthenticateUserUseCase,
     ChooseQuestionBestAnswerUseCase,
     CommentOnAnswerUseCase,
-    CommentOnQuestionUseCase,
     CreateAccountUseCase,
     CreateQuestionUseCase,
     DeleteAccountUseCase,
     DeleteAnswerUseCase,
     DeleteAnswerAttachmentUseCase,
-    DeleteAnswerCommentUseCase,
+    DeleteCommentUseCase,
     DeleteQuestionUseCase,
     DeleteQuestionAttachmentUseCase,
-    DeleteQuestionCommentUseCase,
     FetchQuestionAnswersUseCase,
     FetchUserQuestionsUseCase,
     GetQuestionBySlugUseCase,
@@ -94,8 +86,7 @@ import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-e
     UpdateAccountUseCase,
     UpdateAnswerUseCase,
     UpdateAnswerAttachmentUseCase,
-    UpdateAnswerCommentUseCase,
-    UpdateQuestionCommentUseCase,
+    UpdateCommentUseCase,
     UpdateQuestionUseCase,
     UpdateQuestionAttachmentUseCase,
     UploadAttachmentUseCase,

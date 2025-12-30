@@ -15,16 +15,14 @@ import { AttachToQuestionController } from './presentation/controllers/attach-to
 import { AuthenticateUserController } from './presentation/controllers/authenticate-user/authenticate-user.controller'
 import { ChooseQuestionBestAnswerController } from './presentation/controllers/choose-question-best-answer/choose-question-best-answer.controller'
 import { CommentOnAnswerController } from './presentation/controllers/comment-on-answer/comment-on-answer.controller'
-import { CommentOnQuestionController } from './presentation/controllers/comment-on-question/comment-on-question.controller'
 import { CreateAccountController } from './presentation/controllers/create-account/create-account.controller'
 import { CreateQuestionController } from './presentation/controllers/create-question/create-question.controller'
 import { DeleteAccountController } from './presentation/controllers/delete-account/delete-account.controller'
 import { DeleteAnswerController } from './presentation/controllers/delete-answer/delete-answer.controller'
 import { DeleteAnswerAttachmentController } from './presentation/controllers/delete-answer-attachment/delete-answer-attachment.controller'
-import { DeleteAnswerCommentController } from './presentation/controllers/delete-answer-comment/delete-answer-comment.controller'
+import { DeleteCommentController } from './presentation/controllers/delete-comment/delete-comment.controller'
 import { DeleteQuestionController } from './presentation/controllers/delete-question/delete-question.controller'
 import { DeleteQuestionAttachmentController } from './presentation/controllers/delete-question-attachment/delete-question-attachment.controller'
-import { DeleteQuestionCommentController } from './presentation/controllers/delete-question-comment/delete-question-comment.controller'
 import { FetchQuestionAnswersController } from './presentation/controllers/fetch-question-answers/fetch-question-answers.controller'
 import { FetchQuestionsController } from './presentation/controllers/fetch-questions/fetch-questions.controller'
 import { FetchUserQuestionsController } from './presentation/controllers/fetch-user-questions/fetch-user-questions.controller'
@@ -35,10 +33,9 @@ import { RefreshAccessTokenController } from './presentation/controllers/refresh
 import { SendEmailValidationController } from './presentation/controllers/send-email-validation/send-email-validation.controller'
 import { UpdateAnswerController } from './presentation/controllers/update-answer/update-answer.controller'
 import { UpdateAnswerAttachmentController } from './presentation/controllers/update-answer-attachment/update-answer-attachment.controller'
-import { UpdateAnswerCommentController } from './presentation/controllers/update-answer-comment/update-answer-comment.controller'
+import { UpdateCommentController } from './presentation/controllers/update-comment/update-comment.controller'
 import { UpdateQuestionController } from './presentation/controllers/update-question/update-question.controller'
 import { UpdateQuestionAttachmentController } from './presentation/controllers/update-question-attachment/update-question-attachment.controller'
-import { UpdateQuestionCommentController } from './presentation/controllers/update-question-comment/update-question-comment.controller'
 import { UploadAttachmentController } from './presentation/controllers/upload-attachment/upload-attachment.controller'
 import { VerifyEmailValidationController } from './presentation/controllers/verify-email-validation/verify-email-validation.controller'
 
@@ -64,16 +61,14 @@ import { VerifyEmailValidationController } from './presentation/controllers/veri
     AuthenticateUserController,
     ChooseQuestionBestAnswerController,
     CommentOnAnswerController,
-    CommentOnQuestionController,
     CreateAccountController,
     CreateQuestionController,
     DeleteAccountController,
     DeleteAnswerController,
     DeleteAnswerAttachmentController,
-    DeleteAnswerCommentController,
+    DeleteCommentController,
     DeleteQuestionController,
     DeleteQuestionAttachmentController,
-    DeleteQuestionCommentController,
     FetchQuestionAnswersController,
     FetchQuestionsController,
     FetchUserQuestionsController,
@@ -84,10 +79,9 @@ import { VerifyEmailValidationController } from './presentation/controllers/veri
     SendEmailValidationController,
     UpdateAnswerController,
     UpdateAnswerAttachmentController,
-    UpdateAnswerCommentController,
+    UpdateCommentController,
     UpdateQuestionController,
     UpdateQuestionAttachmentController,
-    UpdateQuestionCommentController,
     UploadAttachmentController,
     VerifyEmailValidationController,
   ],
