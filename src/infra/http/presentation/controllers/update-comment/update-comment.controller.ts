@@ -1,54 +1,61 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   HttpCode,
   NotFoundException,
-  Post,
+  Param,
+  Put,
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { CommentOnQuestionUseCase } from '@/domain/application/usecases/comment-on-question/comment-on-question.usecase'
+import { UpdateCommentUseCase } from '@/domain/application/usecases/update-comment/update-comment.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
-  ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
 import {
-  CommentOnQuestionBodyDto,
-  commentOnQuestionBodySchema,
-} from '@/infra/http/ports/comments/comment-on-question.schema'
+  UpdateCommentBodyDto,
+  updateCommentBodySchema,
+} from '@/infra/http/ports/comments/update-comment.schema'
+import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Comments')
-@Controller('comments/questions')
-export class CommentOnQuestionController {
-  constructor (private readonly commentOnQuestionUseCase: CommentOnQuestionUseCase) {}
+@Controller('comments')
+export class UpdateCommentController {
+  constructor (private readonly updateCommentUseCase: UpdateCommentUseCase) {}
 
-  @Post()
-  @HttpCode(201)
-  @ApiOperation({ summary: 'Comment on a question' })
-  @ApiCreatedResponse('Comment created successfully')
+  @Put(':commentId')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Update a comment' })
+  @ApiOkResponse('Comment updated successfully')
   @ApiUnauthorizedResponse()
-  @ApiNotFoundResponse('Question not found')
+  @ApiNotFoundResponse('Comment not found')
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Body(new ZodValidationPipe(commentOnQuestionBodySchema)) body: CommentOnQuestionBodyDto
+    @Param('commentId') commentId: string,
+    @Body(new ZodValidationPipe(updateCommentBodySchema)) body: UpdateCommentBodyDto
   ) {
     try {
-      const { questionId, content } = body
-      const response = await this.commentOnQuestionUseCase.execute({
+      const { content } = body
+      const response = await this.updateCommentUseCase.execute({
+        commentId,
         authorId: user.id,
-        questionId,
         content,
       })
       return response
     } catch (error) {
       if (error instanceof ResourceNotFoundException) {
         throw new NotFoundException(error.message)
+      }
+      if (error instanceof NotAuthorException) {
+        throw new ForbiddenException(error.message)
       }
       throw error
     }
