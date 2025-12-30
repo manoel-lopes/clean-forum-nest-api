@@ -1,11 +1,10 @@
 import { Global, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { AnswerAttachmentsRepository } from '@/domain/application/repositories/answer-attachments.repository'
-import { AnswerCommentsRepository } from '@/domain/application/repositories/answer-comments.repository'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
+import { CommentsRepository } from '@/domain/application/repositories/comments.repository'
 import { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
 import { QuestionAttachmentsRepository } from '@/domain/application/repositories/question-attachments.repository'
-import { QuestionCommentsRepository } from '@/domain/application/repositories/question-comments.repository'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
@@ -15,13 +14,13 @@ import {
   TypeOrmAnswerAttachmentsRepositoryToken,
 } from '@/infra/cache/repositories/cached-answer-attachments.repository'
 import {
-  CachedAnswerCommentsRepository,
-  TypeOrmAnswerCommentsRepositoryToken,
-} from '@/infra/cache/repositories/cached-answer-comments.repository'
-import {
   CachedAnswersRepository,
   TypeOrmAnswersRepositoryToken,
 } from '@/infra/cache/repositories/cached-answers.repository'
+import {
+  CachedCommentsRepository,
+  TypeOrmCommentsRepositoryToken,
+} from '@/infra/cache/repositories/cached-comments.repository'
 import {
   CachedEmailValidationsRepository,
   TypeOrmEmailValidationsRepositoryToken,
@@ -30,10 +29,6 @@ import {
   CachedQuestionAttachmentsRepository,
   TypeOrmQuestionAttachmentsRepositoryToken,
 } from '@/infra/cache/repositories/cached-question-attachments.repository'
-import {
-  CachedQuestionCommentsRepository,
-  TypeOrmQuestionCommentsRepositoryToken,
-} from '@/infra/cache/repositories/cached-question-comments.repository'
 import {
   CachedQuestionsRepository,
   TypeOrmQuestionsRepositoryToken,
@@ -48,23 +43,20 @@ import {
 } from '@/infra/cache/repositories/cached-users.repository'
 import { EnvService } from '@/infra/env/env.service'
 import { TypeOrmAnswerAttachmentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answer-attachments.repository'
-import { TypeOrmAnswerCommentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answer-comments.repository'
 import { TypeOrmAnswersRepository } from '@/infra/persistence/repositories/typeorm/typeorm-answers.repository'
+import { TypeOrmCommentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-comments.repository'
 import { TypeOrmEmailValidationsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-email-validations.repository'
 import { TypeOrmQuestionAttachmentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-question-attachments.repository'
-import { TypeOrmQuestionCommentsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-question-comments.repository'
 import { TypeOrmQuestionsRepository } from '@/infra/persistence/repositories/typeorm/typeorm-questions.repository'
 import { TypeOrmRefreshTokensRepository } from '@/infra/persistence/repositories/typeorm/typeorm-refresh-tokens.repository'
 import { TypeOrmUsersRepository } from '@/infra/persistence/repositories/typeorm/typeorm-users.repository'
 import { Answer } from '@/domain/enterprise/entities/answer.entity'
 import { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
-import { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
-import { Comment } from '@/domain/enterprise/entities/base/comment.entity'
+import { Comment } from '@/domain/enterprise/entities/comment.entity'
 import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
 import { Question } from '@/domain/enterprise/entities/question.entity'
 import { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
-import { QuestionComment } from '@/domain/enterprise/entities/question-comment.entity'
 import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
 import { User } from '@/domain/enterprise/entities/user.entity'
 
@@ -73,8 +65,6 @@ const entities = [
   Question,
   Answer,
   Comment,
-  QuestionComment,
-  AnswerComment,
   Attachment,
   QuestionAttachment,
   AnswerAttachment,
@@ -120,8 +110,7 @@ const isCacheEnabled = (envService: EnvService) => {
     { provide: TypeOrmUsersRepositoryToken, useClass: TypeOrmUsersRepository },
     { provide: TypeOrmQuestionsRepositoryToken, useClass: TypeOrmQuestionsRepository },
     { provide: TypeOrmAnswersRepositoryToken, useClass: TypeOrmAnswersRepository },
-    { provide: TypeOrmQuestionCommentsRepositoryToken, useClass: TypeOrmQuestionCommentsRepository },
-    { provide: TypeOrmAnswerCommentsRepositoryToken, useClass: TypeOrmAnswerCommentsRepository },
+    { provide: TypeOrmCommentsRepositoryToken, useClass: TypeOrmCommentsRepository },
     { provide: TypeOrmQuestionAttachmentsRepositoryToken, useClass: TypeOrmQuestionAttachmentsRepository },
     { provide: TypeOrmAnswerAttachmentsRepositoryToken, useClass: TypeOrmAnswerAttachmentsRepository },
     { provide: TypeOrmRefreshTokensRepositoryToken, useClass: TypeOrmRefreshTokensRepository },
@@ -129,8 +118,7 @@ const isCacheEnabled = (envService: EnvService) => {
     TypeOrmUsersRepository,
     TypeOrmQuestionsRepository,
     TypeOrmAnswersRepository,
-    TypeOrmQuestionCommentsRepository,
-    TypeOrmAnswerCommentsRepository,
+    TypeOrmCommentsRepository,
     TypeOrmQuestionAttachmentsRepository,
     TypeOrmAnswerAttachmentsRepository,
     TypeOrmRefreshTokensRepository,
@@ -138,8 +126,7 @@ const isCacheEnabled = (envService: EnvService) => {
     CachedUsersRepository,
     CachedQuestionsRepository,
     CachedAnswersRepository,
-    CachedQuestionCommentsRepository,
-    CachedAnswerCommentsRepository,
+    CachedCommentsRepository,
     CachedQuestionAttachmentsRepository,
     CachedAnswerAttachmentsRepository,
     CachedRefreshTokensRepository,
@@ -164,22 +151,13 @@ const isCacheEnabled = (envService: EnvService) => {
       inject: [EnvService, CachedAnswersRepository, TypeOrmAnswersRepository],
     },
     {
-      provide: QuestionCommentsRepository,
+      provide: CommentsRepository,
       useFactory: (
         envService: EnvService,
-        cached: CachedQuestionCommentsRepository,
-        typeorm: TypeOrmQuestionCommentsRepository
+        cached: CachedCommentsRepository,
+        typeorm: TypeOrmCommentsRepository
       ) => isCacheEnabled(envService) ? cached : typeorm,
-      inject: [EnvService, CachedQuestionCommentsRepository, TypeOrmQuestionCommentsRepository],
-    },
-    {
-      provide: AnswerCommentsRepository,
-      useFactory: (
-        envService: EnvService,
-        cached: CachedAnswerCommentsRepository,
-        typeorm: TypeOrmAnswerCommentsRepository
-      ) => isCacheEnabled(envService) ? cached : typeorm,
-      inject: [EnvService, CachedAnswerCommentsRepository, TypeOrmAnswerCommentsRepository],
+      inject: [EnvService, CachedCommentsRepository, TypeOrmCommentsRepository],
     },
     {
       provide: QuestionAttachmentsRepository,
@@ -222,8 +200,7 @@ const isCacheEnabled = (envService: EnvService) => {
     UsersRepository,
     QuestionsRepository,
     AnswersRepository,
-    QuestionCommentsRepository,
-    AnswerCommentsRepository,
+    CommentsRepository,
     QuestionAttachmentsRepository,
     AnswerAttachmentsRepository,
     RefreshTokensRepository,

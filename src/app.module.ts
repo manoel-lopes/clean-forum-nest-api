@@ -6,16 +6,14 @@ import { AttachToQuestionController } from '@/infra/http/presentation/controller
 import { AuthenticateUserController } from '@/infra/http/presentation/controllers/authenticate-user/authenticate-user.controller'
 import { ChooseQuestionBestAnswerController } from '@/infra/http/presentation/controllers/choose-question-best-answer/choose-question-best-answer.controller'
 import { CommentOnAnswerController } from '@/infra/http/presentation/controllers/comment-on-answer/comment-on-answer.controller'
-import { CommentOnQuestionController } from '@/infra/http/presentation/controllers/comment-on-question/comment-on-question.controller'
 import { CreateAccountController } from '@/infra/http/presentation/controllers/create-account/create-account.controller'
 import { CreateQuestionController } from '@/infra/http/presentation/controllers/create-question/create-question.controller'
 import { DeleteAccountController } from '@/infra/http/presentation/controllers/delete-account/delete-account.controller'
 import { DeleteAnswerController } from '@/infra/http/presentation/controllers/delete-answer/delete-answer.controller'
 import { DeleteAnswerAttachmentController } from '@/infra/http/presentation/controllers/delete-answer-attachment/delete-answer-attachment.controller'
-import { DeleteAnswerCommentController } from '@/infra/http/presentation/controllers/delete-answer-comment/delete-answer-comment.controller'
+import { DeleteCommentController } from '@/infra/http/presentation/controllers/delete-comment/delete-comment.controller'
 import { DeleteQuestionController } from '@/infra/http/presentation/controllers/delete-question/delete-question.controller'
 import { DeleteQuestionAttachmentController } from '@/infra/http/presentation/controllers/delete-question-attachment/delete-question-attachment.controller'
-import { DeleteQuestionCommentController } from '@/infra/http/presentation/controllers/delete-question-comment/delete-question-comment.controller'
 import { FetchQuestionAnswersController } from '@/infra/http/presentation/controllers/fetch-question-answers/fetch-question-answers.controller'
 import { FetchQuestionsController } from '@/infra/http/presentation/controllers/fetch-questions/fetch-questions.controller'
 import { FetchUserQuestionsController } from '@/infra/http/presentation/controllers/fetch-user-questions/fetch-user-questions.controller'
@@ -26,10 +24,9 @@ import { RefreshAccessTokenController } from '@/infra/http/presentation/controll
 import { SendEmailValidationController } from '@/infra/http/presentation/controllers/send-email-validation/send-email-validation.controller'
 import { UpdateAnswerController } from '@/infra/http/presentation/controllers/update-answer/update-answer.controller'
 import { UpdateAnswerAttachmentController } from '@/infra/http/presentation/controllers/update-answer-attachment/update-answer-attachment.controller'
-import { UpdateAnswerCommentController } from '@/infra/http/presentation/controllers/update-answer-comment/update-answer-comment.controller'
+import { UpdateCommentController } from '@/infra/http/presentation/controllers/update-comment/update-comment.controller'
 import { UpdateQuestionController } from '@/infra/http/presentation/controllers/update-question/update-question.controller'
 import { UpdateQuestionAttachmentController } from '@/infra/http/presentation/controllers/update-question-attachment/update-question-attachment.controller'
-import { UpdateQuestionCommentController } from '@/infra/http/presentation/controllers/update-question-comment/update-question-comment.controller'
 import { UploadAttachmentController } from '@/infra/http/presentation/controllers/upload-attachment/upload-attachment.controller'
 import { VerifyEmailValidationController } from '@/infra/http/presentation/controllers/verify-email-validation/verify-email-validation.controller'
 import { UseCasesModule } from './domain/application/usecases/usecases.module'
@@ -64,16 +61,14 @@ import { BullBoardConfigModule } from './infra/queues/bull-board.module'
     AuthenticateUserController,
     ChooseQuestionBestAnswerController,
     CommentOnAnswerController,
-    CommentOnQuestionController,
     CreateAccountController,
     CreateQuestionController,
     DeleteAccountController,
     DeleteAnswerController,
     DeleteAnswerAttachmentController,
-    DeleteAnswerCommentController,
+    DeleteCommentController,
     DeleteQuestionController,
     DeleteQuestionAttachmentController,
-    DeleteQuestionCommentController,
     FetchQuestionAnswersController,
     FetchQuestionsController,
     FetchUserQuestionsController,
@@ -84,10 +79,9 @@ import { BullBoardConfigModule } from './infra/queues/bull-board.module'
     SendEmailValidationController,
     UpdateAnswerController,
     UpdateAnswerAttachmentController,
-    UpdateAnswerCommentController,
+    UpdateCommentController,
     UpdateQuestionController,
     UpdateQuestionAttachmentController,
-    UpdateQuestionCommentController,
     UploadAttachmentController,
     VerifyEmailValidationController,
   ],
