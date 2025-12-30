@@ -1,12 +1,13 @@
 import {
   Body,
+  Controller,
   ForbiddenException,
   NotFoundException,
   Param,
   Put,
 } from '@nestjs/common'
-import { ApiOperation } from '@nestjs/swagger'
-import { UseCase } from '@/core/domain/application/use-case'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { UpdateCommentUseCase } from '@/domain/application/usecases/update-comment/update-comment.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
@@ -16,17 +17,24 @@ import {
   UpdateCommentParamsDto,
   updateCommentParamsSchema,
 } from '@/infra/validation/schemas/presentation/comments/update-comment.schema'
-import { ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiUnauthorizedResponse, ApiUnprocessableEntityResponse } from '@/presentation/decorators/api-responses.decorator'
+import {
+  ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@/presentation/decorators/api-responses.decorator'
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
-export abstract class BaseUpdateCommentController {
-  constructor (
-    private readonly updateCommentUseCase: UseCase
-  ) {}
+@ApiTags('Comments')
+@Controller('comments/:commentId')
+export class UpdateCommentController {
+  constructor (private readonly updateCommentUseCase: UpdateCommentUseCase) {}
 
   @Put()
-  @ApiOperation({ summary: 'Update an comment' })
+  @ApiOperation({ summary: 'Update a comment' })
   @ApiOkResponse('Comment updated successfully')
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()

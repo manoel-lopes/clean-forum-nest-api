@@ -5,7 +5,7 @@ import { aUser } from '@tests/builders/user.builder'
 import { makeApp } from '@tests/helpers/app/make-app'
 import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { commentOnAnswer } from '@tests/helpers/domain/enterprise/answers/answer-comment-requests'
-import { deleteAnswerComment } from '@tests/helpers/domain/enterprise/comments/comment-requests'
+import { updateComment } from '@tests/helpers/domain/enterprise/comments/comment-requests'
 import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
@@ -19,9 +19,13 @@ type Answer = {
 type Comment = {
   id: string
   content: string
+  authorId: string
+  answerId: string
+  createdAt: string
+  updatedAt: string
 }
 
-describe('DeleteAnswerComment', () => {
+describe('UpdateComment', () => {
   let app: INestApplication
 
   beforeAll(async () => {
@@ -33,7 +37,7 @@ describe('DeleteAnswerComment', () => {
   })
 
   it('should return 401 when no token is provided', async () => {
-    const response = await deleteAnswerComment(app, '', { commentId: 'any-id' })
+    const response = await updateComment(app, '', { commentId: 'any-id' }, { content: 'Content' })
 
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
@@ -44,7 +48,7 @@ describe('DeleteAnswerComment', () => {
   })
 
   it('should return 401 when invalid token is provided', async () => {
-    const response = await deleteAnswerComment(app, 'invalid-token', { commentId: 'any-id' })
+    const response = await updateComment(app, 'invalid-token', { commentId: 'any-id' }, { content: 'Content' })
 
     expect(response.statusCode).toBe(401)
     expect(response.body).toEqual({
@@ -63,9 +67,12 @@ describe('DeleteAnswerComment', () => {
     })
     const token = authResponse.body.token
 
-    const response = await deleteAnswerComment(app, token, {
-      commentId: '123e4567-e89b-12d3-a456-426614174000',
-    })
+    const response = await updateComment(
+      app,
+      token,
+      { commentId: '123e4567-e89b-12d3-a456-426614174000' },
+      { content: 'Updated comment' }
+    )
 
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
@@ -91,11 +98,11 @@ describe('DeleteAnswerComment', () => {
     const answer = answersResponse.body.items.find((a: Answer) => a.content === 'Answer content')
     await commentOnAnswer(app, authorToken, {
       answerId: answer.id,
-      content: 'Comment content',
+      content: 'Original comment',
     })
     const answersWithComments = await fetchQuestionAnswers(app, question.id, authorToken, { include: 'comments' })
     const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Comment content')
+    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Original comment')
     const otherUserData = aUser().build()
     await createUser(app, otherUserData)
     const otherUserAuthResponse = await authenticateUser(app, {
@@ -104,7 +111,12 @@ describe('DeleteAnswerComment', () => {
     })
     const otherUserToken = otherUserAuthResponse.body.token
 
-    const response = await deleteAnswerComment(app, otherUserToken, { commentId: comment.id })
+    const response = await updateComment(
+      app,
+      otherUserToken,
+      { commentId: comment.id },
+      { content: 'Updated comment' }
+    )
 
     expect(response.statusCode).toBe(403)
     expect(response.body).toEqual({
@@ -114,7 +126,7 @@ describe('DeleteAnswerComment', () => {
     })
   })
 
-  it('should return 204 and delete answer comment', async () => {
+  it('should return 200 and update comment', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
     const authResponse = await authenticateUser(app, {
@@ -130,14 +142,21 @@ describe('DeleteAnswerComment', () => {
     const answer = answersResponse.body.items.find((a: Answer) => a.content === 'Answer content')
     await commentOnAnswer(app, token, {
       answerId: answer.id,
-      content: 'Comment content',
+      content: 'Original comment',
     })
     const answersWithComments = await fetchQuestionAnswers(app, question.id, token, { include: 'comments' })
     const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Comment content')
+    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Original comment')
 
-    const response = await deleteAnswerComment(app, token, { commentId: comment.id })
+    const response = await updateComment(app, token, { commentId: comment.id }, { content: 'Updated comment' })
 
-    expect(response.statusCode).toBe(204)
+    expect(response.statusCode).toBe(200)
+    expect(response.body.id).toBe(comment.id)
+    expect(response.body.content).toBe('Updated comment')
+    expect(response.body.authorId).toBe(comment.authorId)
+    expect(response.body.answerId).toBe(answer.id)
+    expect(response.body.createdAt).toBe(comment.createdAt)
+    expect(response.body.updatedAt).toBeDefined()
+    expect(new Date(response.body.updatedAt).getTime()).toBeGreaterThan(new Date(comment.updatedAt).getTime())
   })
 })

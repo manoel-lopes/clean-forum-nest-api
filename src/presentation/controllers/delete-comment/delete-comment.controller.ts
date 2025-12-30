@@ -1,12 +1,13 @@
 import {
+  Controller,
   Delete,
   ForbiddenException,
   HttpCode,
   NotFoundException,
   Param,
 } from '@nestjs/common'
-import { ApiOperation } from '@nestjs/swagger'
-import { UseCase } from '@/core/domain/application/use-case'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { DeleteCommentUseCase } from '@/domain/application/usecases/delete-comment/delete-comment.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/validation/pipes/zod-validation.pipe'
@@ -25,14 +26,14 @@ import {
 import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
 import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
-export abstract class BaseDeleteCommentController {
-  constructor (
-    private readonly deleteCommentUseCase: UseCase
-  ) {}
+@ApiTags('Comments')
+@Controller('comments/:commentId')
+export class DeleteCommentController {
+  constructor (private readonly deleteCommentUseCase: DeleteCommentUseCase) {}
 
   @Delete()
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete an comment' })
+  @ApiOperation({ summary: 'Delete a comment' })
   @ApiNoContentResponse('Comment deleted successfully')
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
