@@ -5,7 +5,6 @@ import type {
   PaginatedAnswers,
   UpdateAnswerData,
 } from '@/domain/application/repositories/answers.repository'
-import { CacheTTL } from '@/infra/cache/cache-ttl'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
 import type { Answer } from '@/domain/enterprise/entities/answer.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
@@ -14,6 +13,8 @@ export const TypeOrmAnswersRepositoryToken = Symbol('TypeOrmAnswersRepositoryTok
 
 @Injectable()
 export class CachedAnswersRepository extends BaseCachedRepository implements AnswersRepository {
+  private readonly ANSWER_TTL = 30 * 60
+  private readonly ANSWERS_LIST_TTL = 3 * 60
   private readonly answerIdToQuestionId = new Map<string, string>()
 
   constructor (
@@ -28,7 +29,7 @@ export class CachedAnswersRepository extends BaseCachedRepository implements Ans
     await this.answersRepository.save(answer)
     this.answerIdToQuestionId.set(answer.id, answer.questionId)
     await Promise.all([
-      this.setCache(this.getAnswerCacheKey(answer.id), answer, CacheTTL.ANSWER),
+      this.setCache(this.getAnswerCacheKey(answer.id), answer, this.ANSWER_TTL),
       this.invalidateCachePattern(this.getAnswersByQuestionCachePattern(answer.questionId)),
     ])
   }
@@ -43,7 +44,7 @@ export class CachedAnswersRepository extends BaseCachedRepository implements Ans
     const answer = await this.answersRepository.findById(answerId)
     if (answer) {
       this.answerIdToQuestionId.set(answer.id, answer.questionId)
-      await this.setCache(cacheKey, answer, CacheTTL.ANSWER)
+      await this.setCache(cacheKey, answer, this.ANSWER_TTL)
     }
     return answer
   }
@@ -67,7 +68,7 @@ export class CachedAnswersRepository extends BaseCachedRepository implements Ans
     const answer = await this.answersRepository.update(answerData)
     this.answerIdToQuestionId.set(answer.id, answer.questionId)
     await Promise.all([
-      this.setCache(this.getAnswerCacheKey(answer.id), answer, CacheTTL.ANSWER),
+      this.setCache(this.getAnswerCacheKey(answer.id), answer, this.ANSWER_TTL),
       this.invalidateCachePattern(this.getAnswersByQuestionCachePattern(answer.questionId)),
     ])
     return answer
@@ -79,7 +80,7 @@ export class CachedAnswersRepository extends BaseCachedRepository implements Ans
     const cached = await this.getFromCache<PaginatedAnswers>(cacheKey)
     if (cached) return cached
     const answers = await this.answersRepository.findManyByQuestionId(params)
-    await this.setCache(cacheKey, answers, CacheTTL.ANSWERS_LIST)
+    await this.setCache(cacheKey, answers, this.ANSWERS_LIST_TTL)
     return answers
   }
 

@@ -5,7 +5,6 @@ import type {
   PaginatedQuestionComments,
   QuestionCommentsRepository,
 } from '@/domain/application/repositories/question-comments.repository'
-import { CacheTTL } from '@/infra/cache/cache-ttl'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
 import type { Comment } from '@/domain/enterprise/entities/base/comment.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
@@ -16,6 +15,8 @@ export const TypeOrmQuestionCommentsRepositoryToken = Symbol('TypeOrmQuestionCom
 export class CachedQuestionCommentsRepository
   extends BaseCachedRepository
   implements QuestionCommentsRepository {
+  private readonly COMMENT_TTL = 15 * 60
+  private readonly COMMENTS_LIST_TTL = 2 * 60
   private readonly commentIdToQuestionId = new Map<string, string>()
 
   constructor (
@@ -31,11 +32,11 @@ export class CachedQuestionCommentsRepository
     if (comment.questionId) {
       this.commentIdToQuestionId.set(comment.id, comment.questionId)
       await Promise.all([
-        this.setCache(this.getCommentCacheKey(comment.id), comment, CacheTTL.COMMENT),
+        this.setCache(this.getCommentCacheKey(comment.id), comment, this.COMMENT_TTL),
         this.invalidateCachePattern(this.getCommentsByQuestionCachePattern(comment.questionId)),
       ])
     } else {
-      await this.setCache(this.getCommentCacheKey(comment.id), comment, CacheTTL.COMMENT)
+      await this.setCache(this.getCommentCacheKey(comment.id), comment, this.COMMENT_TTL)
     }
   }
 
@@ -49,7 +50,7 @@ export class CachedQuestionCommentsRepository
     const comment = await this.questionCommentsRepository.findById(commentId)
     if (comment) {
       if (comment.questionId) this.commentIdToQuestionId.set(comment.id, comment.questionId)
-      await this.setCache(cacheKey, comment, CacheTTL.COMMENT)
+      await this.setCache(cacheKey, comment, this.COMMENT_TTL)
     }
     return comment
   }
@@ -63,7 +64,7 @@ export class CachedQuestionCommentsRepository
     const cached = await this.getFromCache<PaginatedQuestionComments>(cacheKey)
     if (cached) return cached
     const comments = await this.questionCommentsRepository.findManyByQuestionId(questionId, params)
-    await this.setCache(cacheKey, comments, CacheTTL.COMMENTS_LIST)
+    await this.setCache(cacheKey, comments, this.COMMENTS_LIST_TTL)
     return comments
   }
 
@@ -72,11 +73,11 @@ export class CachedQuestionCommentsRepository
     if (comment.questionId) {
       this.commentIdToQuestionId.set(comment.id, comment.questionId)
       await Promise.all([
-        this.setCache(this.getCommentCacheKey(comment.id), comment, CacheTTL.COMMENT),
+        this.setCache(this.getCommentCacheKey(comment.id), comment, this.COMMENT_TTL),
         this.invalidateCachePattern(this.getCommentsByQuestionCachePattern(comment.questionId)),
       ])
     } else {
-      await this.setCache(this.getCommentCacheKey(comment.id), comment, CacheTTL.COMMENT)
+      await this.setCache(this.getCommentCacheKey(comment.id), comment, this.COMMENT_TTL)
     }
     return comment
   }

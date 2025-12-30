@@ -5,7 +5,6 @@ import type {
   PaginatedQuestionAttachments,
   QuestionAttachmentsRepository,
 } from '@/domain/application/repositories/question-attachments.repository'
-import { CacheTTL } from '@/infra/cache/cache-ttl'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
 import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
@@ -16,6 +15,8 @@ export const TypeOrmQuestionAttachmentsRepositoryToken = Symbol('TypeOrmQuestion
 export class CachedQuestionAttachmentsRepository
   extends BaseCachedRepository
   implements QuestionAttachmentsRepository {
+  private readonly ATTACHMENT_TTL = 60 * 60
+  private readonly ATTACHMENTS_LIST_TTL = 10 * 60
   private readonly attachmentIdToQuestionId = new Map<string, string>()
 
   constructor (
@@ -30,7 +31,7 @@ export class CachedQuestionAttachmentsRepository
     await this.questionAttachmentsRepository.save(attachment)
     this.attachmentIdToQuestionId.set(attachment.id, attachment.questionId)
     await Promise.all([
-      this.setCache(this.getAttachmentCacheKey(attachment.id), attachment, CacheTTL.ATTACHMENT),
+      this.setCache(this.getAttachmentCacheKey(attachment.id), attachment, this.ATTACHMENT_TTL),
       this.invalidateCachePattern(this.getAttachmentsByQuestionCachePattern(attachment.questionId)),
     ])
   }
@@ -44,7 +45,7 @@ export class CachedQuestionAttachmentsRepository
     }
     await Promise.all([
       ...attachments.map(attachment =>
-        this.setCache(this.getAttachmentCacheKey(attachment.id), attachment, CacheTTL.ATTACHMENT)
+        this.setCache(this.getAttachmentCacheKey(attachment.id), attachment, this.ATTACHMENT_TTL)
       ),
       ...Array.from(questionIdsToInvalidate, questionId =>
         this.invalidateCachePattern(this.getAttachmentsByQuestionCachePattern(questionId))
@@ -62,7 +63,7 @@ export class CachedQuestionAttachmentsRepository
     const attachment = await this.questionAttachmentsRepository.findById(attachmentId)
     if (attachment) {
       this.attachmentIdToQuestionId.set(attachment.id, attachment.questionId)
-      await this.setCache(cacheKey, attachment, CacheTTL.ATTACHMENT)
+      await this.setCache(cacheKey, attachment, this.ATTACHMENT_TTL)
     }
     return attachment
   }
@@ -76,7 +77,7 @@ export class CachedQuestionAttachmentsRepository
     const cached = await this.getFromCache<PaginatedQuestionAttachments>(cacheKey)
     if (cached) return cached
     const attachments = await this.questionAttachmentsRepository.findManyByQuestionId(questionId, params)
-    await this.setCache(cacheKey, attachments, CacheTTL.ATTACHMENTS_LIST)
+    await this.setCache(cacheKey, attachments, this.ATTACHMENTS_LIST_TTL)
     return attachments
   }
 
@@ -84,7 +85,7 @@ export class CachedQuestionAttachmentsRepository
     const attachment = await this.questionAttachmentsRepository.update(attachmentId, data)
     this.attachmentIdToQuestionId.set(attachment.id, attachment.questionId)
     await Promise.all([
-      this.setCache(this.getAttachmentCacheKey(attachment.id), attachment, CacheTTL.ATTACHMENT),
+      this.setCache(this.getAttachmentCacheKey(attachment.id), attachment, this.ATTACHMENT_TTL),
       this.invalidateCachePattern(this.getAttachmentsByQuestionCachePattern(attachment.questionId)),
     ])
     return attachment

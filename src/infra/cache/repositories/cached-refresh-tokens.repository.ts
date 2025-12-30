@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
 import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
-import { CacheTTL } from '@/infra/cache/cache-ttl'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
 import type { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
@@ -11,6 +10,7 @@ export const TypeOrmRefreshTokensRepositoryToken = Symbol('TypeOrmRefreshTokensR
 export class CachedRefreshTokensRepository
   extends BaseCachedRepository
   implements RefreshTokensRepository {
+  private readonly REFRESH_TOKEN_TTL = 15 * 60
   private readonly userIdToTokenId = new Map<string, string>()
 
   constructor (
@@ -25,8 +25,8 @@ export class CachedRefreshTokensRepository
     await this.refreshTokensRepository.save(refreshToken)
     this.userIdToTokenId.set(refreshToken.userId, refreshToken.id)
     await Promise.all([
-      this.setCache(this.getRefreshTokenCacheKey(refreshToken.id), refreshToken, CacheTTL.REFRESH_TOKEN),
-      this.setCache(this.getRefreshTokenByUserCacheKey(refreshToken.userId), refreshToken, CacheTTL.REFRESH_TOKEN),
+      this.setCache(this.getRefreshTokenCacheKey(refreshToken.id), refreshToken, this.REFRESH_TOKEN_TTL),
+      this.setCache(this.getRefreshTokenByUserCacheKey(refreshToken.userId), refreshToken, this.REFRESH_TOKEN_TTL),
     ])
   }
 
@@ -40,7 +40,7 @@ export class CachedRefreshTokensRepository
     const token = await this.refreshTokensRepository.findById(id)
     if (token) {
       this.userIdToTokenId.set(token.userId, token.id)
-      await this.setCache(cacheKey, token, CacheTTL.REFRESH_TOKEN)
+      await this.setCache(cacheKey, token, this.REFRESH_TOKEN_TTL)
     }
     return token
   }
@@ -55,7 +55,7 @@ export class CachedRefreshTokensRepository
     const token = await this.refreshTokensRepository.findByUserId(userId)
     if (token) {
       this.userIdToTokenId.set(token.userId, token.id)
-      await this.setCache(cacheKey, token, CacheTTL.REFRESH_TOKEN)
+      await this.setCache(cacheKey, token, this.REFRESH_TOKEN_TTL)
     }
     return token
   }

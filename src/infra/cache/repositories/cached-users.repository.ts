@@ -5,7 +5,6 @@ import {
   type UpdateUserData,
   UsersRepository,
 } from '@/domain/application/repositories/users.repository'
-import { CacheTTL } from '@/infra/cache/cache-ttl'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
 import type { User } from '@/domain/enterprise/entities/user.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
@@ -14,6 +13,8 @@ export const TypeOrmUsersRepositoryToken = Symbol('TypeOrmUsersRepositoryToken')
 
 @Injectable()
 export class CachedUsersRepository extends BaseCachedRepository implements UsersRepository {
+  private readonly USER_TTL = 60 * 60
+  private readonly USERS_LIST_TTL = 5 * 60
   private readonly userIdToEmail = new Map<string, string>()
 
   constructor (
@@ -28,8 +29,8 @@ export class CachedUsersRepository extends BaseCachedRepository implements Users
     await this.usersRepository.save(user)
     this.userIdToEmail.set(user.id, user.email)
     await Promise.all([
-      this.setCache(this.getUserCacheKey(user.id), user, CacheTTL.USER),
-      this.setCache(this.getUserByEmailCacheKey(user.email), user, CacheTTL.USER),
+      this.setCache(this.getUserCacheKey(user.id), user, this.USER_TTL),
+      this.setCache(this.getUserByEmailCacheKey(user.email), user, this.USER_TTL),
       this.invalidateCachePattern(this.getUsersListCachePattern()),
     ])
   }
@@ -38,8 +39,8 @@ export class CachedUsersRepository extends BaseCachedRepository implements Users
     const user = await this.usersRepository.update(userData)
     this.userIdToEmail.set(user.id, user.email)
     await Promise.all([
-      this.setCache(this.getUserCacheKey(user.id), user, CacheTTL.USER),
-      this.setCache(this.getUserByEmailCacheKey(user.email), user, CacheTTL.USER),
+      this.setCache(this.getUserCacheKey(user.id), user, this.USER_TTL),
+      this.setCache(this.getUserByEmailCacheKey(user.email), user, this.USER_TTL),
       this.invalidateCachePattern(this.getUsersListCachePattern()),
     ])
     return user
@@ -55,7 +56,7 @@ export class CachedUsersRepository extends BaseCachedRepository implements Users
     const user = await this.usersRepository.findById(userId)
     if (user) {
       this.userIdToEmail.set(user.id, user.email)
-      await this.setCache(cacheKey, user, CacheTTL.USER)
+      await this.setCache(cacheKey, user, this.USER_TTL)
     }
     return user
   }
@@ -70,7 +71,7 @@ export class CachedUsersRepository extends BaseCachedRepository implements Users
     const user = await this.usersRepository.findByEmail(email)
     if (user) {
       this.userIdToEmail.set(user.id, user.email)
-      await this.setCache(cacheKey, user, CacheTTL.USER)
+      await this.setCache(cacheKey, user, this.USER_TTL)
     }
     return user
   }
@@ -81,7 +82,7 @@ export class CachedUsersRepository extends BaseCachedRepository implements Users
     const cached = await this.getFromCache<PaginatedUsers>(cacheKey)
     if (cached) return cached
     const users = await this.usersRepository.findMany(paginationParams)
-    await this.setCache(cacheKey, users, CacheTTL.USERS_LIST)
+    await this.setCache(cacheKey, users, this.USERS_LIST_TTL)
     return users
   }
 

@@ -3,7 +3,6 @@ import type {
   EmailValidationsRepository,
   UpdateEmailValidationData,
 } from '@/domain/application/repositories/email-validations.repository'
-import { CacheTTL } from '@/infra/cache/cache-ttl'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
 import type { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
@@ -14,6 +13,7 @@ export const TypeOrmEmailValidationsRepositoryToken = Symbol('TypeOrmEmailValida
 export class CachedEmailValidationsRepository
   extends BaseCachedRepository
   implements EmailValidationsRepository {
+  private readonly EMAIL_VALIDATION_TTL = 5 * 60
   private readonly validationIdToEmail = new Map<string, string>()
 
   constructor (
@@ -29,10 +29,10 @@ export class CachedEmailValidationsRepository
     this.validationIdToEmail.set(emailValidation.id, emailValidation.email)
     await Promise.all([
       this.setCache(
-        this.getEmailValidationCacheKey(emailValidation.id), emailValidation, CacheTTL.EMAIL_VALIDATION
+        this.getEmailValidationCacheKey(emailValidation.id), emailValidation, this.EMAIL_VALIDATION_TTL
       ),
       this.setCache(
-        this.getEmailValidationByEmailCacheKey(emailValidation.email), emailValidation, CacheTTL.EMAIL_VALIDATION
+        this.getEmailValidationByEmailCacheKey(emailValidation.email), emailValidation, this.EMAIL_VALIDATION_TTL
       ),
     ])
   }
@@ -42,10 +42,10 @@ export class CachedEmailValidationsRepository
     this.validationIdToEmail.set(emailValidation.id, emailValidation.email)
     await Promise.all([
       this.setCache(
-        this.getEmailValidationCacheKey(emailValidation.id), emailValidation, CacheTTL.EMAIL_VALIDATION
+        this.getEmailValidationCacheKey(emailValidation.id), emailValidation, this.EMAIL_VALIDATION_TTL
       ),
       this.setCache(
-        this.getEmailValidationByEmailCacheKey(emailValidation.email), emailValidation, CacheTTL.EMAIL_VALIDATION
+        this.getEmailValidationByEmailCacheKey(emailValidation.email), emailValidation, this.EMAIL_VALIDATION_TTL
       ),
     ])
     return emailValidation
@@ -61,7 +61,7 @@ export class CachedEmailValidationsRepository
     const validation = await this.emailValidationsRepository.findByEmail(email)
     if (validation) {
       this.validationIdToEmail.set(validation.id, validation.email)
-      await this.setCache(cacheKey, validation, CacheTTL.EMAIL_VALIDATION)
+      await this.setCache(cacheKey, validation, this.EMAIL_VALIDATION_TTL)
     }
     return validation
   }
@@ -76,7 +76,7 @@ export class CachedEmailValidationsRepository
     const validation = await this.emailValidationsRepository.findById(id)
     if (validation) {
       this.validationIdToEmail.set(validation.id, validation.email)
-      await this.setCache(cacheKey, validation, CacheTTL.EMAIL_VALIDATION)
+      await this.setCache(cacheKey, validation, this.EMAIL_VALIDATION_TTL)
     }
     return validation
   }

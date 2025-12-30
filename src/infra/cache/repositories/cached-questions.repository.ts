@@ -8,7 +8,6 @@ import type {
   QuestionsRepository,
   UpdateQuestionData,
 } from '@/domain/application/repositories/questions.repository'
-import { CacheTTL } from '@/infra/cache/cache-ttl'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
 import type { Question } from '@/domain/enterprise/entities/question.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
@@ -22,6 +21,8 @@ type QuestionMetadata = {
 
 @Injectable()
 export class CachedQuestionsRepository extends BaseCachedRepository implements QuestionsRepository {
+  private readonly QUESTION_TTL = 30 * 60
+  private readonly QUESTIONS_LIST_TTL = 3 * 60
   private readonly questionIdToMetadata = new Map<string, QuestionMetadata>()
 
   constructor (
@@ -36,7 +37,7 @@ export class CachedQuestionsRepository extends BaseCachedRepository implements Q
     await this.questionsRepository.save(question)
     this.questionIdToMetadata.set(question.id, { authorId: question.authorId, slug: question.slug })
     await Promise.all([
-      this.setCache(this.getQuestionCacheKey(question.id), question, CacheTTL.QUESTION),
+      this.setCache(this.getQuestionCacheKey(question.id), question, this.QUESTION_TTL),
       this.invalidateCachePattern(this.getQuestionsListCachePattern()),
       this.invalidateCachePattern(this.getQuestionsByUserCachePattern(question.authorId)),
     ])
@@ -52,7 +53,7 @@ export class CachedQuestionsRepository extends BaseCachedRepository implements Q
     const question = await this.questionsRepository.findById(questionId)
     if (question) {
       this.questionIdToMetadata.set(question.id, { authorId: question.authorId, slug: question.slug })
-      await this.setCache(cacheKey, question, CacheTTL.QUESTION)
+      await this.setCache(cacheKey, question, this.QUESTION_TTL)
     }
     return question
   }
@@ -75,7 +76,7 @@ export class CachedQuestionsRepository extends BaseCachedRepository implements Q
     const result = await this.questionsRepository.findBySlug(params)
     if (result) {
       this.questionIdToMetadata.set(result.id, { authorId: result.authorId, slug: result.slug })
-      await this.setCache(cacheKey, result, CacheTTL.QUESTION)
+      await this.setCache(cacheKey, result, this.QUESTION_TTL)
     }
     return result
   }
@@ -104,13 +105,13 @@ export class CachedQuestionsRepository extends BaseCachedRepository implements Q
     const question = await this.questionsRepository.update(questionData)
     this.questionIdToMetadata.set(question.id, { authorId: question.authorId, slug: question.slug })
     const cacheOperations: Promise<void>[] = [
-      this.setCache(this.getQuestionCacheKey(question.id), question, CacheTTL.QUESTION),
+      this.setCache(this.getQuestionCacheKey(question.id), question, this.QUESTION_TTL),
       this.invalidateCachePattern(this.getQuestionsListCachePattern()),
       this.invalidateCachePattern(this.getQuestionsByUserCachePattern(question.authorId)),
     ]
     if (question.slug) {
       cacheOperations.push(
-        this.setCache(this.getQuestionBySlugCacheKey(question.slug), question, CacheTTL.QUESTION)
+        this.setCache(this.getQuestionBySlugCacheKey(question.slug), question, this.QUESTION_TTL)
       )
     }
     await Promise.all(cacheOperations)
@@ -123,7 +124,7 @@ export class CachedQuestionsRepository extends BaseCachedRepository implements Q
     const cached = await this.getFromCache<PaginatedQuestions>(cacheKey)
     if (cached) return cached
     const questions = await this.questionsRepository.findMany(params)
-    await this.setCache(cacheKey, questions, CacheTTL.QUESTIONS_LIST)
+    await this.setCache(cacheKey, questions, this.QUESTIONS_LIST_TTL)
     return questions
   }
 
@@ -136,7 +137,7 @@ export class CachedQuestionsRepository extends BaseCachedRepository implements Q
     const cached = await this.getFromCache<PaginatedQuestions>(cacheKey)
     if (cached) return cached
     const questions = await this.questionsRepository.findManyByUserId(userId, paginationParams)
-    await this.setCache(cacheKey, questions, CacheTTL.QUESTIONS_LIST)
+    await this.setCache(cacheKey, questions, this.QUESTIONS_LIST_TTL)
     return questions
   }
 
