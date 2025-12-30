@@ -140,6 +140,7 @@ export class CreateQuestionController {
 ## Code Style Rules
 
 **Critical Rules**:
+- **NEVER modify `package.json`** - Do not add, remove, or update dependencies or scripts
 - `no-explicit-any`: ERROR (exceptions: `vitest.config.mts`, some Prisma query files)
 - Type assertions: Use `as` syntax when necessary (configured via `consistent-type-assertions`)
 - `no-console`: ERROR
