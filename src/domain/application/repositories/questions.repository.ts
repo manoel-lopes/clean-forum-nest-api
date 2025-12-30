@@ -2,7 +2,6 @@ import type { PaginatedItems } from '@/core/domain/application/paginated-items'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
 import type { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
 import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
-import type { QuestionComment } from '@/domain/enterprise/entities/question-comment.entity'
 import type { User } from '@/domain/enterprise/entities/user.entity'
 import type { ForumIncludeOptions } from '@/shared/types/forum/include-option'
 import type { PaginatedAnswers } from './answers.repository'
@@ -24,7 +23,6 @@ export type FindQuestionBySlugParams = PaginationParams & {
 
 export type QuestionWithRelations = Question & {
   answers?: PaginatedAnswers
-  comments?: QuestionComment[]
   attachments?: QuestionAttachment[]
   author?: Omit<User, 'password'>
 }

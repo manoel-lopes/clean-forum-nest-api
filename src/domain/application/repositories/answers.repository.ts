@@ -2,7 +2,7 @@ import type { PaginatedItems } from '@/core/domain/application/paginated-items'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
 import type { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
 import type { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
-import type { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
+import type { Comment } from '@/domain/enterprise/entities/comment.entity'
 import type { User } from '@/domain/enterprise/entities/user.entity'
 import type { ForumIncludeOptions } from '@/shared/types/forum/include-option'
 
@@ -17,7 +17,7 @@ export type UpdateAnswerData = {
 }
 
 export type AnswerWithRelations = Answer & {
-  comments?: AnswerComment[]
+  comments?: Comment[]
   attachments?: AnswerAttachment[]
   author?: Omit<User, 'password'>
 }
