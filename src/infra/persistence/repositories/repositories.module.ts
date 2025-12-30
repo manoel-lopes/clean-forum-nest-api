@@ -117,7 +117,6 @@ const isCacheEnabled = (envService: EnvService) => {
     TypeOrmModule.forFeature(entities),
   ],
   providers: [
-    // TypeORM repositories (internal tokens for cached repositories)
     { provide: TypeOrmUsersRepositoryToken, useClass: TypeOrmUsersRepository },
     { provide: TypeOrmQuestionsRepositoryToken, useClass: TypeOrmQuestionsRepository },
     { provide: TypeOrmAnswersRepositoryToken, useClass: TypeOrmAnswersRepository },
@@ -127,8 +126,6 @@ const isCacheEnabled = (envService: EnvService) => {
     { provide: TypeOrmAnswerAttachmentsRepositoryToken, useClass: TypeOrmAnswerAttachmentsRepository },
     { provide: TypeOrmRefreshTokensRepositoryToken, useClass: TypeOrmRefreshTokensRepository },
     { provide: TypeOrmEmailValidationsRepositoryToken, useClass: TypeOrmEmailValidationsRepository },
-
-    // TypeORM repositories (direct class registration for factory injection)
     TypeOrmUsersRepository,
     TypeOrmQuestionsRepository,
     TypeOrmAnswersRepository,
@@ -138,8 +135,6 @@ const isCacheEnabled = (envService: EnvService) => {
     TypeOrmAnswerAttachmentsRepository,
     TypeOrmRefreshTokensRepository,
     TypeOrmEmailValidationsRepository,
-
-    // Cached repositories
     CachedUsersRepository,
     CachedQuestionsRepository,
     CachedAnswersRepository,
@@ -150,7 +145,6 @@ const isCacheEnabled = (envService: EnvService) => {
     CachedRefreshTokensRepository,
     CachedEmailValidationsRepository,
 
-    // Public repository interfaces (conditional: cached in dev/prod, direct in test)
     {
       provide: UsersRepository,
       useFactory: (envService: EnvService, cached: CachedUsersRepository, typeorm: TypeOrmUsersRepository) =>
@@ -171,38 +165,56 @@ const isCacheEnabled = (envService: EnvService) => {
     },
     {
       provide: QuestionCommentsRepository,
-      useFactory: (envService: EnvService, cached: CachedQuestionCommentsRepository, typeorm: TypeOrmQuestionCommentsRepository) =>
-        isCacheEnabled(envService) ? cached : typeorm,
+      useFactory: (
+        envService: EnvService,
+        cached: CachedQuestionCommentsRepository,
+        typeorm: TypeOrmQuestionCommentsRepository
+      ) => isCacheEnabled(envService) ? cached : typeorm,
       inject: [EnvService, CachedQuestionCommentsRepository, TypeOrmQuestionCommentsRepository],
     },
     {
       provide: AnswerCommentsRepository,
-      useFactory: (envService: EnvService, cached: CachedAnswerCommentsRepository, typeorm: TypeOrmAnswerCommentsRepository) =>
-        isCacheEnabled(envService) ? cached : typeorm,
+      useFactory: (
+        envService: EnvService,
+        cached: CachedAnswerCommentsRepository,
+        typeorm: TypeOrmAnswerCommentsRepository
+      ) => isCacheEnabled(envService) ? cached : typeorm,
       inject: [EnvService, CachedAnswerCommentsRepository, TypeOrmAnswerCommentsRepository],
     },
     {
       provide: QuestionAttachmentsRepository,
-      useFactory: (envService: EnvService, cached: CachedQuestionAttachmentsRepository, typeorm: TypeOrmQuestionAttachmentsRepository) =>
-        isCacheEnabled(envService) ? cached : typeorm,
+      useFactory: (
+        envService: EnvService,
+        cached: CachedQuestionAttachmentsRepository,
+        typeorm: TypeOrmQuestionAttachmentsRepository
+      ) => isCacheEnabled(envService) ? cached : typeorm,
       inject: [EnvService, CachedQuestionAttachmentsRepository, TypeOrmQuestionAttachmentsRepository],
     },
     {
       provide: AnswerAttachmentsRepository,
-      useFactory: (envService: EnvService, cached: CachedAnswerAttachmentsRepository, typeorm: TypeOrmAnswerAttachmentsRepository) =>
-        isCacheEnabled(envService) ? cached : typeorm,
+      useFactory: (
+        envService: EnvService,
+        cached: CachedAnswerAttachmentsRepository,
+        typeorm: TypeOrmAnswerAttachmentsRepository
+      ) => isCacheEnabled(envService) ? cached : typeorm,
       inject: [EnvService, CachedAnswerAttachmentsRepository, TypeOrmAnswerAttachmentsRepository],
     },
     {
       provide: RefreshTokensRepository,
-      useFactory: (envService: EnvService, cached: CachedRefreshTokensRepository, typeorm: TypeOrmRefreshTokensRepository) =>
-        isCacheEnabled(envService) ? cached : typeorm,
+      useFactory: (
+        envService: EnvService,
+        cached: CachedRefreshTokensRepository,
+        typeorm: TypeOrmRefreshTokensRepository
+      ) => isCacheEnabled(envService) ? cached : typeorm,
       inject: [EnvService, CachedRefreshTokensRepository, TypeOrmRefreshTokensRepository],
     },
     {
       provide: EmailValidationsRepository,
-      useFactory: (envService: EnvService, cached: CachedEmailValidationsRepository, typeorm: TypeOrmEmailValidationsRepository) =>
-        isCacheEnabled(envService) ? cached : typeorm,
+      useFactory: (
+        envService: EnvService,
+        cached: CachedEmailValidationsRepository,
+        typeorm: TypeOrmEmailValidationsRepository
+      ) => isCacheEnabled(envService) ? cached : typeorm,
       inject: [EnvService, CachedEmailValidationsRepository, TypeOrmEmailValidationsRepository],
     },
   ],
