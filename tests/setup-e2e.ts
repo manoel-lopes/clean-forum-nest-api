@@ -3,13 +3,11 @@ import { config } from 'dotenv'
 import { DataSource } from 'typeorm'
 import { Answer } from '@/domain/enterprise/entities/answer.entity'
 import { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
-import { AnswerComment } from '@/domain/enterprise/entities/answer-comment.entity'
 import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
-import { Comment } from '@/domain/enterprise/entities/base/comment.entity'
+import { Comment } from '@/domain/enterprise/entities/comment.entity'
 import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
 import { Question } from '@/domain/enterprise/entities/question.entity'
 import { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
-import { QuestionComment } from '@/domain/enterprise/entities/question-comment.entity'
 import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
 import { User } from '@/domain/enterprise/entities/user.entity'
 
@@ -38,8 +36,6 @@ function createDataSource (schema: string): DataSource {
       Question,
       Answer,
       Comment,
-      QuestionComment,
-      AnswerComment,
       Attachment,
       QuestionAttachment,
       AnswerAttachment,
