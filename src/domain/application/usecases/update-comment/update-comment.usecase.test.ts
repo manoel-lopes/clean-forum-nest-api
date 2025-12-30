@@ -1,14 +1,14 @@
-import { InMemoryAnswerCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-comments.repository'
-import { UpdateAnswerCommentUseCase } from './update-answer-comment.usecase'
-import { makeAnswerCommentData } from '@tests/factories/domain/make-answer-comment'
+import { InMemoryCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-comments.repository'
+import { UpdateCommentUseCase } from './update-comment.usecase'
+import { makeCommentData } from '@tests/factories/domain/make-comment'
 
-describe('UpdateAnswerCommentUseCase', () => {
-  let sut: UpdateAnswerCommentUseCase
-  let answerCommentsRepository: InMemoryAnswerCommentsRepository
+describe('UpdateCommentUseCase', () => {
+  let sut: UpdateCommentUseCase
+  let commentsRepository: InMemoryCommentsRepository
 
   beforeEach(() => {
-    answerCommentsRepository = new InMemoryAnswerCommentsRepository()
-    sut = new UpdateAnswerCommentUseCase(answerCommentsRepository)
+    commentsRepository = new InMemoryCommentsRepository()
+    sut = new UpdateCommentUseCase(commentsRepository)
   })
 
   it('should not update a nonexistent comment', async () => {
@@ -22,7 +22,7 @@ describe('UpdateAnswerCommentUseCase', () => {
   })
 
   it('should not update a comment if the user is not the author', async () => {
-    const comment = await answerCommentsRepository.create(makeAnswerCommentData({ authorId: 'comment-author-id' }))
+    const comment = await commentsRepository.create(makeCommentData({ authorId: 'comment-author-id' }))
 
     const request = {
       commentId: comment.id,
@@ -33,8 +33,8 @@ describe('UpdateAnswerCommentUseCase', () => {
     await expect(sut.execute(request)).rejects.toThrow('The user is not the author of the comment')
   })
 
-  it('should update an answer comment', async () => {
-    const comment = await answerCommentsRepository.create(makeAnswerCommentData({
+  it('should update a comment', async () => {
+    const comment = await commentsRepository.create(makeCommentData({
       authorId: 'comment-author-id',
       content: 'Original content',
     }))

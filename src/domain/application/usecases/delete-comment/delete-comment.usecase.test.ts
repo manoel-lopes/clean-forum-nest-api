@@ -1,64 +1,63 @@
-import { InMemoryAnswerCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-comments.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
-import { DeleteAnswerCommentUseCase } from './delete-answer-comment.usecase'
+import { InMemoryCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-comments.repository'
+import { DeleteCommentUseCase } from './delete-comment.usecase'
 import { makeAnswerData } from '@tests/factories/domain/make-answer'
-import { makeAnswerCommentData } from '@tests/factories/domain/make-answer-comment'
+import { makeCommentData } from '@tests/factories/domain/make-comment'
 
-describe('DeleteAnswerCommentUseCase', () => {
-  let sut: DeleteAnswerCommentUseCase
-  let answerCommentsRepository: InMemoryAnswerCommentsRepository
+describe('DeleteCommentUseCase', () => {
+  let sut: DeleteCommentUseCase
+  let commentsRepository: InMemoryCommentsRepository
   let answersRepository: InMemoryAnswersRepository
 
   beforeEach(() => {
-    answerCommentsRepository = new InMemoryAnswerCommentsRepository()
+    commentsRepository = new InMemoryCommentsRepository()
     answersRepository = new InMemoryAnswersRepository()
-    sut = new DeleteAnswerCommentUseCase(answerCommentsRepository, answersRepository)
+    sut = new DeleteCommentUseCase(commentsRepository, answersRepository)
   })
 
   it('should not delete a nonexistent comment', async () => {
-    await expect(
-      sut.execute({
-        commentId: 'any_inexistent_id',
-        authorId: 'any_author_id',
-      })
-    ).rejects.toThrow('Comment not found')
+    const request = {
+      commentId: 'any_inexistent_id',
+      authorId: 'any_author_id',
+    }
+
+    await expect(sut.execute(request)).rejects.toThrow('Comment not found')
   })
 
   it('should not delete a comment if the answer does not exist', async () => {
     const answer = await answersRepository.create(makeAnswerData({ authorId: 'answer-author-id' }))
-    const comment = await answerCommentsRepository.create(makeAnswerCommentData({
+    const comment = await commentsRepository.create(makeCommentData({
       answerId: answer.id,
       authorId: 'comment-author-id',
     }))
     await answersRepository.delete(answer.id)
 
-    await expect(
-      sut.execute({
-        commentId: comment.id,
-        authorId: 'comment-author-id',
-      })
-    ).rejects.toThrow('Answer not found')
+    const request = {
+      commentId: comment.id,
+      authorId: 'comment-author-id',
+    }
+
+    await expect(sut.execute(request)).rejects.toThrow('Answer not found')
   })
 
   it('should not delete a comment if the user is not the comment author or answer author', async () => {
     const answer = await answersRepository.create(makeAnswerData({ authorId: 'answer-author-id' }))
-
-    const comment = await answerCommentsRepository.create(makeAnswerCommentData({
+    const comment = await commentsRepository.create(makeCommentData({
       answerId: answer.id,
       authorId: 'comment-author-id',
     }))
 
-    await expect(
-      sut.execute({
-        commentId: comment.id,
-        authorId: 'wrong_author_id',
-      })
-    ).rejects.toThrow('The user is not the author of the comment')
+    const request = {
+      commentId: comment.id,
+      authorId: 'wrong_author_id',
+    }
+
+    await expect(sut.execute(request)).rejects.toThrow('The user is not the author of the comment')
   })
 
   it('should delete a comment when user is the comment author', async () => {
     const answer = await answersRepository.create(makeAnswerData({ authorId: 'answer-author-id' }))
-    const comment = await answerCommentsRepository.create(makeAnswerCommentData({
+    const comment = await commentsRepository.create(makeCommentData({
       answerId: answer.id,
       authorId: 'comment-author-id',
     }))
@@ -68,13 +67,13 @@ describe('DeleteAnswerCommentUseCase', () => {
       authorId: comment.authorId,
     })
 
-    const deletedComment = await answerCommentsRepository.findById(comment.id)
+    const deletedComment = await commentsRepository.findById(comment.id)
     expect(deletedComment).toBeNull()
   })
 
   it('should delete a comment when user is the answer author', async () => {
     const answer = await answersRepository.create(makeAnswerData({ authorId: 'answer-author-id' }))
-    const comment = await answerCommentsRepository.create(makeAnswerCommentData({
+    const comment = await commentsRepository.create(makeCommentData({
       answerId: answer.id,
       authorId: 'comment-author-id',
     }))
@@ -84,7 +83,7 @@ describe('DeleteAnswerCommentUseCase', () => {
       authorId: answer.authorId,
     })
 
-    const deletedComment = await answerCommentsRepository.findById(comment.id)
+    const deletedComment = await commentsRepository.findById(comment.id)
     expect(deletedComment).toBeNull()
   })
 })
