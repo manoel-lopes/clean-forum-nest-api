@@ -5,7 +5,6 @@ import { Slug } from '../value-objects/slug/slug.vo'
 import { Answer } from './answer.entity'
 import { Attachment } from './base/attachment.entity'
 import { BaseEntity } from './base/base.entity'
-import { Comment } from './base/comment.entity'
 import { User } from './user.entity'
 
 export type QuestionProps = Optional<Props<Question>, 'slug'>
@@ -33,9 +32,6 @@ export class Question extends BaseEntity {
 
   @OneToMany(() => Answer, answer => answer.question)
   readonly answers: Answer[]
-
-  @OneToMany(() => Comment, comment => comment.question)
-  readonly comments: Comment[]
 
   @OneToMany(() => Attachment, attachment => attachment.question)
   readonly attachments: Attachment[]

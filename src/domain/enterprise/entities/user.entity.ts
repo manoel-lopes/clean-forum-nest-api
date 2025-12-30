@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany } from 'typeorm'
 import { Props } from '@/shared/types/custom/props'
 import { Answer } from './answer.entity'
 import { BaseEntity } from './base/base.entity'
-import { Comment } from './base/comment.entity'
+import { Comment } from './comment.entity'
 import { Question } from './question.entity'
 import { RefreshToken } from './refresh-token.entity'
 

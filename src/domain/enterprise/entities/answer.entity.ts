@@ -3,7 +3,7 @@ import { Optional } from '@/shared/types/common/optional'
 import { Props } from '@/shared/types/custom/props'
 import { Attachment } from './base/attachment.entity'
 import { BaseEntity } from './base/base.entity'
-import { Comment } from './base/comment.entity'
+import { Comment } from './comment.entity'
 import { Question } from './question.entity'
 import { User } from './user.entity'
 
