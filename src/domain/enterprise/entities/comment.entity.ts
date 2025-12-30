@@ -5,5 +5,6 @@ export type CommentProps = Props<Comment>
 
 export interface Comment extends Entity {
   authorId: string
+  answerId: string
   content: string
 }
