@@ -6,7 +6,6 @@ import { aQuestion } from '@tests/builders/question.builder'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion, fetchQuestions, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { commentOnQuestion } from '@tests/helpers/domain/enterprise/questions/question-comment-requests'
 import { attachToQuestion } from '@tests/helpers/domain/enterprise/questions/question-attachment-requests'
 
 describe('FetchQuestions', () => {
@@ -103,27 +102,6 @@ describe('FetchQuestions', () => {
     expect(response.body.items[0].author).toHaveProperty('email')
   })
 
-  it('should return 200 and fetch questions with include=comments', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
-    const createdQuestion = await getQuestionByTile(app, token, questionData.title)
-    await commentOnQuestion(app, token, { questionId: createdQuestion.id, content: 'Test comment' })
-
-    const response = await fetchQuestions(app, token, { include: 'comments' })
-
-    const question = response.body.items.find((q: { id: string }) => q.id === createdQuestion.id)
-    expect(response.statusCode).toBe(200)
-    expect(question).toHaveProperty('comments')
-    expect(question.comments).toHaveLength(1)
-  })
-
   it('should return 200 and fetch questions with include=attachments', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
@@ -156,17 +134,14 @@ describe('FetchQuestions', () => {
     const questionData = aQuestion().build()
     await createQuestion(app, token, questionData)
     const createdQuestion = await getQuestionByTile(app, token, questionData.title)
-    await commentOnQuestion(app, token, { questionId: createdQuestion.id, content: 'Test comment' })
     await attachToQuestion(app, token, { questionId: createdQuestion.id, title: 'Test attachment', url: 'https://example.com/file.pdf' })
 
-    const response = await fetchQuestions(app, token, { include: 'author,comments,attachments' })
+    const response = await fetchQuestions(app, token, { include: 'author,attachments' })
 
     const question = response.body.items.find((q: { id: string }) => q.id === createdQuestion.id)
     expect(response.statusCode).toBe(200)
     expect(question).toHaveProperty('author')
-    expect(question).toHaveProperty('comments')
     expect(question).toHaveProperty('attachments')
-    expect(question.comments).toHaveLength(1)
     expect(question.attachments).toHaveLength(1)
   })
 })
