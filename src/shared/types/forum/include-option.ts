@@ -1,5 +1,4 @@
-export type ForumIncludeOptions = {
-  comments?: boolean
-  attachments?: boolean
-  author?: boolean
-}
+import { AnswerIncludeOptions } from '@/domain/application/repositories/answers.repository'
+import { QuestionIncludeOptions } from '@/domain/application/repositories/questions.repository'
+
+export type ForumIncludeOptions = QuestionIncludeOptions | AnswerIncludeOptions
