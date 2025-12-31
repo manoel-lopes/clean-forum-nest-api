@@ -3,11 +3,15 @@ import type { PaginationParams } from '@/core/domain/application/pagination-para
 import type { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
 import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
 import type { User } from '@/domain/enterprise/entities/user.entity'
-import type { ForumIncludeOptions } from '@/shared/types/forum/include-option'
-import type { PaginatedAnswers } from './answers.repository'
+import type { AnswerIncludeOptions, PaginatedAnswers } from './answers.repository'
+
+export type QuestionIncludeOptions = {
+  attachments?: boolean
+  author?: boolean
+}
 
 export type PaginationWithIncludeParams = PaginationParams & {
-  include?: ForumIncludeOptions
+  include?: QuestionIncludeOptions
 }
 
 export type UpdateQuestionData = {
@@ -17,11 +21,11 @@ export type UpdateQuestionData = {
 
 export type FindQuestionBySlugParams = PaginationParams & {
   slug: string
-  include?: ForumIncludeOptions
-  answerIncludes?: ForumIncludeOptions
+  include?: QuestionIncludeOptions
+  answerIncludes?: AnswerIncludeOptions
 }
 
-export type QuestionWithRelations = Question & {
+export interface QuestionWithRelations extends Question {
   answers?: PaginatedAnswers
   attachments?: QuestionAttachment[]
   author?: Omit<User, 'password'>
@@ -32,7 +36,7 @@ export type PaginatedQuestions = Required<PaginatedItems<QuestionWithRelations>>
 export type FindQuestionsResult = Question | null
 
 export type FindManyQuestionsParams = PaginationParams & {
-  include?: ForumIncludeOptions
+  include?: QuestionIncludeOptions
 }
 
 export type QuestionsRepository = {
