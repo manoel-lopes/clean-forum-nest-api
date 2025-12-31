@@ -3,9 +3,9 @@ import { PaginationParams } from '@/core/domain/application/pagination-params'
 import type {
   FindManyQuestionsParams,
   FindQuestionBySlugParams,
-  FindQuestionsResult,
   PaginatedQuestions,
   QuestionsRepository,
+  QuestionWithRelations,
   UpdateQuestionData,
 } from '@/domain/application/repositories/questions.repository'
 import { formatPagination } from '@/infra/persistence/helpers/format-pagination.helper'
@@ -46,7 +46,7 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
     order = 'desc',
     include,
     answerIncludes,
-  }: FindQuestionBySlugParams): Promise<FindQuestionsResult> {
+  }: FindQuestionBySlugParams): Promise<QuestionWithRelations | null> {
     const pagination = formatPagination(page, pageSize)
     const [question, totalAnswers] = await Promise.all([
       this.prisma.question.findUnique({
@@ -67,16 +67,17 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
       this.prisma.answer.count({ where: { question: { slug } } }),
     ])
     if (!question) return null
-    const result = PrismaQuestionMapper.toDomain(question)
-    result.answers = {
-      items: question.answers.map(PrismaAnswerMapper.toDomain),
-      page: pagination.page,
-      pageSize: pagination.pageSize,
-      totalItems: totalAnswers,
-      totalPages: Math.ceil(totalAnswers / pagination.pageSize),
-      order,
+    return {
+      ...PrismaQuestionMapper.toDomain(question),
+      answers: {
+        items: question.answers.map(PrismaAnswerMapper.toDomain),
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        totalItems: totalAnswers,
+        totalPages: Math.ceil(totalAnswers / pagination.pageSize),
+        order,
+      },
     }
-    return result
   }
 
   async findMany ({
