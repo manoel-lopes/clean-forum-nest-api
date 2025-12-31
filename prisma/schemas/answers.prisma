@@ -12,9 +12,5 @@ model Answer {
     attachments Attachment[]
     comments    Comment[]
 
-    @@index([questionId])
-    @@index([authorId])
-    @@index([createdAt])
-    @@index([questionId, createdAt])
     @@map("answers")
 }
