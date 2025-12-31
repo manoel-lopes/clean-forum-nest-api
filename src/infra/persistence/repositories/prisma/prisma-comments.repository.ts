@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import type { Comment as PrismaComment } from '@prisma/client'
 import type { PaginationParams } from '@/core/domain/application/pagination-params'
 import type {
   CommentsRepository,
@@ -9,24 +8,13 @@ import type {
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import type { Comment, CommentProps } from '@/domain/enterprise/entities/comment.entity'
 
-function toDomain (raw: PrismaComment & { answerId: string }): Comment {
-  return {
-    id: raw.id,
-    content: raw.content,
-    authorId: raw.authorId,
-    answerId: raw.answerId,
-    createdAt: raw.createdAt,
-    updatedAt: raw.updatedAt,
-  }
-}
-
 @Injectable()
 export class PrismaCommentsRepository implements CommentsRepository {
   constructor (private readonly prisma: PrismaService) {}
 
   async create (data: CommentProps): Promise<Comment> {
     const comment = await this.prisma.comment.create({ data })
-    return toDomain({ ...comment, answerId: comment.answerId! })
+    return comment
   }
 
   async findById (commentId: string): Promise<Comment | null> {
@@ -34,7 +22,7 @@ export class PrismaCommentsRepository implements CommentsRepository {
       where: { id: commentId },
     })
     if (!comment?.answerId) return null
-    return toDomain({ ...comment, answerId: comment.answerId })
+    return comment
   }
 
   async findManyByAnswerId (answerId: string, params: PaginationParams): Promise<PaginatedComments> {
@@ -54,14 +42,14 @@ export class PrismaCommentsRepository implements CommentsRepository {
       pageSize,
       totalItems,
       totalPages: Math.ceil(totalItems / pageSize),
-      items: comments.map(c => toDomain({ ...c, answerId: c.answerId! })),
+      items: comments,
       order,
     }
   }
 
   async update ({ where, data }: UpdateCommentData): Promise<Comment> {
     const comment = await this.prisma.comment.update({ where, data })
-    return toDomain({ ...comment, answerId: comment.answerId! })
+    return comment
   }
 
   async delete (commentId: string): Promise<void> {
