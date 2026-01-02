@@ -1,4 +1,3 @@
-import { createZodDto } from 'nestjs-zod'
 import { z } from 'zod'
 
 export const commentSchema = z.object({
@@ -8,5 +7,3 @@ export const commentSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
-
-export class CommentDto extends createZodDto(commentSchema) {}
