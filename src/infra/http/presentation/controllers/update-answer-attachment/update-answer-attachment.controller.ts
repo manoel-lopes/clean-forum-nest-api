@@ -8,13 +8,13 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UpdateAnswerAttachmentUseCase } from '@/domain/application/usecases/update-answer-attachment/update-answer-attachment.usecase'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
-  UpdateAnswerAttachmentBodyDto,
-  updateAnswerAttachmentBodySchema,
-  UpdateAnswerAttachmentParamsDto,
-  updateAnswerAttachmentParamsSchema,
-} from './ports/update-answer-attachment.protocol'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+  AttachmentParamsDto,
+  attachmentParamsSchema,
+  UpdateAttachmentBodyDto,
+  updateAttachmentBodySchema,
+} from '@/shared/presentation/protocols/attachment.protocol'
 
 @ApiTags('Attachments')
 @Controller('answer-attachments/:attachmentId')
@@ -24,20 +24,19 @@ export class UpdateAnswerAttachmentController {
   @Put()
   @ApiOperation({ summary: 'Update an answer attachment' })
   async handle (
-    @Param(new ZodValidationPipe(updateAnswerAttachmentParamsSchema)) params: UpdateAnswerAttachmentParamsDto,
-    @Body(new ZodValidationPipe(updateAnswerAttachmentBodySchema)) body: UpdateAnswerAttachmentBodyDto
+    @Param(new ZodValidationPipe(attachmentParamsSchema)) params: AttachmentParamsDto,
+    @Body(new ZodValidationPipe(updateAttachmentBodySchema)) body: UpdateAttachmentBodyDto
   ) {
-    const { attachmentId } = params
     try {
       const { title, url } = body
       const attachment = await this.updateAnswerAttachmentUseCase.execute({
-        attachmentId,
+        attachmentId: params.attachmentId,
         title,
         url,
       })
       return attachment
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

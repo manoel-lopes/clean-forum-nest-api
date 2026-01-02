@@ -9,13 +9,13 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AttachToQuestionUseCase } from '@/domain/application/usecases/attach-to-question/attach-to-question.usecase'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   AttachToQuestionBodyDto,
   attachToQuestionBodySchema,
   AttachToQuestionParamsDto,
   attachToQuestionParamsSchema,
 } from './ports/attach-to-question.protocol'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Attachments')
 @Controller('questions/:questionId/attachments')
@@ -39,7 +39,7 @@ export class AttachToQuestionController {
       })
       return attachment
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

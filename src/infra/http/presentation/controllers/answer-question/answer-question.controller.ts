@@ -11,13 +11,13 @@ import { AnswerQuestionUseCase } from '@/domain/application/usecases/answer-ques
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   type AnswerQuestionBody,
   answerQuestionBodySchema,
   type AnswerQuestionParams,
   answerQuestionParamsSchema,
 } from './ports/answer-question.protocol'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Answers')
 @Controller('questions/:questionId/answers')
@@ -42,7 +42,7 @@ export class AnswerQuestionController {
       })
       return answer
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

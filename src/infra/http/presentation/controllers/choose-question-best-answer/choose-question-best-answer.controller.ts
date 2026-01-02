@@ -11,10 +11,6 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
-  type ChooseQuestionBestAnswerParams,
-  chooseQuestionBestAnswerParamsSchema,
-} from './ports/choose-question-best-answer.protocol'
-import {
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -22,8 +18,12 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { NotAuthorError } from '@/shared/application/errors/not-author.error'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import {
+  type ChooseQuestionBestAnswerParams,
+  chooseQuestionBestAnswerParamsSchema,
+} from './ports/choose-question-best-answer.protocol'
 
 @ApiTags('Questions')
 @Controller('answers/:answerId/best')
@@ -50,10 +50,10 @@ export class ChooseQuestionBestAnswerController {
       })
       return question
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
-      if (error instanceof NotAuthorException) {
+      if (error instanceof NotAuthorError) {
         throw new ForbiddenException(error.message)
       }
       throw error

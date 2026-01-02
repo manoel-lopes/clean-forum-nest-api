@@ -8,11 +8,11 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { GetUserByEmailUseCase } from '@/domain/application/usecases/get-user-by-email/get-user-by-email.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   GetUserByEmailParamsDto,
   getUserByEmailParamsSchema,
 } from './ports/get-user-by-email.protocol'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Users')
 @Public()
@@ -30,7 +30,7 @@ export class GetUserByEmailController {
       })
       return user
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

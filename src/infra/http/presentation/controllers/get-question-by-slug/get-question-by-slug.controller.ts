@@ -15,13 +15,13 @@ import {
 import { GetQuestionBySlugUseCase } from '@/domain/application/usecases/get-question-by-slug/get-question-by-slug.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   GetQuestionBySlugParamsDto,
   getQuestionBySlugParamsSchema,
   GetQuestionBySlugQueryDto,
   getQuestionBySlugQuerySchema,
 } from './ports/get-question-by-slug.protocol'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Questions')
 @Public()
@@ -51,7 +51,7 @@ export class GetQuestionBySlugController {
       })
       return question
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

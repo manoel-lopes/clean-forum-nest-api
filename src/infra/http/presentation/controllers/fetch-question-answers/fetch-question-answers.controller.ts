@@ -16,13 +16,13 @@ import {
 import { FetchQuestionAnswersUseCase } from '@/domain/application/usecases/fetch-question-answers/fetch-question-answers.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   FetchQuestionAnswersParamsDto,
   fetchQuestionAnswersParamsSchema,
   FetchQuestionAnswersQueryDto,
   fetchQuestionAnswersQuerySchema,
 } from './ports/fetch-question-answers.protocol'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
 
 @ApiTags('Answers')
 @Public()
@@ -52,7 +52,7 @@ export class FetchQuestionAnswersController {
       })
       return answers
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

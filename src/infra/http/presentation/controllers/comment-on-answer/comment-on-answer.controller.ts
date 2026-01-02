@@ -11,16 +11,16 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
-  type CommentOnAnswerBody,
-  commentOnAnswerBodySchema,
-} from './ports/comment-on-answer.protocol'
-import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import {
+  type CommentOnAnswerBody,
+  commentOnAnswerBodySchema,
+} from './ports/comment-on-answer.protocol'
 
 @ApiTags('Comments')
 @Controller('comments/answers')
@@ -47,7 +47,7 @@ export class CommentOnAnswerController {
       })
       return response
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

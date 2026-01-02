@@ -10,12 +10,6 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AttachToAnswerUseCase } from '@/domain/application/usecases/attach-to-answer/attach-to-answer.usecase'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
-  AttachToAnswerBodyDto,
-  attachToAnswerBodySchema,
-  AttachToAnswerParamsDto,
-  attachToAnswerParamsSchema,
-} from './ports/attach-to-answer.protocol'
-import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -23,7 +17,13 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import {
+  AttachToAnswerBodyDto,
+  attachToAnswerBodySchema,
+  AttachToAnswerParamsDto,
+  attachToAnswerParamsSchema,
+} from './ports/attach-to-answer.protocol'
 
 @ApiTags('Attachments')
 @Controller('answers/:answerId/attachments')
@@ -53,7 +53,7 @@ export class AttachToAnswerController {
       })
       return attachment
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

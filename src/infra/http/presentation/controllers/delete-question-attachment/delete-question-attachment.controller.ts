@@ -8,11 +8,8 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { DeleteQuestionAttachmentUseCase } from '@/domain/application/usecases/delete-question-attachment/delete-question-attachment.usecase'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
-import {
-  DeleteQuestionAttachmentParamsDto,
-  deleteQuestionAttachmentParamsSchema,
-} from './ports/delete-question-attachment.protocol'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { AttachmentParamsDto, attachmentParamsSchema } from '@/shared/presentation/protocols/attachment.protocol'
 
 @ApiTags('Attachments')
 @Controller('question-attachments/:attachmentId')
@@ -23,15 +20,14 @@ export class DeleteQuestionAttachmentController {
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete a question attachment' })
   async handle (
-    @Param(new ZodValidationPipe(deleteQuestionAttachmentParamsSchema)) params: DeleteQuestionAttachmentParamsDto
+    @Param(new ZodValidationPipe(attachmentParamsSchema)) params: AttachmentParamsDto
   ) {
-    const { attachmentId } = params
     try {
       await this.deleteQuestionAttachmentUseCase.execute({
-        attachmentId,
+        attachmentId: params.attachmentId,
       })
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error
