@@ -2,8 +2,8 @@ import type { AnswersRepository } from '@/domain/application/repositories/answer
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
-import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { NotAuthorError } from '@/shared/application/errors/not-author.error'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { ChooseQuestionBestAnswerUseCase } from './choose-question-best-answer.usecase'
 import { makeAnswer } from '@tests/factories/domain/make-answer'
 import { makeQuestion } from '@tests/factories/domain/make-question'
@@ -25,7 +25,7 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
         answerId: 'non_existent_answer_id',
         authorId: 'any_author_id',
       })
-    ).rejects.toThrow(new ResourceNotFoundException('Answer'))
+    ).rejects.toThrow(new ResourceNotFoundError('Answer'))
   })
 
   it('should not choose the best answer for a nonexistent question', async () => {
@@ -37,7 +37,7 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
         answerId: answer.id,
         authorId: 'any_author_id',
       })
-    ).rejects.toThrow(new ResourceNotFoundException('Question'))
+    ).rejects.toThrow(new ResourceNotFoundError('Question'))
   })
 
   it('should not choose the best answer for a question not owned by the author', async () => {
@@ -51,7 +51,7 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
         answerId: answer.id,
         authorId: 'wrong_author_id',
       })
-    ).rejects.toThrow(new NotAuthorException('question'))
+    ).rejects.toThrow(new NotAuthorError('question'))
   })
 
   it('should not choose the best answer for a question with no answers', async () => {
@@ -63,7 +63,24 @@ describe('ChooseQuestionBestAnswerUseCase', () => {
         answerId: 'non_existent_answer_id',
         authorId: question.authorId,
       })
-    ).rejects.toThrow(new ResourceNotFoundException('Answer'))
+    ).rejects.toThrow(new ResourceNotFoundError('Answer'))
+  })
+
+  it('should not choose if the given answer is already the question best answer', async () => {
+    const question = makeQuestion()
+    await questionsRepository.save(question)
+    const answer = makeAnswer({ questionId: question.id })
+    await answersRepository.save(answer)
+
+    const request = {
+      answerId: answer.id,
+      authorId: question.authorId,
+    }
+
+    await sut.execute(request)
+    const response = await sut.execute(request)
+
+    expect(response.bestAnswerId).toBe(answer.id)
   })
 
   it('should be able to choose the best answer for a question', async () => {

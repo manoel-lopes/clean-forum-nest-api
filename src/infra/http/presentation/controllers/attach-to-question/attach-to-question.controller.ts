@@ -15,7 +15,7 @@ import {
   AttachToQuestionParamsDto,
   attachToQuestionParamsSchema,
 } from '@/infra/http/ports/attachments/attach-to-question.schema'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 @ApiTags('Attachments')
 @Controller('questions/:questionId/attachments')
@@ -39,7 +39,7 @@ export class AttachToQuestionController {
       })
       return attachment
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

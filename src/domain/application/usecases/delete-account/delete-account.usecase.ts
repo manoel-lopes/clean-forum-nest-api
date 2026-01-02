@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type DeleteAccountRequest = {
   userId: string
@@ -19,7 +19,7 @@ export class DeleteAccountUseCase implements UseCase {
     const { userId } = req
     const user = await this.usersRepository.findById(userId)
     if (!user) {
-      throw new ResourceNotFoundException('User')
+      throw new ResourceNotFoundError('User')
     }
     await this.refreshTokensRepository.deleteManyByUserId(userId)
     await this.usersRepository.delete(userId)

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common'
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CreateAccountUseCase } from '@/domain/application/usecases/create-account/create-account.usecase'
-import { UserWithEmailAlreadyRegisteredException } from '@/domain/application/usecases/create-account/exceptions/user-with-email-already-registered.exception'
+import { UserWithEmailAlreadyRegisteredError } from '@/domain/application/usecases/create-account/errors/user-with-email-already-registered.error'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
@@ -40,7 +40,7 @@ export class CreateAccountController {
       const { name, email, password } = body
       await this.createAccountUseCase.execute({ name, email, password })
     } catch (error) {
-      if (error instanceof UserWithEmailAlreadyRegisteredException) {
+      if (error instanceof UserWithEmailAlreadyRegisteredError) {
         throw new ConflictException(error.message)
       }
       throw error

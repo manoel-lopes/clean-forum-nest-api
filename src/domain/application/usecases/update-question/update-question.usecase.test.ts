@@ -1,6 +1,6 @@
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { UpdateQuestionUseCase } from './update-question.usecase'
 import { makeQuestion } from '@tests/factories/domain/make-question'
 
@@ -19,7 +19,7 @@ describe('UpdateQuestionUseCase', () => {
         questionId: 'any_inexistent_id',
         authorId: 'any-author-id',
       })
-    ).rejects.toThrowError(new ResourceNotFoundException('Question'))
+    ).rejects.toThrowError(new ResourceNotFoundError('Question'))
   })
 
   it('should not update a question if the user is not the author', async () => {

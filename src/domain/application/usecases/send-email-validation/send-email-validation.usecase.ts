@@ -4,7 +4,7 @@ import { EmailValidationsRepository } from '@/domain/application/repositories/em
 import { EmailService } from '@/infra/adapters/email/ports/email-service'
 import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
 import { EmailValidationCode } from '@/domain/enterprise/value-objects/email-validation-code/email-validation-code.vo'
-import { SendEmailValidationError } from './errors/send-email-validation.exception'
+import { SendEmailValidationError } from './errors/send-email-validation.error'
 
 type SendEmailValidationRequest = {
   email: string

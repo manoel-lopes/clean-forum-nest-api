@@ -16,8 +16,8 @@ import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { NotAuthorError } from '@/shared/application/errors/not-author.error'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 @ApiTags('Comments')
 @Controller('comments')
@@ -41,10 +41,10 @@ export class DeleteCommentController {
         authorId: user.id,
       })
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
-      if (error instanceof NotAuthorException) {
+      if (error instanceof NotAuthorError) {
         throw new ForbiddenException(error.message)
       }
       throw error

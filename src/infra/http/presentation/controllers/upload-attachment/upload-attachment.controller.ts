@@ -7,7 +7,7 @@ import {
   Req,
 } from '@nestjs/common'
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { InvalidAttachmentTypeException } from '@/domain/application/usecases/upload-attachment/exceptions/invalid-attachment-type.exception'
+import { InvalidAttachmentTypeError } from '@/domain/application/usecases/upload-attachment/errors/invalid-attachment-type.error'
 import { UploadAttachmentUseCase } from '@/domain/application/usecases/upload-attachment/upload-attachment.usecase'
 import {
   ApiCreatedResponse,
@@ -58,7 +58,7 @@ export class UploadAttachmentController {
       })
       return response
     } catch (error) {
-      if (error instanceof InvalidAttachmentTypeException) {
+      if (error instanceof InvalidAttachmentTypeError) {
         throw new BadRequestException(error.message)
       }
       throw error

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CreateQuestionUseCase } from '@/domain/application/usecases/create-question/create-question.usecase'
-import { QuestionWithTitleAlreadyRegisteredException } from '@/domain/application/usecases/create-question/exceptions/question-with-title-already-registered.exception'
+import { QuestionWithTitleAlreadyRegisteredError } from '@/domain/application/usecases/create-question/errors/question-with-title-already-registered.error'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
@@ -19,7 +19,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 const createQuestionBodySchema = z.object({
   title: z.string().min(1),
@@ -53,10 +53,10 @@ export class CreateQuestionController {
       const question = await this.createQuestionUseCase.execute({ title, content, authorId: user.id })
       return question
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
-      if (error instanceof QuestionWithTitleAlreadyRegisteredException) {
+      if (error instanceof QuestionWithTitleAlreadyRegisteredError) {
         throw new ConflictException(error.message)
       }
       throw error

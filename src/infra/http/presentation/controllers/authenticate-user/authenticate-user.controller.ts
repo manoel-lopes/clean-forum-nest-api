@@ -7,14 +7,14 @@ import {
 } from '@nestjs/common'
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { AuthenticateUserUseCase } from '@/domain/application/usecases/authenticate-user/authenticate-user.usecase'
-import { InvalidPasswordException } from '@/domain/application/usecases/authenticate-user/exceptions/invalid-password.exception'
+import { InvalidPasswordError } from '@/domain/application/usecases/authenticate-user/errors/invalid-password.error'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
   AuthenticateUserBodyDto,
   authenticateUserBodySchema,
 } from '@/infra/http/ports/auth/authenticate-user.schema'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 @ApiTags('Session')
 @Controller('auth')
@@ -38,10 +38,10 @@ export class AuthenticateUserController {
       })
       return response
     } catch (error) {
-      if (error instanceof InvalidPasswordException) {
+      if (error instanceof InvalidPasswordError) {
         throw new UnauthorizedException(error.message)
       }
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

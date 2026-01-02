@@ -14,7 +14,7 @@ import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 @ApiTags('Users')
 @Controller('users')
@@ -32,7 +32,7 @@ export class DeleteAccountController {
     try {
       await this.deleteAccountUseCase.execute({ userId: user.id })
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

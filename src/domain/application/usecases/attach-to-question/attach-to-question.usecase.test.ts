@@ -2,7 +2,7 @@ import type { QuestionAttachmentsRepository } from '@/domain/application/reposit
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryQuestionAttachmentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-attachments.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { AttachToQuestionUseCase } from './attach-to-question.usecase'
 import { makeQuestion } from '@tests/factories/domain/make-question'
 
@@ -24,7 +24,7 @@ describe('AttachToQuestionUseCase', () => {
       url: 'https://example.com/test.pdf',
     }
 
-    await expect(sut.execute(request)).rejects.toThrow(new ResourceNotFoundException('Question'))
+    await expect(sut.execute(request)).rejects.toThrow(new ResourceNotFoundError('Question'))
   })
 
   it('should attach a file to a question', async () => {

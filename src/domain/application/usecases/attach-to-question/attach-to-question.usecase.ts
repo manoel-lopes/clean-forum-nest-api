@@ -3,7 +3,7 @@ import { UseCase } from '@/core/domain/use-case'
 import { QuestionAttachmentsRepository } from '@/domain/application/repositories/question-attachments.repository'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type AttachToQuestionRequest = {
   questionId: string
@@ -22,7 +22,7 @@ export class AttachToQuestionUseCase implements UseCase {
     const { questionId, title, url } = request
     const question = await this.questionsRepository.findById(questionId)
     if (!question) {
-      throw new ResourceNotFoundException('Question')
+      throw new ResourceNotFoundError('Question')
     }
     const attachment = QuestionAttachment.create({
       questionId,

@@ -6,7 +6,7 @@ import {
   Post,
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { ExpiredRefreshTokenException } from '@/domain/application/usecases/refresh-token/errors/expired-refresh-token.exception'
+import { ExpiredRefreshTokenError } from '@/domain/application/usecases/refresh-token/errors/expired-refresh-token.error'
 import { RefreshAccessTokenUseCase } from '@/domain/application/usecases/refresh-token/refresh-token.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
@@ -14,7 +14,7 @@ import {
   RefreshTokenBodyDto,
   refreshTokenBodySchema,
 } from '@/infra/http/ports/auth/refresh-token.schema'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 @ApiTags('Session')
 @Controller('auth/refresh')
@@ -30,10 +30,10 @@ export class RefreshAccessTokenController {
       const response = await this.refreshTokenUseCase.execute({ refreshTokenId })
       return response
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
-      if (error instanceof ExpiredRefreshTokenException) {
+      if (error instanceof ExpiredRefreshTokenError) {
         throw new BadRequestException(error.message)
       }
       throw error

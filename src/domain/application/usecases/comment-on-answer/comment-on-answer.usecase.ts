@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { CommentsRepository } from '@/domain/application/repositories/comments.repository'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type CommentOnAnswerRequest = {
   answerId: string
@@ -21,7 +21,7 @@ export class CommentOnAnswerUseCase implements UseCase {
     const { answerId, content, authorId } = request
     const answer = await this.answersRepository.findById(answerId)
     if (!answer) {
-      throw new ResourceNotFoundException('Answer')
+      throw new ResourceNotFoundError('Answer')
     }
     await this.commentsRepository.create({
       content,

@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import type { User } from '@/domain/enterprise/entities/user.entity'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type GetUserByEmailUseCaseRequest = {
   email: string
@@ -19,7 +19,7 @@ export class GetUserByEmailUseCase implements UseCase {
   async execute ({ email }: GetUserByEmailUseCaseRequest): Promise<GetUserByEmailUseCaseResponse> {
     const user = await this.usersRepository.findByEmail(email)
     if (!user) {
-      throw new ResourceNotFoundException('User')
+      throw new ResourceNotFoundError('User')
     }
     return {
       id: user.id,

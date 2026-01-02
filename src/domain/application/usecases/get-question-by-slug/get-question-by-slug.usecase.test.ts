@@ -2,7 +2,7 @@ import type { AnswersRepository } from '@/domain/application/repositories/answer
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { GetQuestionBySlugUseCase } from './get-question-by-slug.usecase'
 import { makeQuestion } from '@tests/factories/domain/make-question'
 
@@ -25,7 +25,7 @@ describe('GetQuestionBySlugUseCase', () => {
       sut.execute({
         slug: 'any-inexistent-slug',
       })
-    ).rejects.toThrowError(new ResourceNotFoundException('Question'))
+    ).rejects.toThrowError(new ResourceNotFoundError('Question'))
   })
 
   it('should get a question using the slug', async () => {

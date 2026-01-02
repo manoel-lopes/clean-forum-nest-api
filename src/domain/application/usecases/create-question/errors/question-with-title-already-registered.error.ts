@@ -1,4 +1,4 @@
-export class QuestionWithTitleAlreadyRegisteredException extends Error {
+export class QuestionWithTitleAlreadyRegisteredError extends Error {
   constructor () {
     super('Question with title already registered')
   }

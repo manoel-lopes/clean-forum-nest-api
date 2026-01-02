@@ -4,7 +4,7 @@ import { AnswersRepository, type PaginatedAnswers } from '@/domain/application/r
 import { type FindQuestionBySlugParams, QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import type { Answer } from '@/domain/enterprise/entities/answer.entity'
 import type { Question } from '@/domain/enterprise/entities/question.entity'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type GetQuestionBySlugRequest = FindQuestionBySlugParams
 
@@ -23,7 +23,7 @@ export class GetQuestionBySlugUseCase implements UseCase {
     const { slug, include, answerIncludes, page, pageSize, order } = request
     const question = await this.questionsRepository.findBySlug({ slug, include })
     if (!question) {
-      throw new ResourceNotFoundException('Question')
+      throw new ResourceNotFoundError('Question')
     }
 
     if (answerIncludes && answerIncludes.length > 0) {

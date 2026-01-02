@@ -2,7 +2,7 @@ import type { AnswerAttachmentsRepository } from '@/domain/application/repositor
 import type { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { InMemoryAnswerAttachmentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answer-attachments.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { AttachToAnswerUseCase } from './attach-to-answer.usecase'
 import { makeAnswer } from '@tests/factories/domain/make-answer'
 
@@ -22,7 +22,7 @@ describe('AttachToAnswerUseCase', () => {
       answerId: 'non-existent-id',
       title: 'Test Document',
       url: 'https://example.com/test.pdf',
-    })).rejects.toThrow(new ResourceNotFoundException('Answer'))
+    })).rejects.toThrow(new ResourceNotFoundError('Answer'))
   })
 
   it('should attach a file to an answer', async () => {

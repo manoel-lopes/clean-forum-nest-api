@@ -22,7 +22,7 @@ import {
   FetchQuestionAnswersQueryDto,
   fetchQuestionAnswersQuerySchema,
 } from '@/infra/http/ports/answers/fetch-question-answers.schema'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 @ApiTags('Answers')
 @Public()
@@ -52,7 +52,7 @@ export class FetchQuestionAnswersController {
       })
       return answers
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error

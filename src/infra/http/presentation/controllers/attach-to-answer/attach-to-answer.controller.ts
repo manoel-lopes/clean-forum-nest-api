@@ -23,7 +23,7 @@ import {
   AttachToAnswerParamsDto,
   attachToAnswerParamsSchema,
 } from '@/infra/http/ports/attachments/attach-to-answer.schema'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 @ApiTags('Attachments')
 @Controller('answers/:answerId/attachments')
@@ -53,7 +53,7 @@ export class AttachToAnswerController {
       })
       return attachment
     } catch (error) {
-      if (error instanceof ResourceNotFoundException) {
+      if (error instanceof ResourceNotFoundError) {
         throw new NotFoundException(error.message)
       }
       throw error
