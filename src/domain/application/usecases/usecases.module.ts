@@ -27,7 +27,7 @@ import { UpdateCommentUseCase } from './update-comment/update-comment.usecase'
 import { UpdateQuestionUseCase } from './update-question/update-question.usecase'
 import { UpdateQuestionAttachmentUseCase } from './update-question-attachment/update-question-attachment.usecase'
 import { UploadAttachmentUseCase } from './upload-attachment/upload-attachment.usecase'
-import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-email-validation.usecase'
+import { VerifyEmailUseCase } from './verify-email/verify-email.usecase'
 
 @Global()
 @Module({
@@ -60,7 +60,7 @@ import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-e
     UpdateQuestionUseCase,
     UpdateQuestionAttachmentUseCase,
     UploadAttachmentUseCase,
-    VerifyEmailValidationUseCase,
+    VerifyEmailUseCase,
   ],
   exports: [
     AnswerQuestionUseCase,
@@ -90,7 +90,7 @@ import { VerifyEmailValidationUseCase } from './verify-email-validation/verify-e
     UpdateQuestionUseCase,
     UpdateQuestionAttachmentUseCase,
     UploadAttachmentUseCase,
-    VerifyEmailValidationUseCase,
+    VerifyEmailUseCase,
   ],
 })
 export class UseCasesModule {}

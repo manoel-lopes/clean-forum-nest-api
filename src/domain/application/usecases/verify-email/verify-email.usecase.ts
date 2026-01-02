@@ -2,37 +2,34 @@ import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
 import { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
 import { EmailValidationCode } from '@/domain/enterprise/value-objects/email-validation-code/email-validation-code.vo'
-import { EmailAlreadyVerifiedError } from './errors/email-already-verified.exception'
-import { EmailValidationNotFoundError } from './errors/email-validation-not-found.exception'
-import { ExpiredValidationCodeError } from './errors/expired-validation-code.exception'
-import { InvalidCodeError } from './errors/invalid-validation-code.exception'
+import { EmailValidationNotFoundError } from './errors/email-validation-not-found.error'
+import { ExpiredValidationCodeError } from './errors/expired-validation-code.error'
+import { InvalidCodeError } from './errors/invalid-validation-code.error'
 
-type VerifyEmailValidationRequest = {
+type VerifyEmailRequest = {
   email: string
   code: string
 }
 
 @Injectable()
-export class VerifyEmailValidationUseCase implements UseCase {
+export class VerifyEmailUseCase implements UseCase {
   constructor (
     @Inject(EmailValidationsRepository) private readonly emailValidationsRepository: EmailValidationsRepository
   ) {}
 
-  async execute (req: VerifyEmailValidationRequest) {
+  async execute (req: VerifyEmailRequest) {
     const { email, code: codeValue } = req
     const emailValidation = await this.emailValidationsRepository.findByEmail(email)
     if (!emailValidation) {
-      throw new EmailValidationNotFoundError()
+      throw new EmailValidationNotFoundError(email)
     }
-    if (emailValidation.isVerified) {
-      throw new EmailAlreadyVerifiedError()
-    }
+    if (emailValidation.isVerified) return
     if (emailValidation.expiresAt < new Date()) {
       throw new ExpiredValidationCodeError()
     }
     const code = EmailValidationCode.validate(codeValue)
     if (emailValidation.code !== code.value) {
-      throw new InvalidCodeError(codeValue)
+      throw new InvalidCodeError()
     }
     await this.emailValidationsRepository.update({
       where: { id: emailValidation.id },

@@ -3,9 +3,9 @@ import request from 'supertest'
 
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import { makeApp } from '@tests/helpers/app/make-app'
-import { sendEmailValidation, verifyEmailValidation } from '@tests/helpers/domain/enterprise/users/email-validation-requests'
+import { sendEmailValidation, verifyEmail } from '@tests/helpers/domain/enterprise/users/email-validation-requests'
 
-describe('VerifyEmailValidation', () => {
+describe('VerifyEmail', () => {
   let app: INestApplication
   let prisma: PrismaService
 
@@ -80,7 +80,7 @@ describe('VerifyEmailValidation', () => {
 
     const savedValidation = await prisma.emailValidation.findFirst({ where: { email } })
 
-    const response = await verifyEmailValidation(app, { email, code: savedValidation?.code })
+    const response = await verifyEmail(app, { email, code: savedValidation?.code })
 
     expect(response.statusCode).toBe(204)
   })
