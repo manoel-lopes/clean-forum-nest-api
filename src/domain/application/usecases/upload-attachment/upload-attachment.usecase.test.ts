@@ -1,6 +1,6 @@
 import { StorageServiceStub } from '@/infra/adapters/storage/stubs/storage-service.stub'
 import type { StorageService } from '@/infra/adapters/storage/ports/storage-service'
-import { InvalidAttachmentTypeException } from './exceptions/invalid-attachment-type.exception'
+import { InvalidAttachmentTypeError } from './errors/invalid-attachment-type.error'
 import { UploadAttachmentUseCase } from './upload-attachment.usecase'
 
 describe('UploadAttachmentUseCase', () => {
@@ -46,7 +46,7 @@ describe('UploadAttachmentUseCase', () => {
     }
 
     await expect(sut.execute(request)).rejects.toThrow(
-      new InvalidAttachmentTypeException('application/x-msdownload')
+      new InvalidAttachmentTypeError('application/x-msdownload')
     )
   })
 
@@ -57,7 +57,7 @@ describe('UploadAttachmentUseCase', () => {
       body: Buffer.from('some text content'),
     }
 
-    await expect(sut.execute(request)).rejects.toThrow(InvalidAttachmentTypeException)
+    await expect(sut.execute(request)).rejects.toThrow(InvalidAttachmentTypeError)
   })
 
   it.each([

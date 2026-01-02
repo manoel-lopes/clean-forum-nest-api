@@ -5,8 +5,8 @@ import { RefreshTokensRepository } from '@/domain/application/repositories/refre
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
 import type { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
-import { InvalidPasswordException } from './exceptions/invalid-password.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { InvalidPasswordError } from './errors/invalid-password.error'
 
 type AuthenticateUserRequest = {
   email: string
@@ -31,11 +31,11 @@ export class AuthenticateUserUseCase implements UseCase {
     const { email, password } = req
     const user = await this.usersRepository.findByEmail(email)
     if (!user) {
-      throw new ResourceNotFoundException('User')
+      throw new ResourceNotFoundError('User')
     }
     const doesPasswordMatch = await this.passwordHasher.compare(password, user.password)
     if (!doesPasswordMatch) {
-      throw new InvalidPasswordException()
+      throw new InvalidPasswordError()
     }
     const token = this.jwtService.sign({ sub: user.id })
     const expiresAt = new Date()

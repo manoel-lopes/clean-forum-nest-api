@@ -37,7 +37,7 @@ describe('FetchQuestionAnswersUseCase', () => {
     expect(response.totalItems).toBe(2)
   })
 
-  it('should throw ResourceNotFoundException if question does not exist', async () => {
+  it('should throw ResourceNotFoundError if question does not exist', async () => {
     await expect(
       sut.execute({
         questionId: 'non-existent-question',

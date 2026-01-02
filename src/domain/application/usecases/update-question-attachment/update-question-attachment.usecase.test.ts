@@ -1,6 +1,6 @@
 import type { QuestionAttachmentsRepository } from '@/domain/application/repositories/question-attachments.repository'
 import { InMemoryQuestionAttachmentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-attachments.repository'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { UpdateQuestionAttachmentUseCase } from './update-question-attachment.usecase'
 import { makeQuestionAttachmentData } from '@tests/factories/domain/make-question-attachment'
 
@@ -19,7 +19,7 @@ describe('UpdateQuestionAttachmentUseCase', () => {
       title: 'Updated Title',
     }
 
-    await expect(sut.execute(request)).rejects.toThrow(new ResourceNotFoundException('Attachment'))
+    await expect(sut.execute(request)).rejects.toThrow(new ResourceNotFoundError('Attachment'))
   })
 
   it('should update attachment title', async () => {

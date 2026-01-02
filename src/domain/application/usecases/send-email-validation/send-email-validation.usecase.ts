@@ -3,7 +3,7 @@ import { UseCase } from '@/core/domain/application/use-case'
 import { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
 import { EmailService } from '@/infra/adapters/email/ports/email-service'
 import { EmailValidationCode } from '@/domain/enterprise/value-objects/email-validation-code/email-validation-code.vo'
-import { SendEmailValidationError } from './errors/send-email-validation.exception'
+import { SendEmailValidationError } from './errors/send-email-validation.error'
 
 type SendEmailValidationRequest = {
   email: string
