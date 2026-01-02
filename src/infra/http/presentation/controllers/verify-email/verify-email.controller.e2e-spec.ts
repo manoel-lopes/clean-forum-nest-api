@@ -3,9 +3,9 @@ import request from 'supertest'
 import { DataSource } from 'typeorm'
 import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
 import { makeApp } from '@tests/helpers/app/make-app'
-import { sendEmailValidation, verifyEmailValidation } from '@tests/helpers/domain/enterprise/users/email-validation-requests'
+import { sendEmailValidation, verifyEmail } from '@tests/helpers/domain/enterprise/users/email-validation-requests'
 
-describe('VerifyEmailValidation', () => {
+describe('VerifyEmail', () => {
   let app: INestApplication
   let dataSource: DataSource
 
@@ -81,7 +81,7 @@ describe('VerifyEmailValidation', () => {
     const repository = dataSource.getRepository(EmailValidation)
     const savedValidation = await repository.findOneBy({ email })
 
-    const response = await verifyEmailValidation(app, { email, code: savedValidation?.code })
+    const response = await verifyEmail(app, { email, code: savedValidation?.code })
 
     expect(response.statusCode).toBe(204)
   })

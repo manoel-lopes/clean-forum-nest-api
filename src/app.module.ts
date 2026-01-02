@@ -28,7 +28,7 @@ import { UpdateCommentController } from '@/infra/http/presentation/controllers/u
 import { UpdateQuestionController } from '@/infra/http/presentation/controllers/update-question/update-question.controller'
 import { UpdateQuestionAttachmentController } from '@/infra/http/presentation/controllers/update-question-attachment/update-question-attachment.controller'
 import { UploadAttachmentController } from '@/infra/http/presentation/controllers/upload-attachment/upload-attachment.controller'
-import { VerifyEmailValidationController } from '@/infra/http/presentation/controllers/verify-email-validation/verify-email-validation.controller'
+import { VerifyEmailController } from '@/infra/http/presentation/controllers/verify-email/verify-email.controller'
 import { UseCasesModule } from './domain/application/usecases/usecases.module'
 import { EmailModule } from './infra/adapters/email/email.module'
 import { SecurityModule } from './infra/adapters/security/security.module'
@@ -83,7 +83,7 @@ import { BullBoardConfigModule } from './infra/queues/bull-board.module'
     UpdateQuestionController,
     UpdateQuestionAttachmentController,
     UploadAttachmentController,
-    VerifyEmailValidationController,
+    VerifyEmailController,
   ],
 })
 export class AppModule {}
