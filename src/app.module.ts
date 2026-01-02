@@ -7,37 +7,9 @@ import { StorageModule } from './infra/adapters/storage/storage.module'
 import { AuthModule } from './infra/auth/auth.module'
 import { envSchema } from './infra/env/env'
 import { EnvModule } from './infra/env/env.module'
+import { ControllersModule } from './infra/http/presentation/controllers/controllers.module'
 import { RepositoriesModule } from './infra/persistence/repositories/repositories.module'
 import { BullBoardConfigModule } from './infra/queues/bull-board.module'
-import { AnswerQuestionController } from './presentation/controllers/answer-question/answer-question.controller'
-import { AttachToAnswerController } from './presentation/controllers/attach-to-answer/attach-to-answer.controller'
-import { AttachToQuestionController } from './presentation/controllers/attach-to-question/attach-to-question.controller'
-import { AuthenticateUserController } from './presentation/controllers/authenticate-user/authenticate-user.controller'
-import { ChooseQuestionBestAnswerController } from './presentation/controllers/choose-question-best-answer/choose-question-best-answer.controller'
-import { CommentOnAnswerController } from './presentation/controllers/comment-on-answer/comment-on-answer.controller'
-import { CreateAccountController } from './presentation/controllers/create-account/create-account.controller'
-import { CreateQuestionController } from './presentation/controllers/create-question/create-question.controller'
-import { DeleteAccountController } from './presentation/controllers/delete-account/delete-account.controller'
-import { DeleteAnswerController } from './presentation/controllers/delete-answer/delete-answer.controller'
-import { DeleteAnswerAttachmentController } from './presentation/controllers/delete-answer-attachment/delete-answer-attachment.controller'
-import { DeleteCommentController } from './presentation/controllers/delete-comment/delete-comment.controller'
-import { DeleteQuestionController } from './presentation/controllers/delete-question/delete-question.controller'
-import { DeleteQuestionAttachmentController } from './presentation/controllers/delete-question-attachment/delete-question-attachment.controller'
-import { FetchQuestionAnswersController } from './presentation/controllers/fetch-question-answers/fetch-question-answers.controller'
-import { FetchQuestionsController } from './presentation/controllers/fetch-questions/fetch-questions.controller'
-import { FetchUserQuestionsController } from './presentation/controllers/fetch-user-questions/fetch-user-questions.controller'
-import { FetchUsersController } from './presentation/controllers/fetch-users/fetch-users.controller'
-import { GetQuestionBySlugController } from './presentation/controllers/get-question-by-slug/get-question-by-slug.controller'
-import { GetUserByEmailController } from './presentation/controllers/get-user-by-email/get-user-by-email.controller'
-import { RefreshAccessTokenController } from './presentation/controllers/refresh-token/refresh-token.controller'
-import { SendEmailValidationController } from './presentation/controllers/send-email-validation/send-email-validation.controller'
-import { UpdateAnswerController } from './presentation/controllers/update-answer/update-answer.controller'
-import { UpdateAnswerAttachmentController } from './presentation/controllers/update-answer-attachment/update-answer-attachment.controller'
-import { UpdateCommentController } from './presentation/controllers/update-comment/update-comment.controller'
-import { UpdateQuestionController } from './presentation/controllers/update-question/update-question.controller'
-import { UpdateQuestionAttachmentController } from './presentation/controllers/update-question-attachment/update-question-attachment.controller'
-import { UploadAttachmentController } from './presentation/controllers/upload-attachment/upload-attachment.controller'
-import { VerifyEmailValidationController } from './presentation/controllers/verify-email-validation/verify-email-validation.controller'
 
 @Module({
   imports: [
@@ -53,37 +25,7 @@ import { VerifyEmailValidationController } from './presentation/controllers/veri
     AuthModule,
     UseCasesModule,
     BullBoardConfigModule,
-  ],
-  controllers: [
-    AnswerQuestionController,
-    AttachToAnswerController,
-    AttachToQuestionController,
-    AuthenticateUserController,
-    ChooseQuestionBestAnswerController,
-    CommentOnAnswerController,
-    CreateAccountController,
-    CreateQuestionController,
-    DeleteAccountController,
-    DeleteAnswerController,
-    DeleteAnswerAttachmentController,
-    DeleteCommentController,
-    DeleteQuestionController,
-    DeleteQuestionAttachmentController,
-    FetchQuestionAnswersController,
-    FetchQuestionsController,
-    FetchUserQuestionsController,
-    FetchUsersController,
-    GetQuestionBySlugController,
-    GetUserByEmailController,
-    RefreshAccessTokenController,
-    SendEmailValidationController,
-    UpdateAnswerController,
-    UpdateAnswerAttachmentController,
-    UpdateCommentController,
-    UpdateQuestionController,
-    UpdateQuestionAttachmentController,
-    UploadAttachmentController,
-    VerifyEmailValidationController,
+    ControllersModule,
   ],
 })
 export class AppModule {}
