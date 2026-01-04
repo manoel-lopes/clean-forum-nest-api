@@ -19,12 +19,12 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import {
-  DeleteQuestionParamsDto,
-  deleteQuestionParamsSchema,
-} from '@/infra/http/ports/questions/delete-question.schema'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import {
+  type DeleteQuestionParams,
+  deleteQuestionParamsSchema,
+} from './ports/delete-question.protocol'
 
 @ApiTags('Questions')
 @Controller('questions/:questionId')
@@ -42,7 +42,7 @@ export class DeleteQuestionController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(deleteQuestionParamsSchema)) params: DeleteQuestionParamsDto
+    @Param(new ZodValidationPipe(deleteQuestionParamsSchema)) params: DeleteQuestionParams
   ) {
     const { questionId } = params
     try {

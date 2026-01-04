@@ -16,11 +16,11 @@ import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import {
-  CommentOnAnswerBodyDto,
-  commentOnAnswerBodySchema,
-} from '@/infra/http/ports/comments/comment-on-answer.schema'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import {
+  type CommentOnAnswerBody,
+  commentOnAnswerBodySchema,
+} from './ports/comment-on-answer.protocol'
 
 @ApiTags('Comments')
 @Controller('comments/answers')
@@ -36,7 +36,7 @@ export class CommentOnAnswerController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Body(new ZodValidationPipe(commentOnAnswerBodySchema)) body: CommentOnAnswerBodyDto
+    @Body(new ZodValidationPipe(commentOnAnswerBodySchema)) body: CommentOnAnswerBody
   ) {
     try {
       const { answerId, content } = body

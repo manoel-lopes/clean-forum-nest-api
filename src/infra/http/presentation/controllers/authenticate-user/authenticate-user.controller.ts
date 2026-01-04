@@ -10,11 +10,11 @@ import { AuthenticateUserUseCase } from '@/domain/application/usecases/authentic
 import { InvalidPasswordError } from '@/domain/application/usecases/authenticate-user/errors/invalid-password.error'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   AuthenticateUserBodyDto,
   authenticateUserBodySchema,
-} from '@/infra/http/ports/auth/authenticate-user.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+} from './ports/authenticate-user.protocol'
 
 @ApiTags('Session')
 @Controller('auth')

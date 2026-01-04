@@ -18,14 +18,14 @@ import {
   ApiOkResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import {
-  UpdateQuestionBodyDto,
-  updateQuestionBodySchema,
-  UpdateQuestionParamsDto,
-  updateQuestionParamsSchema,
-} from '@/infra/http/ports/questions/update-question.schema'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import {
+  type UpdateQuestionBody,
+  updateQuestionBodySchema,
+  type UpdateQuestionParams,
+  updateQuestionParamsSchema,
+} from './ports/update-question.protocol'
 
 @ApiTags('Questions')
 @Controller('questions/:questionId')
@@ -41,8 +41,8 @@ export class UpdateQuestionController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(updateQuestionParamsSchema)) params: UpdateQuestionParamsDto,
-    @Body(new ZodValidationPipe(updateQuestionBodySchema)) body: UpdateQuestionBodyDto
+    @Param(new ZodValidationPipe(updateQuestionParamsSchema)) params: UpdateQuestionParams,
+    @Body(new ZodValidationPipe(updateQuestionBodySchema)) body: UpdateQuestionBody
   ) {
     const { questionId } = params
     try {

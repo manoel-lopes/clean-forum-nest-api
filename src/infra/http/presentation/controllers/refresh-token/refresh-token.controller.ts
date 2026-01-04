@@ -10,11 +10,11 @@ import { ExpiredRefreshTokenError } from '@/domain/application/usecases/refresh-
 import { RefreshAccessTokenUseCase } from '@/domain/application/usecases/refresh-token/refresh-token.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   RefreshTokenBodyDto,
   refreshTokenBodySchema,
-} from '@/infra/http/ports/auth/refresh-token.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+} from './ports/refresh-token.protocol'
 
 @ApiTags('Session')
 @Controller('auth/refresh')

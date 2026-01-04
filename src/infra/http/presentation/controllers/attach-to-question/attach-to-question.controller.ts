@@ -9,13 +9,13 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AttachToQuestionUseCase } from '@/domain/application/usecases/attach-to-question/attach-to-question.usecase'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   AttachToQuestionBodyDto,
   attachToQuestionBodySchema,
   AttachToQuestionParamsDto,
   attachToQuestionParamsSchema,
-} from '@/infra/http/ports/attachments/attach-to-question.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+} from './ports/attach-to-question.protocol'
 
 @ApiTags('Attachments')
 @Controller('questions/:questionId/attachments')

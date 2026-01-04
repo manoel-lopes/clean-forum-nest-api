@@ -8,11 +8,11 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { GetUserByEmailUseCase } from '@/domain/application/usecases/get-user-by-email/get-user-by-email.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   GetUserByEmailParamsDto,
   getUserByEmailParamsSchema,
-} from '@/infra/http/ports/users/get-user-by-email.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+} from './ports/get-user-by-email.protocol'
 
 @ApiTags('Users')
 @Public()

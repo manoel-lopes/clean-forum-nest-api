@@ -18,12 +18,12 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import {
-  ChooseQuestionBestAnswerParamsDto,
-  chooseQuestionBestAnswerParamsSchema,
-} from '@/infra/http/ports/questions/choose-question-best-answer.schema'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import {
+  type ChooseQuestionBestAnswerParams,
+  chooseQuestionBestAnswerParamsSchema,
+} from './ports/choose-question-best-answer.protocol'
 
 @ApiTags('Questions')
 @Controller('answers/:answerId/best')
@@ -40,7 +40,7 @@ export class ChooseQuestionBestAnswerController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(chooseQuestionBestAnswerParamsSchema)) params: ChooseQuestionBestAnswerParamsDto
+    @Param(new ZodValidationPipe(chooseQuestionBestAnswerParamsSchema)) params: ChooseQuestionBestAnswerParams
   ) {
     const { answerId } = params
     try {

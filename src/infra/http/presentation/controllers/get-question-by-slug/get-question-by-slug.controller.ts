@@ -15,13 +15,13 @@ import {
 import { GetQuestionBySlugUseCase } from '@/domain/application/usecases/get-question-by-slug/get-question-by-slug.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   GetQuestionBySlugParamsDto,
   getQuestionBySlugParamsSchema,
   GetQuestionBySlugQueryDto,
   getQuestionBySlugQuerySchema,
-} from '@/infra/http/ports/questions/get-question-by-slug.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+} from './ports/get-question-by-slug.protocol'
 
 @ApiTags('Questions')
 @Public()

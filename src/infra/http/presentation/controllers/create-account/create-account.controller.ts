@@ -19,7 +19,7 @@ import {
 import {
   CreateAccountBodyDto,
   createAccountBodySchema,
-} from '@/infra/http/ports/users/create-account.schema'
+} from './ports/create-account.protocol'
 
 @ApiTags('Users')
 @Controller('users')

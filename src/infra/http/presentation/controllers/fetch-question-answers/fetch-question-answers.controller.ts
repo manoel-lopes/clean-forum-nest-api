@@ -16,13 +16,13 @@ import {
 import { FetchQuestionAnswersUseCase } from '@/domain/application/usecases/fetch-question-answers/fetch-question-answers.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   FetchQuestionAnswersParamsDto,
   fetchQuestionAnswersParamsSchema,
   FetchQuestionAnswersQueryDto,
   fetchQuestionAnswersQuerySchema,
-} from '@/infra/http/ports/answers/fetch-question-answers.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+} from './ports/fetch-question-answers.protocol'
 
 @ApiTags('Answers')
 @Public()

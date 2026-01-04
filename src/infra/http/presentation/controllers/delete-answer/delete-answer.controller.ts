@@ -19,12 +19,12 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import {
-  DeleteAnswerParamsDto,
-  deleteAnswerParamsSchema,
-} from '@/infra/http/ports/answers/delete-answer.schema'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import {
+  type DeleteAnswerParams,
+  deleteAnswerParamsSchema,
+} from './ports/delete-answer.protocol'
 
 @ApiTags('Answers')
 @Controller('answers/:answerId')
@@ -42,12 +42,11 @@ export class DeleteAnswerController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(deleteAnswerParamsSchema)) params: DeleteAnswerParamsDto
+    @Param(new ZodValidationPipe(deleteAnswerParamsSchema)) params: DeleteAnswerParams
   ) {
-    const { answerId } = params
     try {
       await this.deleteAnswerUseCase.execute({
-        answerId,
+        answerId: params.answerId,
         authorId: user.id,
       })
     } catch (error) {

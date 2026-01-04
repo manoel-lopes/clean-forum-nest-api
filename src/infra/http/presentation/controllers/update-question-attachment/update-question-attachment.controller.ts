@@ -8,13 +8,13 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UpdateQuestionAttachmentUseCase } from '@/domain/application/usecases/update-question-attachment/update-question-attachment.usecase'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
-import {
-  UpdateQuestionAttachmentBodyDto,
-  updateQuestionAttachmentBodySchema,
-  UpdateQuestionAttachmentParamsDto,
-  updateQuestionAttachmentParamsSchema,
-} from '@/infra/http/ports/attachments/update-question-attachment.schema'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import {
+  AttachmentParamsDto,
+  attachmentParamsSchema,
+  UpdateAttachmentBodyDto,
+  updateAttachmentBodySchema,
+} from '@/shared/presentation/protocols/attachment.protocol'
 
 @ApiTags('Attachments')
 @Controller('question-attachments/:attachmentId')
@@ -24,8 +24,8 @@ export class UpdateQuestionAttachmentController {
   @Put()
   @ApiOperation({ summary: 'Update a question attachment' })
   async handle (
-    @Param(new ZodValidationPipe(updateQuestionAttachmentParamsSchema)) params: UpdateQuestionAttachmentParamsDto,
-    @Body(new ZodValidationPipe(updateQuestionAttachmentBodySchema)) body: UpdateQuestionAttachmentBodyDto
+    @Param(new ZodValidationPipe(attachmentParamsSchema)) params: AttachmentParamsDto,
+    @Body(new ZodValidationPipe(updateAttachmentBodySchema)) body: UpdateAttachmentBodyDto
   ) {
     const { attachmentId } = params
     try {

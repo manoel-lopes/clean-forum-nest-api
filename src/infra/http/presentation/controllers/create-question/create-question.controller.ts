@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import {
   Body,
   ConflictException,
@@ -20,17 +19,10 @@ import {
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
-
-const createQuestionBodySchema = z.object({
-  title: z.string().min(1),
-  content: z.string().min(1),
-  attachments: z.array(z.object({
-    title: z.string().min(1),
-    url: z.string().url(),
-  })).optional(),
-})
-
-type CreateQuestionBody = z.infer<typeof createQuestionBodySchema>
+import {
+  type CreateQuestionBody,
+  createQuestionBodySchema,
+} from './ports/create-question.protocol'
 
 @ApiTags('Questions')
 @Controller('questions')

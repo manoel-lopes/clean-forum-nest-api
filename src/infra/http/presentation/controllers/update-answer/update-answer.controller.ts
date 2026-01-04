@@ -20,14 +20,14 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-import {
-  UpdateAnswerBodyDto,
-  updateAnswerBodySchema,
-  UpdateAnswerParamsDto,
-  updateAnswerParamsSchema,
-} from '@/infra/http/ports/answers/update-answer.schema'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import {
+  type UpdateAnswerBody,
+  updateAnswerBodySchema,
+  type UpdateAnswerParams,
+  updateAnswerParamsSchema,
+} from './ports/update-answer.protocol'
 
 @ApiTags('Answers')
 @Controller('answers/:answerId')
@@ -45,8 +45,8 @@ export class UpdateAnswerController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(updateAnswerParamsSchema)) params: UpdateAnswerParamsDto,
-    @Body(new ZodValidationPipe(updateAnswerBodySchema)) body: UpdateAnswerBodyDto
+    @Param(new ZodValidationPipe(updateAnswerParamsSchema)) params: UpdateAnswerParams,
+    @Body(new ZodValidationPipe(updateAnswerBodySchema)) body: UpdateAnswerBody
   ) {
     const { answerId } = params
     try {

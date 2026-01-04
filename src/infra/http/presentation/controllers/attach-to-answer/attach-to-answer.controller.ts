@@ -17,13 +17,13 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   AttachToAnswerBodyDto,
   attachToAnswerBodySchema,
   AttachToAnswerParamsDto,
   attachToAnswerParamsSchema,
-} from '@/infra/http/ports/attachments/attach-to-answer.schema'
-import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+} from './ports/attach-to-answer.protocol'
 
 @ApiTags('Attachments')
 @Controller('answers/:answerId/attachments')

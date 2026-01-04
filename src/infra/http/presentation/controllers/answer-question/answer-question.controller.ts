@@ -1,5 +1,3 @@
-import { createZodDto } from 'nestjs-zod'
-import { z } from 'zod'
 import {
   Body,
   Controller,
@@ -14,16 +12,12 @@ import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
-
-const answerQuestionParamsSchema = z.object({
-  questionId: z.uuid(),
-})
-const answerQuestionBodySchema = z.object({
-  content: z.string().min(1),
-})
-
-class AnswerQuestionParamsDto extends createZodDto(answerQuestionParamsSchema) {}
-class AnswerQuestionBodyDto extends createZodDto(answerQuestionBodySchema) {}
+import {
+  type AnswerQuestionBody,
+  answerQuestionBodySchema,
+  type AnswerQuestionParams,
+  answerQuestionParamsSchema,
+} from './ports/answer-question.protocol'
 
 @ApiTags('Answers')
 @Controller('questions/:questionId/answers')
@@ -35,8 +29,8 @@ export class AnswerQuestionController {
   @ApiOperation({ summary: 'Answer a question' })
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(answerQuestionParamsSchema)) params: AnswerQuestionParamsDto,
-    @Body(new ZodValidationPipe(answerQuestionBodySchema)) body: AnswerQuestionBodyDto
+    @Param(new ZodValidationPipe(answerQuestionParamsSchema)) params: AnswerQuestionParams,
+    @Body(new ZodValidationPipe(answerQuestionBodySchema)) body: AnswerQuestionBody
   ) {
     const { questionId } = params
     try {
