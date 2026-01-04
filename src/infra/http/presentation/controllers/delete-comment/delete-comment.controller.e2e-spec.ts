@@ -95,7 +95,7 @@ describe('DeleteComment', () => {
     })
     const answersWithComments = await fetchQuestionAnswers(app, question.id, authorToken, { include: 'comments' })
     const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Comment content')
+    const comment = answerWithComments.comments.items.find((c: Comment) => c.content === 'Comment content')
     const otherUserData = aUser().build()
     await createUser(app, otherUserData)
     const otherUserAuthResponse = await authenticateUser(app, {
@@ -134,7 +134,7 @@ describe('DeleteComment', () => {
     })
     const answersWithComments = await fetchQuestionAnswers(app, question.id, token, { include: 'comments' })
     const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Comment content')
+    const comment = answerWithComments.comments.items.find((c: Comment) => c.content === 'Comment content')
 
     const response = await deleteComment(app, token, { commentId: comment.id })
 

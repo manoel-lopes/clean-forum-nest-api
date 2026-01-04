@@ -102,7 +102,7 @@ describe('UpdateComment', () => {
     })
     const answersWithComments = await fetchQuestionAnswers(app, question.id, authorToken, { include: 'comments' })
     const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Original comment')
+    const comment = answerWithComments.comments.items.find((c: Comment) => c.content === 'Original comment')
     const otherUserData = aUser().build()
     await createUser(app, otherUserData)
     const otherUserAuthResponse = await authenticateUser(app, {
@@ -146,7 +146,7 @@ describe('UpdateComment', () => {
     })
     const answersWithComments = await fetchQuestionAnswers(app, question.id, token, { include: 'comments' })
     const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Original comment')
+    const comment = answerWithComments.comments.items.find((c: Comment) => c.content === 'Original comment')
 
     const response = await updateComment(app, token, { commentId: comment.id }, { content: 'Updated comment' })
 
