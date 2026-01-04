@@ -70,7 +70,7 @@ describe('VerifyEmail', () => {
     expect(response.body).toEqual({
       statusCode: 404,
       error: 'Not Found',
-      message: 'No email validation found for this email',
+      message: 'No email validation found for the email: nonexistent@example.com',
     })
   })
 
