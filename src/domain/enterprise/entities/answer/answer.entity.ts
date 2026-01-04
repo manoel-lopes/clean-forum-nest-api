@@ -1,19 +1,15 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
 import { Optional } from '@/shared/types/common/optional'
 import { Props } from '@/shared/types/custom/props'
-import { Attachment } from './base/attachment.entity'
-import { BaseEntity } from './base/base.entity'
-import { Comment } from './comment.entity'
-import { Question } from './question.entity'
-import { User } from './user.entity'
+import { AnswerAttachment } from '../answer-attachment/answer-attachment.entity'
+import { BaseEntity } from '../base/base.entity'
+import { Comment } from '../comment/comment.entity'
+import { Question } from '../question/question.entity'
+import { User } from '../user/user.entity'
 
 export type AnswerProps = Optional<Props<Answer>, 'excerpt'>
 
 @Entity('answers')
-@Index('answers_questionId_idx', ['questionId'])
-@Index('answers_authorId_idx', ['authorId'])
-@Index('answers_createdAt_idx', ['createdAt'])
-@Index('answers_questionId_createdAt_idx', ['questionId', 'createdAt'])
 export class Answer extends BaseEntity {
   @Column({ type: 'text' })
   readonly content: string
@@ -38,8 +34,8 @@ export class Answer extends BaseEntity {
   @OneToMany(() => Comment, comment => comment.answer)
   readonly comments: Comment[]
 
-  @OneToMany(() => Attachment, attachment => attachment.answer)
-  readonly attachments: Attachment[]
+  @OneToMany('AnswerAttachment', 'answer')
+  readonly attachments: AnswerAttachment[]
 
   private constructor (props: AnswerProps) {
     super()

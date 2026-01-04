@@ -10,7 +10,7 @@ import type {
   QuestionsRepository,
   UpdateQuestionData,
 } from '@/domain/application/repositories/questions.repository'
-import { Question } from '@/domain/enterprise/entities/question.entity'
+import { Question } from '@/domain/enterprise/entities/question/question.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()

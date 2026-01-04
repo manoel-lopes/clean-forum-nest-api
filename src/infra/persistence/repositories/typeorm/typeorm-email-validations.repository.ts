@@ -5,7 +5,7 @@ import type {
   EmailValidationsRepository,
   UpdateEmailValidationData,
 } from '@/domain/application/repositories/email-validations.repository'
-import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
+import { EmailValidation } from '@/domain/enterprise/entities/email-validation/email-validation.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()

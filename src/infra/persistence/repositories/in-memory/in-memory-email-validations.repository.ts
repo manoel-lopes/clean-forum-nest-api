@@ -2,7 +2,7 @@ import type {
   EmailValidationsRepository,
   UpdateEmailValidationData,
 } from '@/domain/application/repositories/email-validations.repository'
-import type { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
+import type { EmailValidation } from '@/domain/enterprise/entities/email-validation/email-validation.entity'
 import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.repository'
 
 export class InMemoryEmailValidationsRepository

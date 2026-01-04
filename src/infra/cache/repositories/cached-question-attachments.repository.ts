@@ -6,7 +6,7 @@ import type {
   QuestionAttachmentsRepository,
 } from '@/domain/application/repositories/question-attachments.repository'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
-import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
+import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment/question-attachment.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
 
 export const TypeOrmQuestionAttachmentsRepositoryToken = Symbol('TypeOrmQuestionAttachmentsRepositoryToken')

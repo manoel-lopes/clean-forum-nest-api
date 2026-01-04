@@ -3,7 +3,7 @@ import type {
   PaginatedQuestionAttachments,
   QuestionAttachmentsRepository,
 } from '@/domain/application/repositories/question-attachments.repository'
-import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
+import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment/question-attachment.entity'
 import { InMemoryAttachmentsRepository } from './in-memory-attachments.repository'
 
 export class InMemoryQuestionAttachmentsRepository

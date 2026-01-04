@@ -7,7 +7,7 @@ import type {
   PaginatedQuestionAttachments,
   QuestionAttachmentsRepository,
 } from '@/domain/application/repositories/question-attachments.repository'
-import { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
+import { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment/question-attachment.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()

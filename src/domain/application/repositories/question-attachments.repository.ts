@@ -1,7 +1,7 @@
 import type { PaginatedItems } from '@/core/domain/paginated-items'
 import type { PaginationParams } from '@/core/domain/pagination-params'
 import type { UpdateAttachmentData } from '@/domain/application/repositories/base/attachments.repository'
-import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
+import type { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment/question-attachment.entity'
 
 export type PaginatedQuestionAttachments = Required<PaginatedItems<QuestionAttachment>>
 

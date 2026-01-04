@@ -1,4 +1,4 @@
-import { Answer, AnswerProps } from '@/domain/enterprise/entities/answer.entity'
+import { Answer, AnswerProps } from '@/domain/enterprise/entities/answer/answer.entity'
 import { faker } from '@faker-js/faker'
 
 export function makeAnswer (override: Partial<Answer> = {}): Answer {

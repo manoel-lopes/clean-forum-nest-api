@@ -1,7 +1,7 @@
 import { Column, Entity } from 'typeorm'
 import { Props } from '@/shared/types/custom/props'
-import { EmailValidationCode } from '../value-objects/email-validation-code/email-validation-code.vo'
-import { BaseEntity } from './base/base.entity'
+import { EmailValidationCode } from '../../value-objects/email-validation-code/email-validation-code.vo'
+import { BaseEntity } from '../base/base.entity'
 
 export type EmailValidationProps = Omit<Props<EmailValidation>, 'code'>
 

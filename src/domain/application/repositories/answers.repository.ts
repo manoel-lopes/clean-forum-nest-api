@@ -1,6 +1,6 @@
 import type { PaginatedItems } from '@/core/domain/paginated-items'
 import type { PaginationParams } from '@/core/domain/pagination-params'
-import type { Answer } from '@/domain/enterprise/entities/answer.entity'
+import type { Answer } from '@/domain/enterprise/entities/answer/answer.entity'
 import type { ForumIncludeOption } from '@/shared/types/forum/include-option'
 
 export type FindManyByQuestionIdParams = PaginationParams & {

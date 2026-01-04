@@ -1,6 +1,6 @@
 import type { PaginatedItems } from '@/core/domain/paginated-items'
 import type { PaginationParams } from '@/core/domain/pagination-params'
-import type { Comment, CommentProps } from '@/domain/enterprise/entities/comment.entity'
+import type { Comment, CommentProps } from '@/domain/enterprise/entities/comment/comment.entity'
 
 export type PaginatedComments = Required<PaginatedItems<Comment>>
 

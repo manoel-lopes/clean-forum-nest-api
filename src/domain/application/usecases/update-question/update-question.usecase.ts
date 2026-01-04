@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
 import { QuestionsRepository, type UpdateQuestionData } from '@/domain/application/repositories/questions.repository'
-import type { Question } from '@/domain/enterprise/entities/question.entity'
+import type { Question } from '@/domain/enterprise/entities/question/question.entity'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 

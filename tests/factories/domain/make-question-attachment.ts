@@ -1,5 +1,5 @@
 import { uuidv7 } from 'uuidv7'
-import { QuestionAttachment, QuestionAttachmentProps } from '@/domain/enterprise/entities/question-attachment.entity'
+import { QuestionAttachment, QuestionAttachmentProps } from '@/domain/enterprise/entities/question-attachment/question-attachment.entity'
 
 export function makeQuestionAttachment (overrides: Partial<QuestionAttachmentProps> = {}): QuestionAttachment {
   const props: QuestionAttachmentProps = {

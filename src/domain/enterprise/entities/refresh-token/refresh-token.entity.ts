@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
 import { Props } from '@/shared/types/custom/props'
-import { BaseEntity } from './base/base.entity'
-import { User } from './user.entity'
+import { BaseEntity } from '../base/base.entity'
+import { User } from '../user/user.entity'
 
 export type RefreshTokenProps = Props<RefreshToken>
 

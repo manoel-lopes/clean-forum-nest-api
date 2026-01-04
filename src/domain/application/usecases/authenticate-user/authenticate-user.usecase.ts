@@ -4,7 +4,7 @@ import { UseCase } from '@/core/domain/use-case'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
-import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
+import { RefreshToken } from '@/domain/enterprise/entities/refresh-token/refresh-token.entity'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { InvalidPasswordError } from './errors/invalid-password.error'
 

@@ -1,5 +1,5 @@
 import { uuidv7 } from 'uuidv7'
-import { AnswerAttachment, AnswerAttachmentProps } from '@/domain/enterprise/entities/answer-attachment.entity'
+import { AnswerAttachment, AnswerAttachmentProps } from '@/domain/enterprise/entities/answer-attachment/answer-attachment.entity'
 
 export function makeAnswerAttachment (overrides: Partial<AnswerAttachmentProps> = {}): AnswerAttachment {
   const props: AnswerAttachmentProps = {

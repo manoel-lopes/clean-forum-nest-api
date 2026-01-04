@@ -1,7 +1,7 @@
 import type { PaginatedItems } from '@/core/domain/paginated-items'
 import type { PaginationParams } from '@/core/domain/pagination-params'
 import type { UpdateUserData, UsersRepository } from '@/domain/application/repositories/users.repository'
-import type { User } from '@/domain/enterprise/entities/user.entity'
+import type { User } from '@/domain/enterprise/entities/user/user.entity'
 import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.repository'
 
 export class InMemoryUsersRepository extends BaseRepository<User> implements UsersRepository {

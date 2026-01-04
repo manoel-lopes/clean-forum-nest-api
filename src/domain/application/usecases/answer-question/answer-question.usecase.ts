@@ -3,7 +3,7 @@ import { UseCase } from '@/core/domain/use-case'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
-import { Answer, type AnswerProps } from '@/domain/enterprise/entities/answer.entity'
+import { Answer, type AnswerProps } from '@/domain/enterprise/entities/answer/answer.entity'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type AnswerQuestionRequest = Omit<AnswerProps, 'excerpt'>

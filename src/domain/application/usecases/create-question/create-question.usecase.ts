@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
-import { Question, type QuestionProps } from '@/domain/enterprise/entities/question.entity'
+import { Question, type QuestionProps } from '@/domain/enterprise/entities/question/question.entity'
 import { QuestionWithTitleAlreadyRegisteredError } from './errors/question-with-title-already-registered.error'
 
 type CreateQuestionRequest = Omit<QuestionProps, 'slug'>

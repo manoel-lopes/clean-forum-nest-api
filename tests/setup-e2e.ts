@@ -1,15 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { config } from 'dotenv'
 import { DataSource } from 'typeorm'
-import { Answer } from '@/domain/enterprise/entities/answer.entity'
-import { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
-import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
-import { Comment } from '@/domain/enterprise/entities/comment.entity'
-import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
-import { Question } from '@/domain/enterprise/entities/question.entity'
-import { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
-import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
-import { User } from '@/domain/enterprise/entities/user.entity'
+import { entities } from '@/domain/enterprise/entities'
 
 config({ path: '.env', override: true })
 config({ path: '.env.test', override: true })
@@ -31,17 +23,7 @@ function createDataSource (schema: string): DataSource {
     type: 'postgres',
     url: buildDatabaseUrl(schema),
     schema,
-    entities: [
-      User,
-      Question,
-      Answer,
-      Comment,
-      Attachment,
-      QuestionAttachment,
-      AnswerAttachment,
-      RefreshToken,
-      EmailValidation,
-    ],
+    entities,
     synchronize: true,
     logging: false,
   })

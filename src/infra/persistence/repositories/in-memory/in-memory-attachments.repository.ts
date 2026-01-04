@@ -1,8 +1,8 @@
 import type { UpdateAttachmentData } from '@/domain/application/repositories/base/attachments.repository'
-import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
+import { BaseAttachment } from '@/domain/enterprise/entities/base/attachment.entity'
 import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.repository'
 
-export class InMemoryAttachmentsRepository<T extends Attachment = Attachment> extends BaseRepository<T> {
+export class InMemoryAttachmentsRepository<T extends BaseAttachment = BaseAttachment> extends BaseRepository<T> {
   async saveMany (attachments: T[]): Promise<void> {
     for (const attachment of attachments) {
       await this.save(attachment)

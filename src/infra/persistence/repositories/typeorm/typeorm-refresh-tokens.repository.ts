@@ -2,7 +2,7 @@ import { Repository } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
-import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
+import { RefreshToken } from '@/domain/enterprise/entities/refresh-token/refresh-token.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()

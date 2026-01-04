@@ -1,4 +1,4 @@
-import { Question, QuestionProps } from '@/domain/enterprise/entities/question.entity'
+import { Question, QuestionProps } from '@/domain/enterprise/entities/question/question.entity'
 import { Slug } from '@/domain/enterprise/value-objects/slug/slug.vo'
 import { faker } from '@faker-js/faker'
 

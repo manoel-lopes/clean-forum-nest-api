@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
 import { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
 import { EmailService } from '@/infra/adapters/email/ports/email-service'
-import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
+import { EmailValidation } from '@/domain/enterprise/entities/email-validation/email-validation.entity'
 import { EmailValidationCode } from '@/domain/enterprise/value-objects/email-validation-code/email-validation-code.vo'
 import { SendEmailValidationError } from './errors/send-email-validation.error'
 

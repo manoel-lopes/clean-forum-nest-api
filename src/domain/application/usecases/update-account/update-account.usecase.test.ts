@@ -1,7 +1,7 @@
 import type { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { PasswordHasherStub } from '@/infra/adapters/security/stubs/password-hasher.stub'
 import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-users.repository'
-import { User } from '@/domain/enterprise/entities/user.entity'
+import { User } from '@/domain/enterprise/entities/user/user.entity'
 import { UpdateAccountUseCase } from './update-account.usecase'
 import { makeUser } from '@tests/factories/domain/make-user'
 

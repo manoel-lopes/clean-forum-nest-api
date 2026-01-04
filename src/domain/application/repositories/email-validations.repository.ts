@@ -1,4 +1,4 @@
-import type { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
+import type { EmailValidation } from '@/domain/enterprise/entities/email-validation/email-validation.entity'
 
 export type UpdateEmailValidationData = {
   emailValidationId: string

@@ -1,11 +1,11 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
 import { Optional } from '@/shared/types/common/optional'
 import { Props } from '@/shared/types/custom/props'
-import { Slug } from '../value-objects/slug/slug.vo'
-import { Answer } from './answer.entity'
-import { Attachment } from './base/attachment.entity'
-import { BaseEntity } from './base/base.entity'
-import { User } from './user.entity'
+import { Slug } from '../../value-objects/slug/slug.vo'
+import { Answer } from '../answer/answer.entity'
+import { BaseEntity } from '../base/base.entity'
+import { QuestionAttachment } from '../question-attachment/question-attachment.entity'
+import { User } from '../user/user.entity'
 
 export type QuestionProps = Optional<Props<Question>, 'slug'>
 
@@ -33,8 +33,8 @@ export class Question extends BaseEntity {
   @OneToMany(() => Answer, answer => answer.question)
   readonly answers: Answer[]
 
-  @OneToMany(() => Attachment, attachment => attachment.question)
-  readonly attachments: Attachment[]
+  @OneToMany('QuestionAttachment', 'question')
+  readonly attachments: QuestionAttachment[]
 
   private constructor (props: QuestionProps) {
     super()

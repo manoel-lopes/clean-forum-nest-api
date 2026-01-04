@@ -1,4 +1,4 @@
-import type { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
+import type { RefreshToken } from '@/domain/enterprise/entities/refresh-token/refresh-token.entity'
 
 export type RefreshTokensRepository = {
   save(refreshToken: RefreshToken): Promise<void>

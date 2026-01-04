@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import type { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
-import type { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
+import type { RefreshToken } from '@/domain/enterprise/entities/refresh-token/refresh-token.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
 
 export const TypeOrmRefreshTokensRepositoryToken = Symbol('TypeOrmRefreshTokensRepositoryToken')

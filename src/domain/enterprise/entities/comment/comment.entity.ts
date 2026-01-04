@@ -1,8 +1,8 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm'
 import { Props } from '@/shared/types/custom/props'
-import { Answer } from './answer.entity'
-import { BaseEntity } from './base/base.entity'
-import { User } from './user.entity'
+import { Answer } from '../answer/answer.entity'
+import { BaseEntity } from '../base/base.entity'
+import { User } from '../user/user.entity'
 
 export type CommentProps = Props<Comment>
 

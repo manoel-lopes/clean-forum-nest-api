@@ -4,7 +4,7 @@ import type {
   UpdateEmailValidationData,
 } from '@/domain/application/repositories/email-validations.repository'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
-import type { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
+import type { EmailValidation } from '@/domain/enterprise/entities/email-validation/email-validation.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
 
 export const TypeOrmEmailValidationsRepositoryToken = Symbol('TypeOrmEmailValidationsRepositoryToken')

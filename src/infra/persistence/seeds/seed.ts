@@ -1,27 +1,7 @@
 /* eslint-disable no-console */
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
-import { Answer } from '@/domain/enterprise/entities/answer.entity'
-import { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
-import { Attachment } from '@/domain/enterprise/entities/base/attachment.entity'
-import { Comment } from '@/domain/enterprise/entities/comment.entity'
-import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
-import { Question } from '@/domain/enterprise/entities/question.entity'
-import { QuestionAttachment } from '@/domain/enterprise/entities/question-attachment.entity'
-import { RefreshToken } from '@/domain/enterprise/entities/refresh-token.entity'
-import { User } from '@/domain/enterprise/entities/user.entity'
-
-const entities = [
-  User,
-  Question,
-  Answer,
-  Comment,
-  Attachment,
-  QuestionAttachment,
-  AnswerAttachment,
-  RefreshToken,
-  EmailValidation,
-]
+import { Answer, entities, Question, User } from '@/domain/enterprise/entities'
 
 function getDatabaseUrl (): string {
   const dbUser = process.env.DB_USER || 'postgres'

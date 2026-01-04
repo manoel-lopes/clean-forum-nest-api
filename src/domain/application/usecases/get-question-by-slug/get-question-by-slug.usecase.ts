@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
 import { AnswersRepository, type PaginatedAnswers } from '@/domain/application/repositories/answers.repository'
 import { type FindQuestionBySlugParams, QuestionsRepository } from '@/domain/application/repositories/questions.repository'
-import type { Answer } from '@/domain/enterprise/entities/answer.entity'
-import type { Question } from '@/domain/enterprise/entities/question.entity'
+import type { Answer } from '@/domain/enterprise/entities/answer/answer.entity'
+import type { Question } from '@/domain/enterprise/entities/question/question.entity'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type GetQuestionBySlugRequest = FindQuestionBySlugParams

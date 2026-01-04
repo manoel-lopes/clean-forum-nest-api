@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { PasswordHasher } from '@/infra/adapters/security/ports/password-hasher'
-import { User, type UserProps } from '@/domain/enterprise/entities/user.entity'
+import { User, type UserProps } from '@/domain/enterprise/entities/user/user.entity'
 import { UserWithEmailAlreadyRegisteredError } from './errors/user-with-email-already-registered.error'
 
 type CreateAccountRequest = UserProps

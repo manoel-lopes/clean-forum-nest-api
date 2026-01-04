@@ -6,7 +6,7 @@ import {
   UsersRepository,
 } from '@/domain/application/repositories/users.repository'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
-import type { User } from '@/domain/enterprise/entities/user.entity'
+import type { User } from '@/domain/enterprise/entities/user/user.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
 
 export const TypeOrmUsersRepositoryToken = Symbol('TypeOrmUsersRepositoryToken')

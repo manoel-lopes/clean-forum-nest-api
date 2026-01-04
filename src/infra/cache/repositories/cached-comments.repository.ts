@@ -6,7 +6,7 @@ import type {
   UpdateCommentData,
 } from '@/domain/application/repositories/comments.repository'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
-import type { Comment, CommentProps } from '@/domain/enterprise/entities/comment.entity'
+import type { Comment, CommentProps } from '@/domain/enterprise/entities/comment/comment.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
 
 export const TypeOrmCommentsRepositoryToken = Symbol('TypeOrmCommentsRepositoryToken')

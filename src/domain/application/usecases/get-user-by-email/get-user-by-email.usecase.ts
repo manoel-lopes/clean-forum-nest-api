@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
-import type { User } from '@/domain/enterprise/entities/user.entity'
+import type { User } from '@/domain/enterprise/entities/user/user.entity'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type GetUserByEmailUseCaseRequest = {

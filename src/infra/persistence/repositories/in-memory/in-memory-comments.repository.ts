@@ -4,7 +4,7 @@ import type {
   PaginatedComments,
   UpdateCommentData,
 } from '@/domain/application/repositories/comments.repository'
-import { Comment, CommentProps } from '@/domain/enterprise/entities/comment.entity'
+import { Comment, CommentProps } from '@/domain/enterprise/entities/comment/comment.entity'
 import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.repository'
 
 export class InMemoryCommentsRepository

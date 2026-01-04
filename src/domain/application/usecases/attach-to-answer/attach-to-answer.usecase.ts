@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/use-case'
 import { AnswerAttachmentsRepository } from '@/domain/application/repositories/answer-attachments.repository'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
-import { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
+import { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment/answer-attachment.entity'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type AttachToAnswerRequest = {

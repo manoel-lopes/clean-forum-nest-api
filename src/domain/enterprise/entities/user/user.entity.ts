@@ -1,10 +1,10 @@
 import { Column, Entity, OneToMany } from 'typeorm'
 import { Props } from '@/shared/types/custom/props'
-import { Answer } from './answer.entity'
-import { BaseEntity } from './base/base.entity'
-import { Comment } from './comment.entity'
-import { Question } from './question.entity'
-import { RefreshToken } from './refresh-token.entity'
+import { Answer } from '../answer/answer.entity'
+import { BaseEntity } from '../base/base.entity'
+import { Comment } from '../comment/comment.entity'
+import { Question } from '../question/question.entity'
+import { RefreshToken } from '../refresh-token/refresh-token.entity'
 
 export type UserProps = Props<User>
 

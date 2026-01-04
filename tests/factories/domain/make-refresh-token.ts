@@ -1,4 +1,4 @@
-import { RefreshToken, RefreshTokenProps } from '@/domain/enterprise/entities/refresh-token.entity'
+import { RefreshToken, RefreshTokenProps } from '@/domain/enterprise/entities/refresh-token/refresh-token.entity'
 import { faker } from '@faker-js/faker'
 
 export function makeRefreshToken (override: Partial<RefreshTokenProps> = {}): RefreshToken {

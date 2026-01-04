@@ -7,7 +7,7 @@ import type {
   PaginatedAnswerAttachments,
 } from '@/domain/application/repositories/answer-attachments.repository'
 import type { UpdateAttachmentData } from '@/domain/application/repositories/base/attachments.repository'
-import { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment.entity'
+import { AnswerAttachment } from '@/domain/enterprise/entities/answer-attachment/answer-attachment.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()

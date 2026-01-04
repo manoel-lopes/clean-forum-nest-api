@@ -2,7 +2,7 @@ import { uuidv7 } from 'uuidv7'
 import type { INestApplication } from '@nestjs/common'
 import request from 'supertest'
 
-import type { Question } from '@/domain/enterprise/entities/question.entity'
+import type { Question } from '@/domain/enterprise/entities/question/question.entity'
 
 export type CreateQuestionData = {
   title?: unknown

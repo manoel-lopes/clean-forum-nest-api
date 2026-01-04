@@ -1,6 +1,6 @@
 import type { PaginatedItems } from '@/core/domain/paginated-items'
 import type { PaginationParams } from '@/core/domain/pagination-params'
-import type { Question } from '@/domain/enterprise/entities/question.entity'
+import type { Question } from '@/domain/enterprise/entities/question/question.entity'
 import type { ForumIncludeOption } from '@/shared/types/forum/include-option'
 
 export type PaginationWithIncludeParams = PaginationParams & {

@@ -9,7 +9,7 @@ import type {
   UpdateQuestionData,
 } from '@/domain/application/repositories/questions.repository'
 import { RedisCacheService } from '@/infra/cache/redis-cache.service'
-import type { Question } from '@/domain/enterprise/entities/question.entity'
+import type { Question } from '@/domain/enterprise/entities/question/question.entity'
 import { BaseCachedRepository } from './base/base-cached.repository'
 
 export const TypeOrmQuestionsRepositoryToken = Symbol('TypeOrmQuestionsRepositoryToken')

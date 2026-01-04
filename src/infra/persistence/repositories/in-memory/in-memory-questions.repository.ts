@@ -7,7 +7,7 @@ import type {
   QuestionsRepository,
   UpdateQuestionData,
 } from '@/domain/application/repositories/questions.repository'
-import type { Question } from '@/domain/enterprise/entities/question.entity'
+import type { Question } from '@/domain/enterprise/entities/question/question.entity'
 import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.repository'
 
 export class InMemoryQuestionsRepository extends BaseRepository<Question> implements QuestionsRepository {

@@ -7,7 +7,7 @@ import type {
   PaginatedComments,
   UpdateCommentData,
 } from '@/domain/application/repositories/comments.repository'
-import { Comment, CommentProps } from '@/domain/enterprise/entities/comment.entity'
+import { Comment, CommentProps } from '@/domain/enterprise/entities/comment/comment.entity'
 import { BaseTypeOrmRepository } from './base/base-typeorm.repository'
 
 @Injectable()
