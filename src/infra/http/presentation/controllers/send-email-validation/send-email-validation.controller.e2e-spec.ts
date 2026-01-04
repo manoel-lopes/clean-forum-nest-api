@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common'
 import request from 'supertest'
 import { DataSource } from 'typeorm'
 
-import { EmailValidation } from '@/domain/enterprise/entities/email-validation.entity'
+import { EmailValidation } from '@/domain/enterprise/entities/email-validation/email-validation.entity'
 import { makeApp } from '@tests/helpers/app/make-app'
 
 describe('SendEmailValidation', () => {
