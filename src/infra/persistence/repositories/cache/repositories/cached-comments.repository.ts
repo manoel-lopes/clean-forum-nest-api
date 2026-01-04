@@ -70,8 +70,8 @@ export class CachedCommentsRepository
     answerId: string,
     params: PaginationParams
   ): Promise<PaginatedComments> {
-    const { page = 1, pageSize = 10 } = params
-    const cacheKey = this.getCommentsByAnswerCacheKey(answerId, page, pageSize)
+    const { page = 1, pageSize = 10, order = 'desc' } = params
+    const cacheKey = this.getCommentsByAnswerCacheKey(answerId, page, pageSize, order)
     const cached = await this.getFromCache<PaginatedComments>(cacheKey)
     if (cached) return cached
     const comments = await this.commentsRepository.findManyByAnswerId(answerId, params)
@@ -83,8 +83,8 @@ export class CachedCommentsRepository
     return `comment:${id}`
   }
 
-  private getCommentsByAnswerCacheKey (answerId: string, page: number, size: number) {
-    return `comments:answer:${answerId}:page:${page}:size:${size}`
+  private getCommentsByAnswerCacheKey (answerId: string, page: number, size: number, order: string) {
+    return `comments:answer:${answerId}:page:${page}:size:${size}:order:${order}`
   }
 
   private getCommentsByAnswerCachePattern (answerId: string) {
