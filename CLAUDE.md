@@ -141,6 +141,7 @@ export class CreateQuestionController {
 
 **Critical Rules**:
 - **NEVER modify `package.json`** - Do not add, remove, or update dependencies or scripts
+- **NEVER modify `src/domain/enterprise/entities/base/attachment.entity.ts`** - The BaseAttachment entity is locked and must remain exactly as-is
 - **Prefer encapsulation over abstraction** - Hide complexity within classes using private members and factory methods instead of creating additional abstraction layers (interfaces, mappers, adapters). Decorators are configuration/metadata, not coupling. However, keep business behavior in Use Cases, not entities - entities should only contain data, identity, and invariant validation.
 - `no-explicit-any`: ERROR (exceptions: `vitest.config.mts`, some Prisma query files)
 - Type assertions: Use `as` syntax when necessary (configured via `consistent-type-assertions`)
