@@ -62,15 +62,16 @@ describe('VerifyEmail', () => {
   })
 
   it('should return 404 when email validation does not exist', async () => {
+    const email = 'nonexistent@example.com'
     const response = await request(app.getHttpServer())
       .post('/email-validation/verify')
-      .send({ email: 'nonexistent@example.com', code: '123456' })
+      .send({ email, code: '123456' })
 
     expect(response.statusCode).toBe(404)
     expect(response.body).toEqual({
       statusCode: 404,
       error: 'Not Found',
-      message: 'No email validation found for this email',
+      message: `No email validation found for the email: ${email}`,
     })
   })
 
