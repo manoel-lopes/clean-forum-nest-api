@@ -34,6 +34,36 @@ describe('VerifyEmailUseCase', () => {
     await expect(sut.execute(request)).rejects.toThrowError('The code is invalid')
   })
 
+  it('should throw InvalidCodeError when code format is invalid (not 6 digits)', async () => {
+    await emailValidationsRepository.create(makeEmailValidationData({ email: request.email, code: '123456' }))
+    const invalidFormatRequest = {
+      email: request.email,
+      code: 'abc',
+    }
+
+    await expect(sut.execute(invalidFormatRequest)).rejects.toThrowError('The code is invalid')
+  })
+
+  it('should throw InvalidCodeError when code is too short', async () => {
+    await emailValidationsRepository.create(makeEmailValidationData({ email: request.email, code: '123456' }))
+    const shortCodeRequest = {
+      email: request.email,
+      code: '12345',
+    }
+
+    await expect(sut.execute(shortCodeRequest)).rejects.toThrowError('The code is invalid')
+  })
+
+  it('should throw InvalidCodeError when code is too long', async () => {
+    await emailValidationsRepository.create(makeEmailValidationData({ email: request.email, code: '123456' }))
+    const longCodeRequest = {
+      email: request.email,
+      code: '1234567',
+    }
+
+    await expect(sut.execute(longCodeRequest)).rejects.toThrowError('The code is invalid')
+  })
+
   it('should return early if the email is already verified (idempotent)', async () => {
     await emailValidationsRepository.create(
       makeEmailValidationData({ ...request, isVerified: true })
