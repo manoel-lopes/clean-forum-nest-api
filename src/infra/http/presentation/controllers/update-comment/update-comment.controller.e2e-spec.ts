@@ -9,21 +9,8 @@ import { updateComment } from '@tests/helpers/domain/enterprise/comments/comment
 import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-
-type Answer = {
-  id: string
-  content: string
-  comments?: { items: Comment[] }
-}
-
-type Comment = {
-  id: string
-  content: string
-  authorId: string
-  answerId: string
-  createdAt: string
-  updatedAt: string
-}
+import { Answer } from '@/domain/enterprise/entities/answer.entity'
+import { Comment } from '@/domain/enterprise/entities/comment.entity'
 
 describe('UpdateComment', () => {
   let app: INestApplication
@@ -102,7 +89,7 @@ describe('UpdateComment', () => {
     })
     const answersWithComments = await fetchQuestionAnswers(app, question.id, authorToken, { include: 'comments' })
     const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.items.find((c: Comment) => c.content === 'Original comment')
+    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Original comment')
     const otherUserData = aUser().build()
     await createUser(app, otherUserData)
     const otherUserAuthResponse = await authenticateUser(app, {
@@ -146,7 +133,7 @@ describe('UpdateComment', () => {
     })
     const answersWithComments = await fetchQuestionAnswers(app, question.id, token, { include: 'comments' })
     const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.items.find((c: Comment) => c.content === 'Original comment')
+    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Original comment')
 
     const response = await updateComment(app, token, { commentId: comment.id }, { content: 'Updated comment' })
 

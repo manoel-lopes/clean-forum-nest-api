@@ -9,17 +9,9 @@ import { deleteComment } from '@tests/helpers/domain/enterprise/comments/comment
 import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
 import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
+import { Answer } from '@/domain/enterprise/entities/answer.entity'
+import { Comment } from '@/domain/enterprise/entities/comment.entity'
 
-type Answer = {
-  id: string
-  content: string
-  comments?: { items: Comment[] }
-}
-
-type Comment = {
-  id: string
-  content: string
-}
 
 describe('DeleteComment', () => {
   let app: INestApplication
@@ -95,7 +87,7 @@ describe('DeleteComment', () => {
     })
     const answersWithComments = await fetchQuestionAnswers(app, question.id, authorToken, { include: 'comments' })
     const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.items.find((c: Comment) => c.content === 'Comment content')
+    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Comment content')
     const otherUserData = aUser().build()
     await createUser(app, otherUserData)
     const otherUserAuthResponse = await authenticateUser(app, {
@@ -134,7 +126,7 @@ describe('DeleteComment', () => {
     })
     const answersWithComments = await fetchQuestionAnswers(app, question.id, token, { include: 'comments' })
     const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.items.find((c: Comment) => c.content === 'Comment content')
+    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Comment content')
 
     const response = await deleteComment(app, token, { commentId: comment.id })
 
