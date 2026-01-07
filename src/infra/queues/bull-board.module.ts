@@ -13,6 +13,10 @@ import { BullBoardModule } from '@bull-board/nestjs'
       name: 'emails',
       adapter: BullMQAdapter,
     }),
+    BullBoardModule.forFeature({
+      name: 'notifications',
+      adapter: BullMQAdapter,
+    }),
   ],
 })
 export class BullBoardConfigModule {}
