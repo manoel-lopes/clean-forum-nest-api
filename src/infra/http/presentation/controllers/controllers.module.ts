@@ -13,12 +13,14 @@ import { DeleteAnswerAttachmentController } from './delete-answer-attachment/del
 import { DeleteCommentController } from './delete-comment/delete-comment.controller'
 import { DeleteQuestionController } from './delete-question/delete-question.controller'
 import { DeleteQuestionAttachmentController } from './delete-question-attachment/delete-question-attachment.controller'
+import { FetchNotificationsController } from './fetch-notifications/fetch-notifications.controller'
 import { FetchQuestionAnswersController } from './fetch-question-answers/fetch-question-answers.controller'
 import { FetchQuestionsController } from './fetch-questions/fetch-questions.controller'
 import { FetchUserQuestionsController } from './fetch-user-questions/fetch-user-questions.controller'
 import { FetchUsersController } from './fetch-users/fetch-users.controller'
 import { GetQuestionBySlugController } from './get-question-by-slug/get-question-by-slug.controller'
 import { GetUserByEmailController } from './get-user-by-email/get-user-by-email.controller'
+import { ReadNotificationController } from './read-notification/read-notification.controller'
 import { RefreshAccessTokenController } from './refresh-token/refresh-token.controller'
 import { SendEmailValidationController } from './send-email-validation/send-email-validation.controller'
 import { UpdateAnswerController } from './update-answer/update-answer.controller'
@@ -60,6 +62,8 @@ import { VerifyEmailController } from './verify-email/verify-email.controller'
     UpdateQuestionAttachmentController,
     UploadAttachmentController,
     VerifyEmailController,
+    FetchNotificationsController,
+    ReadNotificationController,
   ],
 })
 export class ControllersModule {}
