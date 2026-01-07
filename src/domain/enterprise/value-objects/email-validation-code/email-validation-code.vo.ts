@@ -8,7 +8,10 @@ export class EmailValidationCode {
   private constructor (readonly value: string) {}
 
   static create (): EmailValidationCode {
-    const code = crypto.randomInt(EmailValidationCode.MIN_VALUE, EmailValidationCode.MAX_VALUE + 1).toString()
+    const code = crypto.randomInt(
+      EmailValidationCode.MIN_VALUE,
+      EmailValidationCode.MAX_VALUE + 1
+    ).toString()
     return new EmailValidationCode(code)
   }
 
