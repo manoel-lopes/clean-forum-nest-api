@@ -1,8 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
+import { DomainEventEmitter } from '@/core/domain/events/domain-event-emitter'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import type { Question } from '@/domain/enterprise/entities/question.entity'
+import { BestAnswerChosenEvent } from '@/domain/events/best-answer-chosen/best-answer-chosen.event'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { PrimitiveAndDates } from '@/shared/types/custom/primitive-and-dates'
@@ -18,7 +20,8 @@ export type ChooseQuestionBestAnswerResponse = PrimitiveAndDates<Question>
 export class ChooseQuestionBestAnswerUseCase implements UseCase {
   constructor (
     @Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository,
-    @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository
+    @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository,
+    @Inject(DomainEventEmitter) private readonly eventEmitter: DomainEventEmitter
   ) {}
 
   async execute ({
@@ -43,6 +46,7 @@ export class ChooseQuestionBestAnswerUseCase implements UseCase {
       questionId: question.id,
       data: { bestAnswerId: answer.id },
     })
+    this.eventEmitter.emit(new BestAnswerChosenEvent(editedQuestion, answer.id))
     return editedQuestion
   }
 }
