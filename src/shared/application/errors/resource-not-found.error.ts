@@ -6,6 +6,7 @@ type Resource = 'User'
 | 'Refresh token'
 | 'Email validation'
 | 'Attachment'
+| 'Notification'
 
 export class ResourceNotFoundError extends Error {
   constructor (resource: Resource) {
