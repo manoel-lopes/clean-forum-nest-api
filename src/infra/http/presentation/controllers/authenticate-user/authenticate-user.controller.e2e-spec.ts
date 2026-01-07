@@ -67,7 +67,7 @@ describe('AuthenticateUser', () => {
     await appWithError.close()
   })
 
-  it('should return 201 and authenticate user with token and refreshToken', async () => {
+  it('should return 200 and authenticate user with token and refreshToken', async () => {
     const userData = aUser().build()
     await createUser(app, userData)
 
@@ -76,7 +76,7 @@ describe('AuthenticateUser', () => {
       password: userData.password,
     })
 
-    expect(response.statusCode).toBe(201)
+    expect(response.statusCode).toBe(200)
     expect(response.body).toHaveProperty('token')
     expect(response.body).toHaveProperty('refreshToken')
   })
