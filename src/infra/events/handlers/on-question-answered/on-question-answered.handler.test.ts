@@ -16,7 +16,6 @@ describe('OnQuestionAnsweredHandler', () => {
   beforeEach(() => {
     questionsRepository = new InMemoryQuestionsRepository()
     notificationQueue = new MockNotificationQueue()
-    // @ts-expect-error - mock queue for testing
     sut = new OnQuestionAnsweredHandler(questionsRepository, notificationQueue)
   })
 

@@ -16,7 +16,6 @@ describe('OnCommentCreatedHandler', () => {
   beforeEach(() => {
     answersRepository = new InMemoryAnswersRepository()
     notificationQueue = new MockNotificationQueue()
-    // @ts-expect-error - mock queue for testing
     sut = new OnCommentCreatedHandler(answersRepository, notificationQueue)
   })
 

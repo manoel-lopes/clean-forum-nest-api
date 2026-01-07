@@ -16,7 +16,6 @@ describe('OnBestAnswerChosenHandler', () => {
   beforeEach(() => {
     answersRepository = new InMemoryAnswersRepository()
     notificationQueue = new MockNotificationQueue()
-    // @ts-expect-error - mock queue for testing
     sut = new OnBestAnswerChosenHandler(answersRepository, notificationQueue)
   })
 
