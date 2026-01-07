@@ -10,6 +10,4 @@ export const createQuestionBodySchema = z.object({
   })).optional(),
 })
 
-export type CreateQuestionBody = z.infer<typeof createQuestionBodySchema>
-
 export class CreateQuestionBodyDto extends createZodDto(createQuestionBodySchema) {}

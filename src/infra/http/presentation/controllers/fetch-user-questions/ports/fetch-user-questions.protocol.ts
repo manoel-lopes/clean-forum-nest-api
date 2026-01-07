@@ -11,10 +11,6 @@ export const fetchUserQuestionsQuerySchema = z.object({
   order: z.enum(['asc', 'desc']).default('desc'),
 })
 
-export type FetchUserQuestionsParams = z.infer<typeof fetchUserQuestionsParamsSchema>
-
-export type FetchUserQuestionsQuery = z.infer<typeof fetchUserQuestionsQuerySchema>
-
 export class FetchUserQuestionsParamsDto extends createZodDto(fetchUserQuestionsParamsSchema) {}
 
 export class FetchUserQuestionsQueryDto extends createZodDto(fetchUserQuestionsQuerySchema) {}

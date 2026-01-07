@@ -15,10 +15,6 @@ export const getQuestionBySlugQuerySchema = paginationQuerySchema.extend({
   answerIncludes: z.string().optional().transform(v => parseIncludesOptions(v, answerIncludes)),
 })
 
-export type GetQuestionBySlugParams = z.infer<typeof getQuestionBySlugParamsSchema>
-
-export type GetQuestionBySlugQuery = z.infer<typeof getQuestionBySlugQuerySchema>
-
 export class GetQuestionBySlugParamsDto extends createZodDto(getQuestionBySlugParamsSchema) {}
 
 export class GetQuestionBySlugQueryDto extends createZodDto(getQuestionBySlugQuerySchema) {}
