@@ -1,9 +1,8 @@
 import { INestApplication } from '@nestjs/common'
 
 import { makeApp } from '@tests/helpers/app/make-app'
-import { aUser } from '@tests/builders/user.builder'
-import { createUser, fetchUsers } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
+import { fetchUsers } from '@tests/helpers/domain/enterprise/users/user-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('FetchUsers', () => {
   let app: INestApplication
@@ -17,15 +16,9 @@ describe('FetchUsers', () => {
   })
 
   it('should return 200 and fetch users with pagination metadata', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    await createUser(app, aUser().build())
-    await createUser(app, aUser().build())
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
+    await signUp(app)
+    await signUp(app)
 
     const response = await fetchUsers(app, token, { page: 1, pageSize: 2 })
 
@@ -40,15 +33,9 @@ describe('FetchUsers', () => {
   })
 
   it('should return 200 and fetch different items on page change', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    await createUser(app, aUser().build())
-    await createUser(app, aUser().build())
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
+    await signUp(app)
+    await signUp(app)
 
     const page1Response = await fetchUsers(app, token, { page: 1, pageSize: 2 })
     const page2Response = await fetchUsers(app, token, { page: 2, pageSize: 2 })

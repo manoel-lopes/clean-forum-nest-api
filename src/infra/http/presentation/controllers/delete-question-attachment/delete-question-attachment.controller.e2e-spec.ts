@@ -1,11 +1,9 @@
 import { INestApplication } from '@nestjs/common'
 
 import { makeApp } from '@tests/helpers/app/make-app'
-import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
-import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion, getQuestionBySlug, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { createQuestion, getQuestionBySlug } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createQuestionAttachment, deleteQuestionAttachment } from '@tests/helpers/domain/enterprise/questions/question-attachment-requests'
 
 describe('DeleteQuestionAttachment', () => {
@@ -42,13 +40,7 @@ describe('DeleteQuestionAttachment', () => {
   })
 
   it('should return 422 when attachmentId is not a valid UUID', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await deleteQuestionAttachment(app, token, 'invalid-uuid')
 
@@ -61,16 +53,8 @@ describe('DeleteQuestionAttachment', () => {
   })
 
   it('should delete question attachment and return 204', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
-    const question = await getQuestionByTile(app, token, questionData.title)
+    const { token } = await signUp(app)
+    const { body: question } = await createQuestion(app, token, aQuestion().build())
     await createQuestionAttachment(app, token, {
       questionId: question.id,
       title: 'Attachment title',
@@ -85,13 +69,7 @@ describe('DeleteQuestionAttachment', () => {
   })
 
   it('should return 404 when attachment does not exist', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await deleteQuestionAttachment(app, token, '123e4567-e89b-12d3-a456-426614174000')
 

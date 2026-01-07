@@ -1,9 +1,8 @@
 import { INestApplication } from '@nestjs/common'
 
 import { makeApp } from '@tests/helpers/app/make-app'
-import { aUser } from '@tests/builders/user.builder'
-import { createUser, getUserByEmail } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
+import { getUserByEmail } from '@tests/helpers/domain/enterprise/users/user-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('GetUserByEmail', () => {
   let app: INestApplication
@@ -28,13 +27,7 @@ describe('GetUserByEmail', () => {
   })
 
   it('should return 404 when user with email does not exist', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await getUserByEmail(app, token, { email: 'nonexistent@example.com' })
 
@@ -47,20 +40,14 @@ describe('GetUserByEmail', () => {
   })
 
   it('should return 200 and get user by email', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token, user } = await signUp(app)
 
-    const response = await getUserByEmail(app, token, { email: userData.email })
+    const response = await getUserByEmail(app, token, { email: user.email })
 
     expect(response.statusCode).toBe(200)
     expect(response.body).toHaveProperty('id')
     expect(response.body).toHaveProperty('name')
     expect(response.body).toHaveProperty('email')
-    expect(response.body.email).toBe(userData.email)
+    expect(response.body.email).toBe(user.email)
   })
 })

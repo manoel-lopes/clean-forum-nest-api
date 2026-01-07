@@ -3,12 +3,10 @@ import { INestApplication } from '@nestjs/common'
 import { DeleteAnswerUseCase } from '@/domain/application/usecases/delete-answer/delete-answer.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
 import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
-import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
-import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { createAnswer, deleteAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
+import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createAnswer, deleteAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('DeleteAnswer', () => {
   let app: INestApplication
@@ -44,13 +42,7 @@ describe('DeleteAnswer', () => {
   })
 
   it('should return 422 when answerId is not a valid UUID', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await deleteAnswer(app, token, { answerId: 'invalid-uuid' })
 
@@ -63,13 +55,7 @@ describe('DeleteAnswer', () => {
   })
 
   it('should return 404 when answer does not exist', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await deleteAnswer(app, token, { answerId: '123e4567-e89b-12d3-a456-426614174000' })
 
@@ -82,26 +68,10 @@ describe('DeleteAnswer', () => {
   })
 
   it('should return 403 when user is not the author of the answer', async () => {
-    const authorData = aUser().build()
-    await createUser(app, authorData)
-    const authorAuthResponse = await authenticateUser(app, {
-      email: authorData.email,
-      password: authorData.password,
-    })
-    const authorToken = authorAuthResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, authorToken, questionData)
-    const question = await getQuestionByTile(app, authorToken, questionData.title)
-    await createAnswer(app, authorToken, { questionId: question.id, content: 'Answer content' })
-    const answersResponse = await fetchQuestionAnswers(app, question.id, authorToken)
-    const answer = answersResponse.body.items[0]
-    const otherUserData = aUser().build()
-    await createUser(app, otherUserData)
-    const otherUserAuthResponse = await authenticateUser(app, {
-      email: otherUserData.email,
-      password: otherUserData.password,
-    })
-    const otherUserToken = otherUserAuthResponse.body.token
+    const { token: authorToken } = await signUp(app)
+    const { body: question } = await createQuestion(app, authorToken, aQuestion().build())
+    const { body: answer } = await createAnswer(app, authorToken, { questionId: question.id, content: 'Answer content' })
+    const { token: otherUserToken } = await signUp(app)
 
     const response = await deleteAnswer(app, otherUserToken, { answerId: answer.id })
 
@@ -117,19 +87,9 @@ describe('DeleteAnswer', () => {
     const appWithError = await makeAppWithErrorStub({
       useCaseClass: DeleteAnswerUseCase,
     })
-    const userData = aUser().build()
-    await createUser(appWithError, userData)
-    const authResponse = await authenticateUser(appWithError, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(appWithError, token, questionData)
-    const question = await getQuestionByTile(appWithError, token, questionData.title)
-    await createAnswer(appWithError, token, { questionId: question.id, content: 'Answer content' })
-    const answersResponse = await fetchQuestionAnswers(appWithError, question.id, token)
-    const answer = answersResponse.body.items[0]
+    const { token } = await signUp(appWithError)
+    const { body: question } = await createQuestion(appWithError, token, aQuestion().build())
+    const { body: answer } = await createAnswer(appWithError, token, { questionId: question.id, content: 'Answer content' })
 
     const response = await deleteAnswer(appWithError, token, { answerId: answer.id })
 
@@ -142,19 +102,9 @@ describe('DeleteAnswer', () => {
   })
 
   it('should return 204 and delete answer', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
-    const question = await getQuestionByTile(app, token, questionData.title)
-    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
-    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
-    const answer = answersResponse.body.items[0]
+    const { token } = await signUp(app)
+    const { body: question } = await createQuestion(app, token, aQuestion().build())
+    const { body: answer } = await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
 
     const response = await deleteAnswer(app, token, { answerId: answer.id })
 

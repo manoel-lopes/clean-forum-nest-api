@@ -3,9 +3,8 @@ import { INestApplication } from '@nestjs/common'
 import { DeleteAccountUseCase } from '@/domain/application/usecases/delete-account/delete-account.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
 import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
-import { aUser } from '@tests/builders/user.builder'
-import { createUser, deleteUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
+import { deleteUser } from '@tests/helpers/domain/enterprise/users/user-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('DeleteAccount', () => {
   let app: INestApplication
@@ -41,13 +40,7 @@ describe('DeleteAccount', () => {
   })
 
   it('should return 404 when user does not exist', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
     await deleteUser(app, token)
 
     const response = await deleteUser(app, token)
@@ -64,13 +57,7 @@ describe('DeleteAccount', () => {
     const appWithError = await makeAppWithErrorStub({
       useCaseClass: DeleteAccountUseCase,
     })
-    const userData = aUser().build()
-    await createUser(appWithError, userData)
-    const authResponse = await authenticateUser(appWithError, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(appWithError)
 
     const response = await deleteUser(appWithError, token)
 
@@ -83,13 +70,7 @@ describe('DeleteAccount', () => {
   })
 
   it('should return 204 and delete account', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await deleteUser(app, token)
 

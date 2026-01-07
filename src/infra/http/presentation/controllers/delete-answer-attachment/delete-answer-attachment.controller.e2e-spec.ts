@@ -1,11 +1,9 @@
 import { INestApplication } from '@nestjs/common'
 
 import { makeApp } from '@tests/helpers/app/make-app'
-import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
-import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { createAnswerAttachment, deleteAnswerAttachment } from '@tests/helpers/domain/enterprise/answers/answer-attachment-requests'
 
@@ -43,13 +41,7 @@ describe('DeleteAnswerAttachment', () => {
   })
 
   it('should return 422 when attachmentId is not a valid UUID', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await deleteAnswerAttachment(app, token, 'invalid-uuid')
 
@@ -62,21 +54,11 @@ describe('DeleteAnswerAttachment', () => {
   })
 
   it('should delete answer attachment and return 204', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
-    const question = await getQuestionByTile(app, token, questionData.title)
-    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
-    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
-    const answerId = answersResponse.body.items[0].id
+    const { token } = await signUp(app)
+    const { body: question } = await createQuestion(app, token, aQuestion().build())
+    const { body: answer } = await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
     await createAnswerAttachment(app, token, {
-      answerId,
+      answerId: answer.id,
       title: 'Attachment title',
       url: 'https://example.com/file.pdf',
     })
@@ -89,13 +71,7 @@ describe('DeleteAnswerAttachment', () => {
   })
 
   it('should return 404 when attachment does not exist', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await deleteAnswerAttachment(app, token, '123e4567-e89b-12d3-a456-426614174000')
 

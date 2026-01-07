@@ -1,9 +1,7 @@
 import type { INestApplication } from '@nestjs/common'
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import { makeApp } from '@tests/helpers/app/make-app'
-import { aUser } from '@tests/builders/user.builder'
-import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
 import { fetchNotifications } from '@tests/helpers/domain/notification/notification-requests'
 
 describe('FetchNotifications', () => {
@@ -31,13 +29,7 @@ describe('FetchNotifications', () => {
   })
 
   it('should return 200 and empty array when user has no notifications', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await fetchNotifications(app, token)
 
@@ -47,18 +39,11 @@ describe('FetchNotifications', () => {
   })
 
   it('should return 200 and notifications for current user', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const user = await prisma.user.findUnique({ where: { email: String(userData.email) } })
+    const { token, userId } = await signUp(app)
 
     await prisma.notification.create({
       data: {
-        recipientId: user!.id,
+        recipientId: userId,
         title: 'Test notification',
         content: 'Test content',
       },
@@ -73,19 +58,12 @@ describe('FetchNotifications', () => {
   })
 
   it('should return paginated results', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const user = await prisma.user.findUnique({ where: { email: String(userData.email) } })
+    const { token, userId } = await signUp(app)
 
     for (let i = 0; i < 15; i++) {
       await prisma.notification.create({
         data: {
-          recipientId: user!.id,
+          recipientId: userId,
           title: `Notification ${i}`,
           content: 'Content',
         },
@@ -101,24 +79,12 @@ describe('FetchNotifications', () => {
   })
 
   it('should not return notifications from other users', async () => {
-    const user1Data = aUser().build()
-    const user2Data = aUser().build()
-    await createUser(app, user1Data)
-    await createUser(app, user2Data)
-    await authenticateUser(app, {
-      email: user1Data.email,
-      password: user1Data.password,
-    })
-    const auth2Response = await authenticateUser(app, {
-      email: user2Data.email,
-      password: user2Data.password,
-    })
-    const user1 = await prisma.user.findUnique({ where: { email: String(user1Data.email) } })
-    const user2Token = auth2Response.body.token
+    const { userId: user1Id } = await signUp(app)
+    const { token: user2Token } = await signUp(app)
 
     await prisma.notification.create({
       data: {
-        recipientId: user1!.id,
+        recipientId: user1Id,
         title: 'User 1 notification',
         content: 'Content',
       },

@@ -4,12 +4,10 @@ import request from 'supertest'
 import { AnswerQuestionUseCase } from '@/domain/application/usecases/answer-question/answer-question.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
 import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
-import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
 import { anAnswer } from '@tests/builders/answer.builder'
-import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('AnswerQuestion', () => {
   let app: INestApplication
@@ -50,13 +48,7 @@ describe('AnswerQuestion', () => {
   })
 
   it('should return 404 when question does not exist', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await request(app.getHttpServer())
       .post('/questions/123e4567-e89b-12d3-a456-426614174000/answers')
@@ -75,22 +67,13 @@ describe('AnswerQuestion', () => {
     const appWithError = await makeAppWithErrorStub({
       useCaseClass: AnswerQuestionUseCase,
     })
-    const userData = aUser().build()
-    await createUser(appWithError, userData)
-    const authResponse = await authenticateUser(appWithError, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(appWithError, token, questionData)
-    const question = await getQuestionByTile(appWithError, token, questionData.title)
-    const answerData = anAnswer().build()
+    const { token } = await signUp(appWithError)
+    const { body: question } = await createQuestion(appWithError, token, aQuestion().build())
 
     const response = await request(appWithError.getHttpServer())
       .post(`/questions/${question.id}/answers`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ content: answerData.content })
+      .send({ content: anAnswer().build().content })
 
     expect(response.statusCode).toBe(500)
     expect(response.body).toEqual({
@@ -101,22 +84,13 @@ describe('AnswerQuestion', () => {
   })
 
   it('should return 201 and create answer for question', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
-    const question = await getQuestionByTile(app, token, questionData.title)
-    const answerData = anAnswer().build()
+    const { token } = await signUp(app)
+    const { body: question } = await createQuestion(app, token, aQuestion().build())
 
     const response = await request(app.getHttpServer())
       .post(`/questions/${question.id}/answers`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ content: answerData.content })
+      .send({ content: anAnswer().build().content })
 
     expect(response.statusCode).toBe(201)
   })
