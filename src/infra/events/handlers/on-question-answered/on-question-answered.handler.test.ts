@@ -1,14 +1,13 @@
+import { uuidv7 } from 'uuidv7'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-memory/in-memory-answers.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
-import type { Question } from '@/domain/enterprise/entities/question.entity'
 import { QuestionAnsweredEvent } from '@/domain/events/question-answered/question-answered.event'
 import { OnQuestionAnsweredHandler } from './on-question-answered.handler'
 import { makeAnswerData } from '@tests/factories/domain/make-answer'
 import { makeQuestionData } from '@tests/factories/domain/make-question'
 import { MockNotificationQueue } from '@tests/mocks/notification-queue.mock'
-import { uuidv7 } from 'uuidv7'
 
 describe('OnQuestionAnsweredHandler', () => {
   let sut: OnQuestionAnsweredHandler
