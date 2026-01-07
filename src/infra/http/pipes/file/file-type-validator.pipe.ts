@@ -1,0 +1,13 @@
+import type { UploadedFileData } from '@/infra/http/interceptors/fastify-file.interceptor'
+import { FileValidator } from '@/infra/validation/files/file-validator'
+
+export class FileTypeValidator implements FileValidator {
+  private readonly fileType = /^(image\/(jpeg|png|gif|webp)|application\/pdf)$/
+  isValid (file: UploadedFileData): boolean {
+    return this.fileType.test(file.mimetype)
+  }
+
+  buildErrorMessage (file: UploadedFileData): string {
+    return `File type '${file.mimetype}' is not allowed`
+  }
+}
