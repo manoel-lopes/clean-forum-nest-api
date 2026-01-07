@@ -1,4 +1,7 @@
 import { Global, Module } from '@nestjs/common'
+import { FetchNotificationsUseCase } from '@/domain/application/usecases/fetch-notifications/fetch-notifications.usecase'
+import { ReadNotificationUseCase } from '@/domain/application/usecases/read-notification/read-notification.usecase'
+import { SendNotificationUseCase } from '@/domain/application/usecases/send-notification/send-notification.usecase'
 import { RepositoriesModule } from '@/infra/persistence/repositories/repositories.module'
 import { AnswerQuestionUseCase } from './answer-question/answer-question.usecase'
 import { AttachToAnswerUseCase } from './attach-to-answer/attach-to-answer.usecase'
@@ -61,6 +64,9 @@ import { VerifyEmailUseCase } from './verify-email/verify-email.usecase'
     UpdateQuestionAttachmentUseCase,
     UploadAttachmentUseCase,
     VerifyEmailUseCase,
+    FetchNotificationsUseCase,
+    ReadNotificationUseCase,
+    SendNotificationUseCase,
   ],
   exports: [
     AnswerQuestionUseCase,
@@ -91,6 +97,9 @@ import { VerifyEmailUseCase } from './verify-email/verify-email.usecase'
     UpdateQuestionAttachmentUseCase,
     UploadAttachmentUseCase,
     VerifyEmailUseCase,
+    FetchNotificationsUseCase,
+    ReadNotificationUseCase,
+    SendNotificationUseCase,
   ],
 })
 export class UseCasesModule {}
