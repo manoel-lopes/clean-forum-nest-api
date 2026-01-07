@@ -13,9 +13,9 @@ import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
-  type AnswerQuestionBody,
+  AnswerQuestionBodyDto,
   answerQuestionBodySchema,
-  type AnswerQuestionParams,
+  AnswerQuestionParamsDto,
   answerQuestionParamsSchema,
 } from './ports/answer-question.protocol'
 
@@ -29,8 +29,8 @@ export class AnswerQuestionController {
   @ApiOperation({ summary: 'Answer a question' })
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(answerQuestionParamsSchema)) params: AnswerQuestionParams,
-    @Body(new ZodValidationPipe(answerQuestionBodySchema)) body: AnswerQuestionBody
+    @Param(new ZodValidationPipe(answerQuestionParamsSchema)) params: AnswerQuestionParamsDto,
+    @Body(new ZodValidationPipe(answerQuestionBodySchema)) body: AnswerQuestionBodyDto
   ) {
     const { questionId } = params
     try {

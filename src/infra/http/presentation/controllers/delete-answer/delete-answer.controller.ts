@@ -22,7 +22,7 @@ import {
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
-  type DeleteAnswerParams,
+  DeleteAnswerParamsDto,
   deleteAnswerParamsSchema,
 } from './ports/delete-answer.protocol'
 
@@ -42,7 +42,7 @@ export class DeleteAnswerController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(deleteAnswerParamsSchema)) params: DeleteAnswerParams
+    @Param(new ZodValidationPipe(deleteAnswerParamsSchema)) params: DeleteAnswerParamsDto
   ) {
     try {
       await this.deleteAnswerUseCase.execute({

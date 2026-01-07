@@ -18,7 +18,7 @@ import {
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
-  type CommentOnAnswerBody,
+  CommentOnAnswerBodyDto,
   commentOnAnswerBodySchema,
 } from './ports/comment-on-answer.protocol'
 
@@ -36,7 +36,7 @@ export class CommentOnAnswerController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Body(new ZodValidationPipe(commentOnAnswerBodySchema)) body: CommentOnAnswerBody
+    @Body(new ZodValidationPipe(commentOnAnswerBodySchema)) body: CommentOnAnswerBodyDto
   ) {
     try {
       const { answerId, content } = body

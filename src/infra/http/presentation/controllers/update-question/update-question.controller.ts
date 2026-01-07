@@ -21,9 +21,9 @@ import {
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
-  type UpdateQuestionBody,
+  UpdateQuestionBodyDto,
   updateQuestionBodySchema,
-  type UpdateQuestionParams,
+  UpdateQuestionParamsDto,
   updateQuestionParamsSchema,
 } from './ports/update-question.protocol'
 
@@ -41,8 +41,8 @@ export class UpdateQuestionController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(updateQuestionParamsSchema)) params: UpdateQuestionParams,
-    @Body(new ZodValidationPipe(updateQuestionBodySchema)) body: UpdateQuestionBody
+    @Param(new ZodValidationPipe(updateQuestionParamsSchema)) params: UpdateQuestionParamsDto,
+    @Body(new ZodValidationPipe(updateQuestionBodySchema)) body: UpdateQuestionBodyDto
   ) {
     const { questionId } = params
     try {

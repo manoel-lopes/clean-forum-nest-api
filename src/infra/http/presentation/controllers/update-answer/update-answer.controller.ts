@@ -23,9 +23,9 @@ import {
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
-  type UpdateAnswerBody,
+  UpdateAnswerBodyDto,
   updateAnswerBodySchema,
-  type UpdateAnswerParams,
+  UpdateAnswerParamsDto,
   updateAnswerParamsSchema,
 } from './ports/update-answer.protocol'
 
@@ -45,8 +45,8 @@ export class UpdateAnswerController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(updateAnswerParamsSchema)) params: UpdateAnswerParams,
-    @Body(new ZodValidationPipe(updateAnswerBodySchema)) body: UpdateAnswerBody
+    @Param(new ZodValidationPipe(updateAnswerParamsSchema)) params: UpdateAnswerParamsDto,
+    @Body(new ZodValidationPipe(updateAnswerBodySchema)) body: UpdateAnswerBodyDto
   ) {
     const { answerId } = params
     try {

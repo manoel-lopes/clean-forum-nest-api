@@ -7,12 +7,11 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { Public } from '@/infra/auth/decorators/public.decorator'
-
-type FetchUsersQuery = {
-  page?: number
-  pageSize?: number
-  order?: 'asc' | 'desc'
-}
+import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import {
+  FetchUsersQueryDto,
+  fetchUsersQuerySchema,
+} from './ports/fetch-users.protocol'
 
 @ApiTags('Users')
 @Public()
@@ -22,7 +21,7 @@ export class FetchUsersController {
 
   @Get()
   @ApiOperation({ summary: 'Fetch users' })
-  async handle (@Query() query: FetchUsersQuery) {
+  async handle (@Query(new ZodValidationPipe(fetchUsersQuerySchema)) query: FetchUsersQueryDto) {
     const { page, pageSize, order } = query
     return this.usersRepository.findMany({ page, pageSize, order })
   }

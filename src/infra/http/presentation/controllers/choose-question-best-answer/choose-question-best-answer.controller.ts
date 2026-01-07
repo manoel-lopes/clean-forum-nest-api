@@ -21,7 +21,7 @@ import {
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
-  type ChooseQuestionBestAnswerParams,
+  ChooseQuestionBestAnswerParamsDto,
   chooseQuestionBestAnswerParamsSchema,
 } from './ports/choose-question-best-answer.protocol'
 
@@ -40,7 +40,7 @@ export class ChooseQuestionBestAnswerController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(chooseQuestionBestAnswerParamsSchema)) params: ChooseQuestionBestAnswerParams
+    @Param(new ZodValidationPipe(chooseQuestionBestAnswerParamsSchema)) params: ChooseQuestionBestAnswerParamsDto
   ) {
     const { answerId } = params
     try {
