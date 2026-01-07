@@ -4,16 +4,19 @@ import { InMemoryAnswersRepository } from '@/infra/persistence/repositories/in-m
 import { InMemoryCommentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-comments.repository'
 import { CommentOnAnswerUseCase } from './comment-on-answer.usecase'
 import { makeAnswerData } from '@tests/factories/domain/make-answer'
+import { MockDomainEventEmitter } from '@tests/mocks/domain-event-emitter.mock'
 
 describe('CommentOnAnswerUseCase', () => {
   let sut: CommentOnAnswerUseCase
   let answersRepository: AnswersRepository
   let commentsRepository: CommentsRepository
+  let eventEmitter: MockDomainEventEmitter
 
   beforeEach(() => {
     answersRepository = new InMemoryAnswersRepository()
     commentsRepository = new InMemoryCommentsRepository()
-    sut = new CommentOnAnswerUseCase(answersRepository, commentsRepository)
+    eventEmitter = new MockDomainEventEmitter()
+    sut = new CommentOnAnswerUseCase(answersRepository, commentsRepository, eventEmitter)
   })
 
   it('should not comment on a inexistent answer', async () => {

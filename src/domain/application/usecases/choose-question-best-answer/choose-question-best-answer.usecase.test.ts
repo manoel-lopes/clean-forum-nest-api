@@ -7,16 +7,19 @@ import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-
 import { ChooseQuestionBestAnswerUseCase } from './choose-question-best-answer.usecase'
 import { makeAnswerData } from '@tests/factories/domain/make-answer'
 import { makeQuestionData } from '@tests/factories/domain/make-question'
+import { MockDomainEventEmitter } from '@tests/mocks/domain-event-emitter.mock'
 
 describe('ChooseQuestionBestAnswerUseCase', () => {
   let sut: ChooseQuestionBestAnswerUseCase
   let questionsRepository: QuestionsRepository
   let answersRepository: AnswersRepository
+  let eventEmitter: MockDomainEventEmitter
 
   beforeEach(() => {
     questionsRepository = new InMemoryQuestionsRepository()
     answersRepository = new InMemoryAnswersRepository()
-    sut = new ChooseQuestionBestAnswerUseCase(questionsRepository, answersRepository)
+    eventEmitter = new MockDomainEventEmitter()
+    sut = new ChooseQuestionBestAnswerUseCase(questionsRepository, answersRepository, eventEmitter)
   })
 
   it('should not choose a nonexistent answer as the best answer', async () => {
