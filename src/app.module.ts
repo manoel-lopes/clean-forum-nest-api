@@ -7,6 +7,8 @@ import { StorageModule } from './infra/adapters/storage/storage.module'
 import { AuthModule } from './infra/auth/auth.module'
 import { envSchema } from './infra/env/env'
 import { EnvModule } from './infra/env/env.module'
+import { EventsModule } from './infra/events/events.module'
+import { HandlersModule } from './infra/events/handlers/handlers.module'
 import { ControllersModule } from './infra/http/presentation/controllers/controllers.module'
 import { RepositoriesModule } from './infra/persistence/repositories/repositories.module'
 import { BullBoardConfigModule } from './infra/queues/bull-board.module'
@@ -24,6 +26,8 @@ import { BullBoardConfigModule } from './infra/queues/bull-board.module'
     StorageModule,
     AuthModule,
     UseCasesModule,
+    EventsModule,
+    HandlersModule,
     BullBoardConfigModule,
     ControllersModule,
   ],
