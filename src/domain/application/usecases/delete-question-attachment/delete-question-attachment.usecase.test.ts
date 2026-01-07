@@ -1,6 +1,6 @@
 import type { QuestionAttachmentsRepository } from '@/domain/application/repositories/question-attachments.repository'
 import { InMemoryQuestionAttachmentsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-question-attachments.repository'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { DeleteQuestionAttachmentUseCase } from './delete-question-attachment.usecase'
 import { makeQuestionAttachmentData } from '@tests/factories/domain/make-question-attachment'
 
@@ -16,7 +16,7 @@ describe('DeleteQuestionAttachmentUseCase', () => {
   it('should throw error when attachment does not exist', async () => {
     const request = { attachmentId: 'non-existent-id' }
 
-    await expect(sut.execute(request)).rejects.toThrow(new ResourceNotFoundException('Attachment'))
+    await expect(sut.execute(request)).rejects.toThrow(new ResourceNotFoundError('Attachment'))
   })
 
   it('should delete an attachment', async () => {

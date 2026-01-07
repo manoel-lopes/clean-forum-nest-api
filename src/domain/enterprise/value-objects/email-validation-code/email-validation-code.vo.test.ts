@@ -1,5 +1,5 @@
 import { EmailValidationCode } from './email-validation-code.vo'
-import { InvalidValidationCodeError } from './errors/invalid-validation-code.exception'
+import { InvalidValidationCodeError } from './errors/invalid-validation-code.error'
 
 describe('EmailValidationCode', () => {
   it('should create a valid 6-digit code within range', () => {

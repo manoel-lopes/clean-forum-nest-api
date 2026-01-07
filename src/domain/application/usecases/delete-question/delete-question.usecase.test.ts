@@ -1,7 +1,7 @@
 import type { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { InMemoryQuestionsRepository } from '@/infra/persistence/repositories/in-memory/in-memory-questions.repository'
-import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { NotAuthorError } from '@/shared/application/errors/not-author.error'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { DeleteQuestionUseCase } from './delete-question.usecase'
 import { makeQuestionData } from '@tests/factories/domain/make-question'
 
@@ -20,7 +20,7 @@ describe('DeleteQuestionUseCase', () => {
         questionId: 'any_inexistent_id',
         authorId: 'any_author_id',
       })
-    ).rejects.toThrowError(new ResourceNotFoundException('Question'))
+    ).rejects.toThrowError(new ResourceNotFoundError('Question'))
   })
 
   it('should not delete a question if the user is not the author', async () => {
@@ -31,7 +31,7 @@ describe('DeleteQuestionUseCase', () => {
         questionId: question.id,
         authorId: 'wrong_author_id',
       })
-    ).rejects.toThrowError(new NotAuthorException('question'))
+    ).rejects.toThrowError(new NotAuthorError('question'))
   })
 
   it('should delete a question', async () => {

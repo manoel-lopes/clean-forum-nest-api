@@ -1,10 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { UseCase } from '@/core/domain/application/use-case'
+import { DomainEventEmitter } from '@/core/domain/events/domain-event-emitter'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import type { Question } from '@/domain/enterprise/entities/question.entity'
-import { NotAuthorException } from '@/shared/application/exceptions/not-author.exception'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { BestAnswerChosenEvent } from '@/domain/events/best-answer-chosen/best-answer-chosen.event'
+import { NotAuthorError } from '@/shared/application/errors/not-author.error'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { PrimitiveAndDates } from '@/shared/types/custom/primitive-and-dates'
 
 type ChooseQuestionBestAnswerRequest = {
@@ -18,25 +20,33 @@ export type ChooseQuestionBestAnswerResponse = PrimitiveAndDates<Question>
 export class ChooseQuestionBestAnswerUseCase implements UseCase {
   constructor (
     @Inject(QuestionsRepository) private readonly questionsRepository: QuestionsRepository,
-    @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository
+    @Inject(AnswersRepository) private readonly answersRepository: AnswersRepository,
+    @Inject(DomainEventEmitter) private readonly eventEmitter: DomainEventEmitter
   ) {}
 
-  async execute ({ answerId, authorId }: ChooseQuestionBestAnswerRequest): Promise<ChooseQuestionBestAnswerResponse> {
+  async execute ({
+    answerId,
+    authorId
+  }: ChooseQuestionBestAnswerRequest): Promise<ChooseQuestionBestAnswerResponse> {
     const answer = await this.answersRepository.findById(answerId)
     if (!answer) {
-      throw new ResourceNotFoundException('Answer')
+      throw new ResourceNotFoundError('Answer')
     }
     const question = await this.questionsRepository.findById(answer.questionId)
     if (!question) {
-      throw new ResourceNotFoundException('Question')
+      throw new ResourceNotFoundError('Question')
     }
     if (authorId !== question.authorId) {
-      throw new NotAuthorException('question')
+      throw new NotAuthorError('question')
+    }
+    if (question.bestAnswerId === answer.id) {
+      return question
     }
     const editedQuestion = await this.questionsRepository.update({
       questionId: question.id,
       data: { bestAnswerId: answer.id },
     })
+    this.eventEmitter.emit(new BestAnswerChosenEvent(editedQuestion, answer.id))
     return editedQuestion
   }
 }

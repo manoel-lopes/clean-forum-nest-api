@@ -7,18 +7,21 @@ import { InMemoryUsersRepository } from '@/infra/persistence/repositories/in-mem
 import { AnswerQuestionUseCase } from './answer-question.usecase'
 import { makeQuestionData } from '@tests/factories/domain/make-question'
 import { makeUserData } from '@tests/factories/domain/make-user'
+import { MockDomainEventEmitter } from '@tests/mocks/domain-event-emitter.mock'
 
 describe('AnswerQuestionUseCase', () => {
   let sut: AnswerQuestionUseCase
   let answersRepository: AnswersRepository
   let usersRepository: UsersRepository
   let questionsRepository: QuestionsRepository
+  let eventEmitter: MockDomainEventEmitter
 
   beforeEach(() => {
     answersRepository = new InMemoryAnswersRepository()
     usersRepository = new InMemoryUsersRepository()
     questionsRepository = new InMemoryQuestionsRepository()
-    sut = new AnswerQuestionUseCase(answersRepository, usersRepository, questionsRepository)
+    eventEmitter = new MockDomainEventEmitter()
+    sut = new AnswerQuestionUseCase(answersRepository, usersRepository, questionsRepository, eventEmitter)
   })
 
   it('should not answer a question using an inexistent author', async () => {

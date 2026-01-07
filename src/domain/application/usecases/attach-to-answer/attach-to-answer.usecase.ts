@@ -3,7 +3,7 @@ import { UseCase } from '@/core/domain/application/use-case'
 import { AnswerAttachmentsRepository } from '@/domain/application/repositories/answer-attachments.repository'
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import type { AnswerAttachment, AnswerAttachmentProps } from '@/domain/enterprise/entities/answer-attachment.entity'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 
 type AttachToAnswerRequest = AnswerAttachmentProps
 
@@ -18,7 +18,7 @@ export class AttachToAnswerUseCase implements UseCase {
     const { answerId, title, url } = request
     const answer = await this.answersRepository.findById(answerId)
     if (!answer) {
-      throw new ResourceNotFoundException('Answer')
+      throw new ResourceNotFoundError('Answer')
     }
     const attachment = await this.answerAttachmentsRepository.create({ answerId, title, url })
     return attachment

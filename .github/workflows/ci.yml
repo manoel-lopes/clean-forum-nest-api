@@ -15,7 +15,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
-          - 5433:5432
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 10s
@@ -62,12 +62,12 @@ jobs:
 
           PORT=3333
 
-          DB_PORT=5433
+          DB_PORT=5432
           DB_USER=postgres
           DB_PASSWORD=postgres
           DB_HOST=localhost
           DB_NAME=forum_test
-          DATABASE_URL=postgresql://postgres:postgres@localhost:5433/forum_test?schema=public
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/forum_test?schema=public
 
           REDIS_HOST=localhost
           REDIS_PORT=6377
@@ -86,7 +86,11 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5433/forum_test?schema=public
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_HOST: localhost
+          DB_PORT: "5432"
+          DB_NAME: forum_test
 
       - name: Run database migrations
         run: pnpm run migrate:test

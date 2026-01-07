@@ -11,8 +11,7 @@ model Question {
     author      User         @relation(fields: [authorId], references: [id])
     answers     Answer[]
     attachments Attachment[]
-    comments    Comment[]
-
+    
     @@index([authorId])
     @@index([createdAt])
     @@index([slug])

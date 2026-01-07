@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { UseCase } from '@/core/domain/application/use-case'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
-import { ResourceNotFoundException } from '@/shared/application/exceptions/resource-not-found.exception'
-import { ExpiredRefreshTokenException } from './errors/expired-refresh-token.exception'
+import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
+import { ExpiredRefreshTokenError } from './errors/expired-refresh-token.error'
 
 type RefreshAccessTokenRequest = {
   refreshTokenId: string
@@ -24,13 +24,13 @@ export class RefreshAccessTokenUseCase implements UseCase {
     const { refreshTokenId } = req
     const currentRefreshToken = await this.refreshTokensRepository.findById(refreshTokenId)
     if (!currentRefreshToken) {
-      throw new ResourceNotFoundException('Refresh token')
+      throw new ResourceNotFoundError('Refresh token')
     }
     const { userId } = currentRefreshToken
     const isExpired = currentRefreshToken.expiresAt < new Date()
     if (isExpired) {
       await this.refreshTokensRepository.deleteManyByUserId(userId)
-      throw new ExpiredRefreshTokenException()
+      throw new ExpiredRefreshTokenError()
     }
     const newToken = this.jwtService.sign({ sub: currentRefreshToken.userId })
     return { token: newToken }

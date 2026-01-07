@@ -7,7 +7,5 @@ model EmailValidation {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now()) @updatedAt
 
-  @@index([email])
-  @@index([createdAt])
   @@map("email_validations")
 }

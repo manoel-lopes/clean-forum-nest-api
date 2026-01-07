@@ -10,6 +10,7 @@ model User {
     answers       Answer[]
     refreshTokens RefreshToken[]
     comments      Comment[]
+    notifications Notification[]
 
     @@map("users")
 }

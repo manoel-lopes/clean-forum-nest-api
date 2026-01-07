@@ -5,41 +5,25 @@ export type UpdateCommentData = {
   content?: unknown
 }
 
-export async function deleteQuestionComment (
+export async function deleteComment (
   app: INestApplication,
-  token: string ,
+  token: string,
   {
     commentId,
   }: {
     commentId: string
   }
 ) {
-  const req = request(app.getHttpServer()).delete(`/questions/comments/${commentId}`)
+  const req = request(app.getHttpServer()).delete(`/comments/${commentId}`)
   if (token) {
     req.set('Authorization', `Bearer ${token}`)
   }
   return req
 }
 
-export async function deleteAnswerComment (
+export async function updateComment (
   app: INestApplication,
-  token: string ,
-  {
-    commentId,
-  }: {
-    commentId: string
-  }
-) {
-  const req = request(app.getHttpServer()).delete(`/answers/comments/${commentId}`)
-  if (token) {
-    req.set('Authorization', `Bearer ${token}`)
-  }
-  return req
-}
-
-export async function updateQuestionComment (
-  app: INestApplication,
-  token: string ,
+  token: string,
   {
     commentId,
   }: {
@@ -47,24 +31,7 @@ export async function updateQuestionComment (
   },
   commentData: UpdateCommentData
 ) {
-  const req = request(app.getHttpServer()).put(`/questions/comments/${commentId}`)
-  if (token) {
-    req.set('Authorization', `Bearer ${token}`)
-  }
-  return req.send(commentData)
-}
-
-export async function updateAnswerComment (
-  app: INestApplication,
-  token: string ,
-  {
-    commentId,
-  }: {
-    commentId: string
-  },
-  commentData: UpdateCommentData
-) {
-  const req = request(app.getHttpServer()).put(`/answers/comments/${commentId}`)
+  const req = request(app.getHttpServer()).put(`/comments/${commentId}`)
   if (token) {
     req.set('Authorization', `Bearer ${token}`)
   }
