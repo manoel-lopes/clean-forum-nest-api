@@ -3,6 +3,7 @@ import { AnswerAttachmentsRepository } from '@/domain/application/repositories/a
 import { AnswersRepository } from '@/domain/application/repositories/answers.repository'
 import { CommentsRepository } from '@/domain/application/repositories/comments.repository'
 import { EmailValidationsRepository } from '@/domain/application/repositories/email-validations.repository'
+import { NotificationsRepository } from '@/domain/application/repositories/notifications.repository'
 import { QuestionAttachmentsRepository } from '@/domain/application/repositories/question-attachments.repository'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { RefreshTokensRepository } from '@/domain/application/repositories/refresh-tokens.repository'
@@ -40,6 +41,7 @@ import { PrismaAnswerAttachmentsRepository } from '@/infra/persistence/repositor
 import { PrismaAnswersRepository } from '@/infra/persistence/repositories/prisma/prisma-answers.repository'
 import { PrismaCommentsRepository } from '@/infra/persistence/repositories/prisma/prisma-comments.repository'
 import { PrismaEmailValidationsRepository } from '@/infra/persistence/repositories/prisma/prisma-email-validations.repository'
+import { PrismaNotificationsRepository } from '@/infra/persistence/repositories/prisma/prisma-notifications.repository'
 import { PrismaQuestionAttachmentsRepository } from '@/infra/persistence/repositories/prisma/prisma-question-attachments.repository'
 import { PrismaQuestionsRepository } from '@/infra/persistence/repositories/prisma/prisma-questions.repository'
 import { PrismaRefreshTokensRepository } from '@/infra/persistence/repositories/prisma/prisma-refresh-tokens.repository'
@@ -64,6 +66,7 @@ const isCacheEnabled = (envService: EnvService) => {
     PrismaAnswerAttachmentsRepository,
     PrismaRefreshTokensRepository,
     PrismaEmailValidationsRepository,
+    PrismaNotificationsRepository,
 
     {
       provide: UsersRepository,
@@ -137,6 +140,10 @@ const isCacheEnabled = (envService: EnvService) => {
       ) => isCacheEnabled(envService) ? cached : prisma,
       inject: [EnvService, CachedEmailValidationsRepository, PrismaEmailValidationsRepository],
     },
+    {
+      provide: NotificationsRepository,
+      useClass: PrismaNotificationsRepository,
+    },
 
     CachedUsersRepository,
     CachedQuestionsRepository,
@@ -156,6 +163,7 @@ const isCacheEnabled = (envService: EnvService) => {
     AnswerAttachmentsRepository,
     RefreshTokensRepository,
     EmailValidationsRepository,
+    NotificationsRepository,
   ],
 })
 export class RepositoriesModule {}
