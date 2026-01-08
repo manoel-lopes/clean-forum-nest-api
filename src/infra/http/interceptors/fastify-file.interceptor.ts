@@ -21,53 +21,47 @@ export type UploadedFileData = {
 
 @Injectable()
 export class FastifyFileInterceptor implements NestInterceptor {
-  constructor (private readonly fieldName: string = 'file') {}
+  constructor (private readonly fieldName = 'file') {}
 
   async intercept (context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
     const request = context.switchToHttp().getRequest<FastifyRequest>()
     try {
-      const file = await request.file()
-      if (!file) {
-        throw new BadRequestException('No file uploaded')
-      }
-
-      if (file.fieldname !== this.fieldName) {
-        throw new BadRequestException(`Expected field name '${this.fieldName}', got '${file.fieldname}'`)
-      }
-      const buffer = await file.toBuffer()
-      const uploadedFile: UploadedFileData = {
-        filename: file.filename,
-        mimetype: file.mimetype,
-        buffer,
-      }
+      const uploadedFile = await this.extractFile(request)
       Object.assign(request, { [UPLOADED_FILE_KEY]: uploadedFile })
     } catch (error) {
-      if (isFastifyError(error)) {
-        const errorHandlers: Record<string, () => never> = {
-          FST_INVALID_MULTIPART_CONTENT_TYPE: () => {
-            throw new NotAcceptableException('Request is not multipart')
-          },
-          FST_REQ_FILE_TOO_LARGE: () => {
-            throw new PayloadTooLargeException('File size exceeds the maximum allowed limit')
-          },
-        }
-        const handler = errorHandlers[error.code]
-        if (handler) {
-          handler()
-        }
-      }
+      this.handleFastifyError(error)
       throw error
     }
     return next.handle()
   }
-}
 
-export function FileInterceptor (fieldName: string = 'file'): new () => NestInterceptor {
-  @Injectable()
-  class MixinInterceptor extends FastifyFileInterceptor {
-    constructor () {
-      super(fieldName)
+  private async extractFile (request: FastifyRequest): Promise<UploadedFileData> {
+    const file = await request.file()
+    if (!file) {
+      throw new BadRequestException('No file uploaded')
+    }
+    if (file.fieldname !== this.fieldName) {
+      throw new BadRequestException(`Expected field name '${this.fieldName}', got '${file.fieldname}'`)
+    }
+    const buffer = await file.toBuffer()
+    return {
+      filename: file.filename,
+      mimetype: file.mimetype,
+      buffer,
     }
   }
-  return MixinInterceptor
+
+  private handleFastifyError (error: unknown): void {
+    if (!isFastifyError(error)) return
+    const errorHandlers: Record<string, () => never> = {
+      FST_INVALID_MULTIPART_CONTENT_TYPE: () => {
+        throw new NotAcceptableException('Request is not multipart')
+      },
+      FST_REQ_FILE_TOO_LARGE: () => {
+        throw new PayloadTooLargeException('File size exceeds the maximum allowed limit')
+      },
+    }
+    const handler = errorHandlers[error.code]
+    if (handler) handler()
+  }
 }
