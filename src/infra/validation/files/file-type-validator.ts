@@ -1,5 +1,5 @@
 import type { UploadedFileData } from '@/infra/http/interceptors/fastify-file.interceptor'
-import { FileValidator } from '@/infra/validation/files/file-validator'
+import { FileValidator } from '../ports/file-validator'
 
 export class FileTypeValidator implements FileValidator {
   private readonly fileType = /^(image\/(jpeg|png|gif|webp)|application\/pdf)$/

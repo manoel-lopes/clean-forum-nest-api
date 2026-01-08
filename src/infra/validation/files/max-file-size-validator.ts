@@ -1,5 +1,5 @@
 import type { UploadedFileData } from '@/infra/http/interceptors/fastify-file.interceptor'
-import { FileValidator } from '@/infra/validation/files/file-validator'
+import { FileValidator } from '../ports/file-validator'
 
 export class MaxFileSizeValidator implements FileValidator {
   private readonly MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
