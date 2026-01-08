@@ -7,7 +7,7 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UsersRepository } from '@/domain/application/repositories/users.repository'
 import { Public } from '@/infra/auth/decorators/public.decorator'
-import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   FetchUsersQueryDto,
   fetchUsersQuerySchema,

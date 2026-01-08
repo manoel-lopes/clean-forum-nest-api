@@ -9,7 +9,7 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CreateAccountUseCase } from '@/domain/application/usecases/create-account/create-account.usecase'
 import { UserWithEmailAlreadyRegisteredError } from '@/domain/application/usecases/create-account/errors/user-with-email-already-registered.error'
 import { Public } from '@/infra/auth/decorators/public.decorator'
-import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { DeleteAnswerAttachmentUseCase } from '@/domain/application/usecases/delete-answer-attachment/delete-answer-attachment.usecase'
-import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import { AttachmentParamsDto, attachmentParamsSchema } from '@/shared/presentation/protocols/attachment.protocol'
 

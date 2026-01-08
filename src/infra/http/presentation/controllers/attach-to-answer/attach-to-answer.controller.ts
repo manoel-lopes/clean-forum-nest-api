@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AttachToAnswerUseCase } from '@/domain/application/usecases/attach-to-answer/attach-to-answer.usecase'
-import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,

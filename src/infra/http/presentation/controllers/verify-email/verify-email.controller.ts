@@ -12,7 +12,7 @@ import { ExpiredValidationCodeError } from '@/domain/application/usecases/verify
 import { InvalidCodeError } from '@/domain/application/usecases/verify-email/errors/invalid-validation-code.error'
 import { VerifyEmailUseCase } from '@/domain/application/usecases/verify-email/verify-email.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
-import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   VerifyEmailBodyDto,
   verifyEmailBodySchema,

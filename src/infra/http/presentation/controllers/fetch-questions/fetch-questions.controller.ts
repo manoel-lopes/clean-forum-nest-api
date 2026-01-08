@@ -12,7 +12,7 @@ import {
 } from '@nestjs/swagger'
 import { QuestionsRepository } from '@/domain/application/repositories/questions.repository'
 import { Public } from '@/infra/auth/decorators/public.decorator'
-import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   FetchQuestionsQueryDto,
   fetchQuestionsQuerySchema,

@@ -10,7 +10,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UpdateAnswerUseCase } from '@/domain/application/usecases/update-answer/update-answer.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
-import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
