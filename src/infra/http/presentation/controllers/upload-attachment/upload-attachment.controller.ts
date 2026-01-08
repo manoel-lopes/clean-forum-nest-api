@@ -8,10 +8,8 @@ import {
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { InvalidAttachmentTypeError } from '@/domain/application/usecases/upload-attachment/errors/invalid-attachment-type.error'
 import { UploadAttachmentUseCase } from '@/domain/application/usecases/upload-attachment/upload-attachment.usecase'
-import { FileInterceptor, UploadedFileData } from '@/infra/http/interceptors/fastify-file.interceptor'
-import { FileTypeValidator } from '@/infra/http/pipes/file/file-type-validator.pipe'
-import { MaxFileSizeValidator } from '@/infra/http/pipes/file/max-file-size-validator.pipe'
-import { ParseFilePipe } from '@/infra/http/pipes/file/parse-file.pipe'
+import { FastifyFileInterceptor, UploadedFileData } from '@/infra/http/interceptors/fastify-file.interceptor'
+import { ParseFilePipe } from '@/infra/http/pipes/files/parse-file.pipe'
 import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -19,6 +17,8 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
 import { UploadedFile } from '@/infra/http/presentation/decorators/uploaded-file.decorator'
+import { FileTypeValidator } from '@/infra/validation/files/file-type-validator'
+import { MaxFileSizeValidator } from '@/infra/validation/files/max-file-size-validator'
 import { UploadAttachmentBodyDto } from './ports/upload-attachment.protocol'
 
 @ApiTags('Attachments')
@@ -28,7 +28,7 @@ export class UploadAttachmentController {
 
   @Post('upload')
   @HttpCode(201)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(new FastifyFileInterceptor())
   @ApiOperation({ summary: 'Upload a file attachment' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadAttachmentBodyDto })
