@@ -4,7 +4,7 @@ import {
   Injectable,
   PipeTransform,
 } from '@nestjs/common'
-import type { UploadedFileData } from '@/infra/http/interceptors/fastify-file.interceptor'
+import type { UploadedFileData } from '@/infra/http/presentation/interceptors/fastify-file.interceptor'
 import { FileValidator } from '@/infra/validation/ports/file-validator'
 
 type ParseFilePipeOptions = {
