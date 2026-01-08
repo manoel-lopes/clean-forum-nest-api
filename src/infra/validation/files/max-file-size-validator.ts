@@ -1,4 +1,4 @@
-import type { UploadedFileData } from '@/infra/http/interceptors/fastify-file.interceptor'
+import type { UploadedFileData } from '@/infra/http/presentation/interceptors/fastify-file.interceptor'
 import { FileValidator } from '../ports/file-validator'
 
 export class MaxFileSizeValidator implements FileValidator {
