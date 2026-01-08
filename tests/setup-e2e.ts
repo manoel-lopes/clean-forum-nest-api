@@ -1,8 +1,11 @@
 import { execSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
+import { Logger } from '@nestjs/common'
 import { config } from 'dotenv'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
+
+Logger.overrideLogger(false)
 
 config({ path: '.env', override: true })
 config({ path: '.env.test', override: true })

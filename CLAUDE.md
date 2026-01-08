@@ -309,6 +309,21 @@ const obj = condition ? { include: value } : {}
 ```
 - **NO nested ternaries** - use registry pattern (lookup object)
 - **NO if/else if chains** - use registry pattern
+- **NEVER create index.ts barrel files** - import directly from the source file
+- **ONE class per file** - NEVER export more than one class from a single file. Each class must have its own file:
+```typescript
+// ❌ Bad: multiple classes in one file
+// file-validators.ts
+export class MaxFileSizeValidator { ... }
+export class FileTypeValidator { ... }
+
+// ✅ Good: one class per file
+// max-file-size-validator.ts
+export class MaxFileSizeValidator { ... }
+
+// file-type-validator.ts
+export class FileTypeValidator { ... }
+```
 
 **Registry Pattern Example**:
 ```typescript

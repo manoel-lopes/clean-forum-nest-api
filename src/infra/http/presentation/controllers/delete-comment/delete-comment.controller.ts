@@ -22,7 +22,7 @@ import {
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
-  type DeleteCommentParams,
+  DeleteCommentParamsDto,
   deleteCommentParamsSchema,
 } from './ports/delete-comment.protocol'
 
@@ -42,7 +42,7 @@ export class DeleteCommentController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(deleteCommentParamsSchema)) params: DeleteCommentParams
+    @Param(new ZodValidationPipe(deleteCommentParamsSchema)) params: DeleteCommentParamsDto
   ) {
     const { commentId } = params
     try {

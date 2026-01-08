@@ -10,10 +10,6 @@ export const updateQuestionBodySchema = z.object({
   content: z.string().min(1),
 })
 
-export type UpdateQuestionParams = z.infer<typeof updateQuestionParamsSchema>
-
-export type UpdateQuestionBody = z.infer<typeof updateQuestionBodySchema>
-
 export class UpdateQuestionParamsDto extends createZodDto(updateQuestionParamsSchema) {}
 
 export class UpdateQuestionBodyDto extends createZodDto(updateQuestionBodySchema) {}

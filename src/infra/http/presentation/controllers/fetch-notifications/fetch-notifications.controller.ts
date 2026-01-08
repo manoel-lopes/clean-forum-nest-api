@@ -7,17 +7,16 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { FetchNotificationsUseCase } from '@/domain/application/usecases/fetch-notifications/fetch-notifications.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
+import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
-
-type FetchNotificationsQuery = {
-  page?: number
-  pageSize?: number
-  order?: 'asc' | 'desc'
-}
+import {
+  FetchNotificationsQueryDto,
+  fetchNotificationsQuerySchema,
+} from './ports/fetch-notifications.protocol'
 
 @ApiTags('Notifications')
 @Controller('notifications')
@@ -31,7 +30,7 @@ export class FetchNotificationsController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Query() query: FetchNotificationsQuery
+    @Query(new ZodValidationPipe(fetchNotificationsQuerySchema)) query: FetchNotificationsQueryDto
   ) {
     const { page, pageSize, order } = query
     return this.fetchNotificationsUseCase.execute({

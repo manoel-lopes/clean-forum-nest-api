@@ -4,12 +4,10 @@ import request from 'supertest'
 import { CommentOnAnswerUseCase } from '@/domain/application/usecases/comment-on-answer/comment-on-answer.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
 import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
-import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
-import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
+import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('CommentOnAnswer', () => {
   let app: INestApplication
@@ -50,13 +48,7 @@ describe('CommentOnAnswer', () => {
   })
 
   it('should return 404 when answer does not exist', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await request(app.getHttpServer())
       .post('/comments/answers')
@@ -78,19 +70,9 @@ describe('CommentOnAnswer', () => {
     const appWithError = await makeAppWithErrorStub({
       useCaseClass: CommentOnAnswerUseCase,
     })
-    const userData = aUser().build()
-    await createUser(appWithError, userData)
-    const authResponse = await authenticateUser(appWithError, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(appWithError, token, questionData)
-    const question = await getQuestionByTile(appWithError, token, questionData.title)
-    await createAnswer(appWithError, token, { questionId: question.id, content: 'Answer content' })
-    const answersResponse = await fetchQuestionAnswers(appWithError, question.id, token)
-    const answer = answersResponse.body.items[0]
+    const { token } = await signUp(appWithError)
+    const { body: question } = await createQuestion(appWithError, token, aQuestion().build())
+    const { body: answer } = await createAnswer(appWithError, token, { questionId: question.id, content: 'Answer content' })
 
     const response = await request(appWithError.getHttpServer())
       .post('/comments/answers')
@@ -109,19 +91,9 @@ describe('CommentOnAnswer', () => {
   })
 
   it('should create comment on answer and return 201', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
-    const question = await getQuestionByTile(app, token, questionData.title)
-    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
-    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
-    const answer = answersResponse.body.items[0]
+    const { token } = await signUp(app)
+    const { body: question } = await createQuestion(app, token, aQuestion().build())
+    const { body: answer } = await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
 
     const response = await request(app.getHttpServer())
       .post('/comments/answers')

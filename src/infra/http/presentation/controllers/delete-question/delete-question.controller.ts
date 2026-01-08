@@ -22,7 +22,7 @@ import {
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
-  type DeleteQuestionParams,
+  DeleteQuestionParamsDto,
   deleteQuestionParamsSchema,
 } from './ports/delete-question.protocol'
 
@@ -42,7 +42,7 @@ export class DeleteQuestionController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Param(new ZodValidationPipe(deleteQuestionParamsSchema)) params: DeleteQuestionParams
+    @Param(new ZodValidationPipe(deleteQuestionParamsSchema)) params: DeleteQuestionParamsDto
   ) {
     const { questionId } = params
     try {

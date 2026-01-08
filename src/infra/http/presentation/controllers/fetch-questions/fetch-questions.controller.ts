@@ -14,7 +14,7 @@ import { QuestionsRepository } from '@/domain/application/repositories/questions
 import { Public } from '@/infra/auth/decorators/public.decorator'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
 import {
-  type FetchQuestionsQuery,
+  FetchQuestionsQueryDto,
   fetchQuestionsQuerySchema,
 } from './ports/fetch-questions.protocol'
 
@@ -28,7 +28,7 @@ export class FetchQuestionsController {
   @ApiOperation({ summary: 'Fetch questions with pagination' })
   @ApiOkResponse({ description: 'Questions fetched successfully' })
   @ApiInternalServerErrorResponse()
-  async handle (@Query(new ZodValidationPipe(fetchQuestionsQuerySchema)) query: FetchQuestionsQuery) {
+  async handle (@Query(new ZodValidationPipe(fetchQuestionsQuerySchema)) query: FetchQuestionsQueryDto) {
     const { page, pageSize, order, include } = query
     const questions = await this.questionsRepository.findMany({
       page,

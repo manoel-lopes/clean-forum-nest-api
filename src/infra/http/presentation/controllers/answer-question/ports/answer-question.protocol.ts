@@ -9,10 +9,6 @@ export const answerQuestionBodySchema = z.object({
   content: z.string().min(1),
 })
 
-export type AnswerQuestionParams = z.infer<typeof answerQuestionParamsSchema>
-
-export type AnswerQuestionBody = z.infer<typeof answerQuestionBodySchema>
-
 export class AnswerQuestionParamsDto extends createZodDto(answerQuestionParamsSchema) {}
 
 export class AnswerQuestionBodyDto extends createZodDto(answerQuestionBodySchema) {}

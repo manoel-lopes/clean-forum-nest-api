@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  HttpCode,
   NotFoundException,
   Post,
   UnauthorizedException,
@@ -23,9 +24,10 @@ export class AuthenticateUserController {
 
   @Public()
   @Post()
+  @HttpCode(200)
   @ApiOperation({ summary: 'Authenticate user' })
   @ApiBody({ type: AuthenticateUserBodyDto })
-  @ApiResponse({ status: 201, description: 'User authenticated successfully' })
+  @ApiResponse({ status: 200, description: 'User authenticated successfully' })
   @ApiResponse({ status: 401, description: 'Invalid password' })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 500, description: 'Internal server error' })

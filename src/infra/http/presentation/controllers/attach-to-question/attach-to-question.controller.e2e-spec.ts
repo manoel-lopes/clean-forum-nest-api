@@ -1,11 +1,9 @@
 import { INestApplication } from '@nestjs/common'
 
 import { makeApp } from '@tests/helpers/app/make-app'
-import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
-import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { attachToQuestion } from '@tests/helpers/domain/enterprise/questions/question-attachment-requests'
 
 describe('AttachToQuestion', () => {
@@ -50,13 +48,7 @@ describe('AttachToQuestion', () => {
   })
 
   it('should return 400 when title is missing', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await attachToQuestion(app, token, {
       questionId: '123e4567-e89b-12d3-a456-426614174000',
@@ -73,13 +65,7 @@ describe('AttachToQuestion', () => {
   })
 
   it('should return 400 when url is missing', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await attachToQuestion(app, token, {
       questionId: '123e4567-e89b-12d3-a456-426614174000',
@@ -96,13 +82,7 @@ describe('AttachToQuestion', () => {
   })
 
   it('should return 422 when questionId is not a valid UUID', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await attachToQuestion(app, token, {
       questionId: 'invalid-uuid',
@@ -119,13 +99,7 @@ describe('AttachToQuestion', () => {
   })
 
   it('should return 422 when url is not a valid URL', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await attachToQuestion(app, token, {
       questionId: '123e4567-e89b-12d3-a456-426614174000',
@@ -142,16 +116,8 @@ describe('AttachToQuestion', () => {
   })
 
   it('should attach to question and return 201', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
-    const question = await getQuestionByTile(app, token, questionData.title)
+    const { token } = await signUp(app)
+    const { body: question } = await createQuestion(app, token, aQuestion().build())
 
     const response = await attachToQuestion(app, token, {
       questionId: question.id,
@@ -163,13 +129,7 @@ describe('AttachToQuestion', () => {
   })
 
   it('should return 404 when question does not exist', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await attachToQuestion(app, token, {
       questionId: '123e4567-e89b-12d3-a456-426614174000',

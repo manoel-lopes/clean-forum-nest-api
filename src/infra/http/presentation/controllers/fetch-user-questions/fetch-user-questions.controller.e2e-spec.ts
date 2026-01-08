@@ -2,10 +2,8 @@ import { INestApplication } from '@nestjs/common'
 import request from 'supertest'
 
 import { makeApp } from '@tests/helpers/app/make-app'
-import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
-import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
 
 describe('FetchUserQuestions', () => {
@@ -32,14 +30,7 @@ describe('FetchUserQuestions', () => {
   })
 
   it('should return 200 and fetch user questions with pagination metadata', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const userId = authResponse.body.refreshToken.userId
+    const { token, userId } = await signUp(app)
     await createQuestion(app, token, aQuestion().build())
     await createQuestion(app, token, aQuestion().build())
     await createQuestion(app, token, aQuestion().build())
@@ -56,14 +47,7 @@ describe('FetchUserQuestions', () => {
   })
 
   it('should return 200 and fetch different items on page change', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const userId = authResponse.body.refreshToken.userId
+    const { token, userId } = await signUp(app)
     await createQuestion(app, token, aQuestion().build())
     await createQuestion(app, token, aQuestion().build())
     await createQuestion(app, token, aQuestion().build())
@@ -92,13 +76,7 @@ describe('FetchUserQuestions', () => {
   })
 
   it('should return 200 and empty array when user has no questions', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const userId = authResponse.body.refreshToken.userId
+    const { userId } = await signUp(app)
 
     const response = await request(app.getHttpServer())
       .get(`/users/${userId}/questions`)

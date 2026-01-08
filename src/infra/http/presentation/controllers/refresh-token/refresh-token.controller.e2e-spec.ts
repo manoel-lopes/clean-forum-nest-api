@@ -1,10 +1,9 @@
 import { INestApplication } from '@nestjs/common'
-import { aUser } from '@tests/builders/user.builder'
-import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
 import request from 'supertest'
 
 import { makeApp } from '@tests/helpers/app/make-app'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { refreshAccessToken } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('RefreshAccessToken', () => {
   let app: INestApplication
@@ -18,19 +17,9 @@ describe('RefreshAccessToken', () => {
   })
 
   it('should return 201 and refresh access token', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
+    const { refreshTokenId } = await signUp(app)
 
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-
-    const refreshTokenId = authResponse.body.refreshToken.id
-
-    const response = await request(app.getHttpServer())
-      .post('/auth/refresh')
-      .send({ refreshTokenId })
+    const response = await refreshAccessToken(app, { refreshTokenId })
 
     expect(response.statusCode).toBe(201)
     expect(response.body).toHaveProperty('token')

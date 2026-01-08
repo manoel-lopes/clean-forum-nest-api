@@ -1,16 +1,12 @@
 import { INestApplication } from '@nestjs/common'
 
 import { aQuestion } from '@tests/builders/question.builder'
-import { aUser } from '@tests/builders/user.builder'
 import { makeApp } from '@tests/helpers/app/make-app'
-import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
+import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { commentOnAnswer } from '@tests/helpers/domain/enterprise/answers/answer-comment-requests'
 import { updateComment } from '@tests/helpers/domain/enterprise/comments/comment-requests'
-import { createQuestion, getQuestionByTile } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { Answer } from '@/domain/enterprise/entities/answer.entity'
-import { Comment } from '@/domain/enterprise/entities/comment.entity'
+import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('UpdateComment', () => {
   let app: INestApplication
@@ -46,13 +42,7 @@ describe('UpdateComment', () => {
   })
 
   it('should return 404 when comment does not exist', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await updateComment(
       app,
@@ -70,33 +60,11 @@ describe('UpdateComment', () => {
   })
 
   it('should return 403 when user is not the author of the comment', async () => {
-    const authorData = aUser().build()
-    await createUser(app, authorData)
-    const authorAuthResponse = await authenticateUser(app, {
-      email: authorData.email,
-      password: authorData.password,
-    })
-    const authorToken = authorAuthResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, authorToken, questionData)
-    const question = await getQuestionByTile(app, authorToken, questionData.title)
-    await createAnswer(app, authorToken, { questionId: question.id, content: 'Answer content' })
-    const answersResponse = await fetchQuestionAnswers(app, question.id, authorToken)
-    const answer = answersResponse.body.items.find((a: Answer) => a.content === 'Answer content')
-    await commentOnAnswer(app, authorToken, {
-      answerId: answer.id,
-      content: 'Original comment',
-    })
-    const answersWithComments = await fetchQuestionAnswers(app, question.id, authorToken, { include: 'comments' })
-    const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Original comment')
-    const otherUserData = aUser().build()
-    await createUser(app, otherUserData)
-    const otherUserAuthResponse = await authenticateUser(app, {
-      email: otherUserData.email,
-      password: otherUserData.password,
-    })
-    const otherUserToken = otherUserAuthResponse.body.token
+    const { token: authorToken } = await signUp(app)
+    const { body: question } = await createQuestion(app, authorToken, aQuestion().build())
+    const { body: answer } = await createAnswer(app, authorToken, { questionId: question.id, content: 'Answer content' })
+    const { body: comment } = await commentOnAnswer(app, authorToken, { answerId: answer.id, content: 'Original comment' })
+    const { token: otherUserToken } = await signUp(app)
 
     const response = await updateComment(
       app,
@@ -114,26 +82,10 @@ describe('UpdateComment', () => {
   })
 
   it('should return 200 and update comment', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
-    const question = await getQuestionByTile(app, token, questionData.title)
-    await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
-    const answersResponse = await fetchQuestionAnswers(app, question.id, token)
-    const answer = answersResponse.body.items.find((a: Answer) => a.content === 'Answer content')
-    await commentOnAnswer(app, token, {
-      answerId: answer.id,
-      content: 'Original comment',
-    })
-    const answersWithComments = await fetchQuestionAnswers(app, question.id, token, { include: 'comments' })
-    const answerWithComments = answersWithComments.body.items.find((a: Answer) => a.id === answer.id)
-    const comment = answerWithComments.comments.find((c: Comment) => c.content === 'Original comment')
+    const { token } = await signUp(app)
+    const { body: question } = await createQuestion(app, token, aQuestion().build())
+    const { body: answer } = await createAnswer(app, token, { questionId: question.id, content: 'Answer content' })
+    const { body: comment } = await commentOnAnswer(app, token, { answerId: answer.id, content: 'Original comment' })
 
     const response = await updateComment(app, token, { commentId: comment.id }, { content: 'Updated comment' })
 

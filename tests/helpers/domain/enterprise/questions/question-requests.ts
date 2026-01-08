@@ -2,8 +2,6 @@ import { uuidv7 } from 'uuidv7'
 import type { INestApplication } from '@nestjs/common'
 import request from 'supertest'
 
-import type { Question } from '@/domain/enterprise/entities/question.entity'
-
 export type CreateQuestionData = {
   title?: unknown
   content?: unknown
@@ -60,12 +58,12 @@ export async function getQuestionByTile (
   app: INestApplication,
   authToken: string,
   questionTitle: unknown
-): Promise<Question> {
+) {
   const fetchQuestionsResponse = await fetchQuestions(app, authToken)
   if (!fetchQuestionsResponse.body || !fetchQuestionsResponse.body.items) {
     throw new Error(`Failed to fetch questions: ${JSON.stringify(fetchQuestionsResponse.body)}`)
   }
-  const createdQuestion = fetchQuestionsResponse.body.items.find((q: Question) => {
+  const createdQuestion = fetchQuestionsResponse.body.items.find((q: { title: string }) => {
     return q.title === questionTitle
   })
   if (!createdQuestion) {

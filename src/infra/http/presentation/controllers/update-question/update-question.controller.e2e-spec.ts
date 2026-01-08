@@ -1,14 +1,12 @@
 import { INestApplication } from '@nestjs/common'
+import { uuidv7 } from 'uuidv7'
 
 import { UpdateQuestionUseCase } from '@/domain/application/usecases/update-question/update-question.usecase'
 import { makeApp } from '@tests/helpers/app/make-app'
 import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
-import { aUser } from '@tests/builders/user.builder'
 import { aQuestion } from '@tests/builders/question.builder'
-import { createUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { authenticateUser } from '@tests/helpers/infra/auth/authentication-requests'
-import { createQuestion, getQuestionByTile, updateQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { uuidv7 } from 'uuidv7'
+import { createQuestion, updateQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('UpdateQuestion', () => {
   let app: INestApplication
@@ -52,13 +50,7 @@ describe('UpdateQuestion', () => {
   })
 
   it('should return 404 when question does not exist', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
+    const { token } = await signUp(app)
 
     const response = await updateQuestion(app, token, {
       questionId: uuidv7(),
@@ -75,23 +67,9 @@ describe('UpdateQuestion', () => {
   })
 
   it('should return 403 when user is not the author of the question', async () => {
-    const authorData = aUser().build()
-    await createUser(app, authorData)
-    const authorAuthResponse = await authenticateUser(app, {
-      email: authorData.email,
-      password: authorData.password,
-    })
-    const authorToken = authorAuthResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, authorToken, questionData)
-    const question = await getQuestionByTile(app, authorToken, questionData.title)
-    const otherUserData = aUser().build()
-    await createUser(app, otherUserData)
-    const otherUserAuthResponse = await authenticateUser(app, {
-      email: otherUserData.email,
-      password: otherUserData.password,
-    })
-    const otherUserToken = otherUserAuthResponse.body.token
+    const { token: authorToken } = await signUp(app)
+    const { body: question } = await createQuestion(app, authorToken, aQuestion().build())
+    const { token: otherUserToken } = await signUp(app)
 
     const response = await updateQuestion(app, otherUserToken, {
       questionId: question.id,
@@ -111,16 +89,8 @@ describe('UpdateQuestion', () => {
     const appWithError = await makeAppWithErrorStub({
       useCaseClass: UpdateQuestionUseCase,
     })
-    const userData = aUser().build()
-    await createUser(appWithError, userData)
-    const authResponse = await authenticateUser(appWithError, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(appWithError, token, questionData)
-    const question = await getQuestionByTile(appWithError, token, questionData.title)
+    const { token } = await signUp(appWithError)
+    const { body: question } = await createQuestion(appWithError, token, aQuestion().build())
 
     const response = await updateQuestion(appWithError, token, {
       questionId: question.id,
@@ -137,16 +107,8 @@ describe('UpdateQuestion', () => {
   })
 
   it('should return 200 and update question', async () => {
-    const userData = aUser().build()
-    await createUser(app, userData)
-    const authResponse = await authenticateUser(app, {
-      email: userData.email,
-      password: userData.password,
-    })
-    const token = authResponse.body.token
-    const questionData = aQuestion().build()
-    await createQuestion(app, token, questionData)
-    const question = await getQuestionByTile(app, token, questionData.title)
+    const { token } = await signUp(app)
+    const { body: question } = await createQuestion(app, token, aQuestion().build())
 
     const response = await updateQuestion(app, token, {
       questionId: question.id,

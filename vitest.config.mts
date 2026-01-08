@@ -22,6 +22,7 @@ export default defineConfig({
     exclude: [...configDefaults.exclude],
     include: ['**/*.test.ts'],
     globals: true,
+    setupFiles: ['./tests/setup.ts'],
     pool: 'forks',
     isolate: true,
     fileParallelism: true,

@@ -20,7 +20,7 @@ import {
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
-  type CreateQuestionBody,
+  CreateQuestionBodyDto,
   createQuestionBodySchema,
 } from './ports/create-question.protocol'
 
@@ -38,7 +38,7 @@ export class CreateQuestionController {
   @ApiInternalServerErrorResponse()
   async handle (
     @CurrentUser() user: AuthUser,
-    @Body(new ZodValidationPipe(createQuestionBodySchema)) body: CreateQuestionBody
+    @Body(new ZodValidationPipe(createQuestionBodySchema)) body: CreateQuestionBodyDto
   ) {
     try {
       const { title, content } = body
