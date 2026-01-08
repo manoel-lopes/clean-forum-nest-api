@@ -11,10 +11,6 @@ export class EnvService {
   }
 
   getDatabaseUrl () {
-    const value = this.configService.get('DATABASE_URL', { infer: true })
-    if (value) {
-      return value
-    }
     const dbUser = this.configService.get('DB_USER', { infer: true })
     const dbPassword = this.configService.get('DB_PASSWORD', { infer: true })
     const dbHost = this.configService.get('DB_HOST', { infer: true })
