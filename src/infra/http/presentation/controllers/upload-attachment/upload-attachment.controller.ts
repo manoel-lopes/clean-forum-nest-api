@@ -8,8 +8,6 @@ import {
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { InvalidAttachmentTypeError } from '@/domain/application/usecases/upload-attachment/errors/invalid-attachment-type.error'
 import { UploadAttachmentUseCase } from '@/domain/application/usecases/upload-attachment/upload-attachment.usecase'
-import { FastifyFileInterceptor, UploadedFileData } from '@/infra/http/interceptors/fastify-file.interceptor'
-import { ParseFilePipe } from '@/infra/http/pipes/files/parse-file.pipe'
 import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -17,6 +15,8 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
 import { UploadedFile } from '@/infra/http/presentation/decorators/uploaded-file.decorator'
+import { FastifyFileInterceptor, UploadedFileData } from '@/infra/http/presentation/interceptors/fastify-file.interceptor'
+import { ParseFilePipe } from '@/infra/http/presentation/pipes/files/parse-file.pipe'
 import { FileTypeValidator } from '@/infra/validation/files/file-type-validator'
 import { MaxFileSizeValidator } from '@/infra/validation/files/max-file-size-validator'
 import { UploadAttachmentBodyDto } from './ports/upload-attachment.protocol'
