@@ -9,13 +9,13 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CommentOnAnswerUseCase } from '@/domain/application/usecases/comment-on-answer/comment-on-answer.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
-import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import { ZodValidationPipe } from '@/infra/http/presentation/pipes/schemas/zod-validation.pipe'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   CommentOnAnswerBodyDto,

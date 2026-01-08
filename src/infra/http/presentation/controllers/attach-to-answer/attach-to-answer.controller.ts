@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AttachToAnswerUseCase } from '@/domain/application/usecases/attach-to-answer/attach-to-answer.usecase'
-import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -17,6 +16,7 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import { ZodValidationPipe } from '@/infra/http/presentation/pipes/schemas/zod-validation.pipe'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   AttachToAnswerBodyDto,

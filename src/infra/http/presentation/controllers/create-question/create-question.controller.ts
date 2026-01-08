@@ -11,13 +11,13 @@ import { CreateQuestionUseCase } from '@/domain/application/usecases/create-ques
 import { QuestionWithTitleAlreadyRegisteredError } from '@/domain/application/usecases/create-question/errors/question-with-title-already-registered.error'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
-import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import { ZodValidationPipe } from '@/infra/http/presentation/pipes/schemas/zod-validation.pipe'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   CreateQuestionBodyDto,

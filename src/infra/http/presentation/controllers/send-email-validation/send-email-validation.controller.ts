@@ -9,7 +9,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { SendEmailValidationError } from '@/domain/application/usecases/send-email-validation/errors/send-email-validation.error'
 import { SendEmailValidationUseCase } from '@/domain/application/usecases/send-email-validation/send-email-validation.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
-import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
+import { ZodValidationPipe } from '@/infra/http/presentation/pipes/schemas/zod-validation.pipe'
 import {
   SendEmailValidationBodyDto,
   sendEmailValidationBodySchema,

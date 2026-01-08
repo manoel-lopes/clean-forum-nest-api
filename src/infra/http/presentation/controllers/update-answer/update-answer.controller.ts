@@ -10,7 +10,6 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UpdateAnswerUseCase } from '@/domain/application/usecases/update-answer/update-answer.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
-import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
@@ -20,6 +19,7 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import { ZodValidationPipe } from '@/infra/http/presentation/pipes/schemas/zod-validation.pipe'
 import { NotAuthorError } from '@/shared/application/errors/not-author.error'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {

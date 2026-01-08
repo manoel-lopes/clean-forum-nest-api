@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AttachToQuestionUseCase } from '@/domain/application/usecases/attach-to-question/attach-to-question.usecase'
-import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
+import { ZodValidationPipe } from '@/infra/http/presentation/pipes/schemas/zod-validation.pipe'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   AttachToQuestionBodyDto,

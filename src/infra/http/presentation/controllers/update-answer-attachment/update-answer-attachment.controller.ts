@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UpdateAnswerAttachmentUseCase } from '@/domain/application/usecases/update-answer-attachment/update-answer-attachment.usecase'
-import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
+import { ZodValidationPipe } from '@/infra/http/presentation/pipes/schemas/zod-validation.pipe'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   AttachmentParamsDto,

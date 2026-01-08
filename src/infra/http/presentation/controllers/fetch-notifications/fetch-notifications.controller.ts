@@ -7,12 +7,12 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { FetchNotificationsUseCase } from '@/domain/application/usecases/fetch-notifications/fetch-notifications.usecase'
 import { CurrentUser } from '@/infra/auth/decorators/current-user.decorator'
 import type { AuthUser } from '@/infra/auth/strategies/jwt.strategy'
-import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiUnauthorizedResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import { ZodValidationPipe } from '@/infra/http/presentation/pipes/schemas/zod-validation.pipe'
 import {
   FetchNotificationsQueryDto,
   fetchNotificationsQuerySchema,

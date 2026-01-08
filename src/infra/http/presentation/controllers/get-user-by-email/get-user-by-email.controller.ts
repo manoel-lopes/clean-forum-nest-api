@@ -7,7 +7,7 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { GetUserByEmailUseCase } from '@/domain/application/usecases/get-user-by-email/get-user-by-email.usecase'
 import { Public } from '@/infra/auth/decorators/public.decorator'
-import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
+import { ZodValidationPipe } from '@/infra/http/presentation/pipes/schemas/zod-validation.pipe'
 import { ResourceNotFoundError } from '@/shared/application/errors/resource-not-found.error'
 import {
   GetUserByEmailParamsDto,

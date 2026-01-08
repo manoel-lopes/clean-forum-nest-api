@@ -9,13 +9,13 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CreateAccountUseCase } from '@/domain/application/usecases/create-account/create-account.usecase'
 import { UserWithEmailAlreadyRegisteredError } from '@/domain/application/usecases/create-account/errors/user-with-email-already-registered.error'
 import { Public } from '@/infra/auth/decorators/public.decorator'
-import { ZodValidationPipe } from '@/infra/http/pipes/schemas/zod-validation.pipe'
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiUnprocessableEntityResponse,
 } from '@/infra/http/presentation/decorators/api-responses.decorator'
+import { ZodValidationPipe } from '@/infra/http/presentation/pipes/schemas/zod-validation.pipe'
 import {
   CreateAccountBodyDto,
   createAccountBodySchema,
