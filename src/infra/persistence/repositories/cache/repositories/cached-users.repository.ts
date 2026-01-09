@@ -30,8 +30,8 @@ export class CachedUsersRepository
     return user
   }
 
-  async update ({ where, data }: UpdateUserData): Promise<User> {
-    const user = await this.usersRepository.update({ where, data })
+  async update ({ userId, data }: UpdateUserData): Promise<User> {
+    const user = await this.usersRepository.update({ userId, data })
     this.userIdToEmail.set(user.id, user.email)
     await this.setCache(this.getUserCacheKey(user.id), user, this.USERS_TTL)
     await this.setCache(this.getUserByEmailCacheKey(user.email), user, this.USERS_TTL)

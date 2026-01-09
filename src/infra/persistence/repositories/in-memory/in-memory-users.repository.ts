@@ -21,8 +21,8 @@ export class InMemoryUsersRepository implements UsersRepository {
     return this.items.find(item => item.id === id) ?? null
   }
 
-  async update ({ where, data }: UpdateUserData): Promise<User> {
-    const index = this.items.findIndex(item => item.id === where.id)
+  async update ({ userId, data }: UpdateUserData): Promise<User> {
+    const index = this.items.findIndex(item => item.id === userId)
     const item = this.items[index]
     const updatedItem: User = {
       ...item,
