@@ -47,8 +47,8 @@ export class PrismaCommentsRepository implements CommentsRepository {
     }
   }
 
-  async update ({ where, data }: UpdateCommentData): Promise<Comment> {
-    const comment = await this.prisma.comment.update({ where, data })
+  async update ({ commentId, data }: UpdateCommentData): Promise<Comment> {
+    const comment = await this.prisma.comment.update({ where: { id: commentId }, data })
     return comment
   }
 

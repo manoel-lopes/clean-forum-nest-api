@@ -26,7 +26,7 @@ export class UpdateCommentUseCase implements UseCase {
       throw new NotAuthorError('comment')
     }
     const updatedComment = await this.commentsRepository.update({
-      where: { id: commentId },
+      commentId,
       data: { content },
     })
     return updatedComment

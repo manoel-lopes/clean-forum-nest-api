@@ -11,8 +11,8 @@ export class InMemoryCommentsRepository
   extends BaseRepository<Comment>
   implements CommentsRepository {
   async update (commentData: UpdateCommentData): Promise<Comment> {
-    const { where, data } = commentData
-    const updatedComment = await this.updateOne({ where, data })
+    const { commentId, data } = commentData
+    const updatedComment = await this.updateOne({ entityId: commentId, data })
     return updatedComment
   }
 

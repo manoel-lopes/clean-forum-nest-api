@@ -5,7 +5,7 @@ import type { Comment, CommentProps } from '@/domain/enterprise/entities/comment
 export type PaginatedComments = Required<PaginatedItems<Comment>>
 
 export type UpdateCommentData = {
-  where: { id: string }
+  commentId: string
   data: Partial<Omit<Comment, 'id' | 'createdAt' | 'updatedAt'>>
 }
 
