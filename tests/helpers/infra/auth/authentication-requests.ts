@@ -1,4 +1,5 @@
 import type { INestApplication } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
 import request from 'supertest'
 
 import { aUser } from '@tests/builders/user.builder'
@@ -33,4 +34,9 @@ export async function signUp (app: INestApplication, override?: { name?: string;
 
 export async function refreshAccessToken (app: INestApplication, tokenData: RefreshTokenData) {
   return await request(app.getHttpServer()).post('/auth/refresh').send(tokenData)
+}
+
+export function makeExpiredToken (app: INestApplication): string {
+  const jwtService = app.get(JwtService)
+  return jwtService.sign({ sub: 'expired-user-id' }, { expiresIn: '-1s' })
 }
