@@ -11,9 +11,9 @@ export class InMemoryAttachmentsRepository<T extends Attachment = Attachment> ex
     return createdAttachments
   }
 
-  async update (attachmentId: string, data: Partial<Pick<T, 'title' | 'url'>>): Promise<T> {
+  async update ({ attachmentId, data }: { attachmentId: string, data: Partial<Pick<T, 'title' | 'url'>> }): Promise<T> {
     const updatedAttachment = await this.updateOne({
-      where: { id: attachmentId },
+      entityId: attachmentId,
       data,
     })
     return updatedAttachment
