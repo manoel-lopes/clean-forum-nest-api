@@ -13,7 +13,7 @@ import { BaseInMemoryRepository as BaseRepository } from './base/base-in-memory.
 export class InMemoryQuestionsRepository extends BaseRepository<Question> implements QuestionsRepository {
   async update (questionData: UpdateQuestionData): Promise<Question> {
     const question = await this.updateOne({
-      where: { id: questionData.questionId },
+      entityId: questionData.questionId,
       data: questionData.data,
     })
     return question
