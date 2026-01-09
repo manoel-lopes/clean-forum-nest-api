@@ -22,9 +22,12 @@ export class UpdateQuestionAttachmentUseCase implements UseCase {
     if (!attachment) {
       throw new ResourceNotFoundError('Attachment')
     }
-    const updatedAttachment = await this.questionAttachmentsRepository.update(attachmentId, {
-      ...(title && { title }),
-      ...(url && { url }),
+    const updatedAttachment = await this.questionAttachmentsRepository.update({
+      attachmentId,
+      data: {
+        ...(title && { title }),
+        ...(url && { url }),
+      },
     })
     return updatedAttachment
   }

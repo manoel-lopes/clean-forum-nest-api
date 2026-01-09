@@ -3,6 +3,7 @@ import type { PaginationParams } from '@/core/domain/application/pagination-para
 import type {
   PaginatedQuestionAttachments,
   QuestionAttachmentsRepository,
+  UpdateQuestionAttachmentData,
 } from '@/domain/application/repositories/question-attachments.repository'
 import { RedisCacheService } from '@/infra/persistence/repositories/cache/redis-cache.service'
 import { PrismaQuestionAttachmentsRepository } from '@/infra/persistence/repositories/prisma/prisma-question-attachments.repository'
@@ -91,11 +92,8 @@ export class CachedQuestionAttachmentsRepository
     return attachments
   }
 
-  async update (
-    attachmentId: string,
-    data: Partial<Pick<QuestionAttachment, 'title' | 'url'>>
-  ): Promise<QuestionAttachment> {
-    const attachment = await this.questionAttachmentsRepository.update(attachmentId, data)
+  async update ({ attachmentId, data }: UpdateQuestionAttachmentData): Promise<QuestionAttachment> {
+    const attachment = await this.questionAttachmentsRepository.update({ attachmentId, data })
     if (attachment.questionId) {
       this.attachmentIdToQuestionId.set(attachment.id, attachment.questionId)
       await this.invalidateCachePattern(this.getAttachmentsByQuestionCachePattern(attachment.questionId))
