@@ -24,7 +24,7 @@ export class SendEmailValidationUseCase implements UseCase {
       const existingValidation = await this.emailValidationsRepository.findByEmail(email)
       if (existingValidation) {
         await this.emailValidationsRepository.update({
-          where: { id: existingValidation.id },
+          emailValidationId: existingValidation.id,
           data: {
             code: code.value,
             expiresAt,

@@ -38,8 +38,8 @@ export class CachedEmailValidationsRepository
     return emailValidation
   }
 
-  async update ({ where, data }: UpdateEmailValidationData): Promise<EmailValidation> {
-    const emailValidation = await this.emailValidationsRepository.update({ where, data })
+  async update ({ emailValidationId, data }: UpdateEmailValidationData): Promise<EmailValidation> {
+    const emailValidation = await this.emailValidationsRepository.update({ emailValidationId, data })
     this.validationIdToEmail.set(emailValidation.id, emailValidation.email)
     await this.setCache(
       this.getEmailValidationCacheKey(emailValidation.id),

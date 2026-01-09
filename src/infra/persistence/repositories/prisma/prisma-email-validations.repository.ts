@@ -14,8 +14,8 @@ export class PrismaEmailValidationsRepository implements EmailValidationsReposit
     return this.prisma.emailValidation.create({ data })
   }
 
-  async update ({ where, data }: UpdateEmailValidationData): Promise<EmailValidation> {
-    return this.prisma.emailValidation.update({ where, data })
+  async update ({ emailValidationId, data }: UpdateEmailValidationData): Promise<EmailValidation> {
+    return this.prisma.emailValidation.update({ where: { id: emailValidationId }, data })
   }
 
   async findByEmail (email: string): Promise<EmailValidation | null> {

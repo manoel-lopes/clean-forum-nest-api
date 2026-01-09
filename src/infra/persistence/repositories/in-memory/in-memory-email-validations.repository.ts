@@ -14,7 +14,8 @@ export class InMemoryEmailValidationsRepository
   }
 
   async update (emailValidationData: UpdateEmailValidationData): Promise<EmailValidation> {
-    const updatedEmailValidation = await this.updateOne(emailValidationData)
+    const { emailValidationId, data } = emailValidationData
+    const updatedEmailValidation = await this.updateOne({ entityId: emailValidationId, data })
     return updatedEmailValidation
   }
 
