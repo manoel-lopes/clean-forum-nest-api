@@ -3,6 +3,7 @@ import type { PaginationParams } from '@/core/domain/application/pagination-para
 import type {
   NotificationsRepository,
   PaginatedNotifications,
+  UpdateNotificationData,
 } from '@/domain/application/repositories/notifications.repository'
 import type { Notification, NotificationProps } from '@/domain/enterprise/entities/notification.entity'
 
@@ -18,6 +19,14 @@ export class InMemoryNotificationsRepository implements NotificationsRepository 
     }
     this.items.push(notification)
     return notification
+  }
+
+  async update ({ notificationId, data }: UpdateNotificationData): Promise<Notification> {
+    const index = this.items.findIndex(item => item.id === notificationId)
+    const item = this.items[index]
+    const updatedItem: Notification = { ...item, ...data }
+    this.items[index] = updatedItem
+    return updatedItem
   }
 
   async save (notification: Notification): Promise<Notification> {

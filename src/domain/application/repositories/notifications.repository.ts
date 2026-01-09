@@ -4,9 +4,14 @@ import type { Notification, NotificationProps } from '@/domain/enterprise/entiti
 
 export type PaginatedNotifications = Required<PaginatedItems<Notification>>
 
+export type UpdateNotificationData = {
+  notificationId: string
+  data: Partial<Omit<Notification, 'id' | 'createdAt' | 'updatedAt'>>
+}
+
 export type NotificationsRepository = {
   create(notification: NotificationProps): Promise<Notification>
-  save(notification: Notification): Promise<Notification>
+  update(notificationData: UpdateNotificationData): Promise<Notification>
   findById(notificationId: string): Promise<Notification | null>
   findManyByRecipientId(recipientId: string, params: PaginationParams): Promise<PaginatedNotifications>
 }

@@ -3,9 +3,9 @@ import type { PaginationParams } from '@/core/domain/application/pagination-para
 import type {
   NotificationsRepository,
   PaginatedNotifications,
+  UpdateNotificationData,
 } from '@/domain/application/repositories/notifications.repository'
 import { formatPagination } from '@/infra/persistence/helpers/format-pagination.helper'
-import { PrismaNotificationMapper } from '@/infra/persistence/mappers/prisma/prisma-notification.mapper'
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import type { Notification, NotificationProps } from '@/domain/enterprise/entities/notification.entity'
 
@@ -15,15 +15,15 @@ export class PrismaNotificationsRepository implements NotificationsRepository {
 
   async create (data: NotificationProps): Promise<Notification> {
     const notification = await this.prisma.notification.create({ data })
-    return PrismaNotificationMapper.toDomain(notification)
+    return notification
   }
 
-  async save (notification: Notification): Promise<Notification> {
-    const updated = await this.prisma.notification.update({
-      where: { id: notification.id },
-      data: { readAt: notification.readAt },
+  async update ({ notificationId, data }: UpdateNotificationData): Promise<Notification> {
+    const updatedNotification = await this.prisma.notification.update({
+      where: { id: notificationId },
+      data,
     })
-    return PrismaNotificationMapper.toDomain(updated)
+    return updatedNotification
   }
 
   async findById (notificationId: string): Promise<Notification | null> {
@@ -31,7 +31,7 @@ export class PrismaNotificationsRepository implements NotificationsRepository {
       where: { id: notificationId },
     })
     if (!notification) return null
-    return PrismaNotificationMapper.toDomain(notification)
+    return notification
   }
 
   async findManyByRecipientId (
@@ -53,7 +53,7 @@ export class PrismaNotificationsRepository implements NotificationsRepository {
       pageSize: pagination.pageSize,
       totalItems,
       totalPages: Math.ceil(totalItems / pagination.pageSize),
-      items: notifications.map(PrismaNotificationMapper.toDomain),
+      items: notifications,
       order,
     }
   }

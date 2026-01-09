@@ -25,10 +25,9 @@ export class ReadNotificationUseCase implements UseCase {
     if (notification.recipientId !== recipientId) {
       throw new NotRecipientError()
     }
-    const readNotification: Notification = {
-      ...notification,
-      readAt: new Date(),
-    }
-    return this.notificationsRepository.save(readNotification)
+    return this.notificationsRepository.update({
+      notificationId,
+      data: { readAt: new Date() },
+    })
   }
 }
