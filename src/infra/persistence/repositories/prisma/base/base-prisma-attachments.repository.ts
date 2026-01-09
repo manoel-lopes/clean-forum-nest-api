@@ -6,6 +6,11 @@ import type { Attachment, AttachmentProps } from '@/domain/enterprise/entities/b
 
 export type AttachmentForeignKey = 'questionId' | 'answerId'
 
+export type UpdateAttachmentData = {
+  attachmentId: string
+  data: Partial<Pick<Attachment, 'title' | 'url'>>
+}
+
 export abstract class BasePrismaAttachmentsRepository<TAttachment extends Attachment> {
   protected abstract readonly foreignKey: AttachmentForeignKey
 
@@ -32,10 +37,7 @@ export abstract class BasePrismaAttachmentsRepository<TAttachment extends Attach
     return this.mapper.toDomain(attachment)
   }
 
-  async update (
-    attachmentId: string,
-    data: Partial<Pick<Attachment, 'title' | 'url'>>
-  ): Promise<TAttachment> {
+  async update ({ attachmentId, data }: UpdateAttachmentData): Promise<TAttachment> {
     const updatedAttachment = await this.prisma.attachment.update({
       where: { id: attachmentId },
       data,
