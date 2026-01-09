@@ -1,10 +1,10 @@
 import { INestApplication } from '@nestjs/common'
-import request from 'supertest'
 
 import { makeApp } from '@tests/helpers/app/make-app'
 import { aQuestion } from '@tests/builders/question.builder'
 import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
+import { fetchUserQuestions } from '@tests/helpers/domain/enterprise/users/user-requests'
 
 describe('FetchUserQuestions', () => {
   let app: INestApplication
@@ -18,8 +18,7 @@ describe('FetchUserQuestions', () => {
   })
 
   it('should return 422 when userId is not a valid UUID', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/users/invalid-uuid/questions')
+    const response = await fetchUserQuestions(app, 'invalid-uuid')
 
     expect(response.statusCode).toBe(422)
     expect(response.body).toEqual({
@@ -35,8 +34,7 @@ describe('FetchUserQuestions', () => {
     await createQuestion(app, token, aQuestion().build())
     await createQuestion(app, token, aQuestion().build())
 
-    const response = await request(app.getHttpServer())
-      .get(`/users/${userId}/questions?page=1&pageSize=2`)
+    const response = await fetchUserQuestions(app, userId, { page: 1, pageSize: 2 })
 
     expect(response.statusCode).toBe(200)
     expect(response.body.items).toHaveLength(2)
@@ -52,10 +50,8 @@ describe('FetchUserQuestions', () => {
     await createQuestion(app, token, aQuestion().build())
     await createQuestion(app, token, aQuestion().build())
 
-    const page1Response = await request(app.getHttpServer())
-      .get(`/users/${userId}/questions?page=1&pageSize=2`)
-    const page2Response = await request(app.getHttpServer())
-      .get(`/users/${userId}/questions?page=2&pageSize=2`)
+    const page1Response = await fetchUserQuestions(app, userId, { page: 1, pageSize: 2 })
+    const page2Response = await fetchUserQuestions(app, userId, { page: 2, pageSize: 2 })
 
     expect(page1Response.statusCode).toBe(200)
     expect(page2Response.statusCode).toBe(200)
@@ -78,8 +74,7 @@ describe('FetchUserQuestions', () => {
   it('should return 200 and empty array when user has no questions', async () => {
     const { userId } = await signUp(app)
 
-    const response = await request(app.getHttpServer())
-      .get(`/users/${userId}/questions`)
+    const response = await fetchUserQuestions(app, userId)
 
     expect(response.statusCode).toBe(200)
     expect(response.body.items).toEqual([])
