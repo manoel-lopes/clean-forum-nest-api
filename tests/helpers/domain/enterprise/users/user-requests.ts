@@ -46,3 +46,15 @@ export async function getUserByEmail (
   }
   return await req
 }
+
+export async function fetchUserQuestions (
+  app: INestApplication,
+  userId: unknown,
+  options?: { page?: number; pageSize?: number }
+) {
+  const params = new URLSearchParams()
+  if (options?.page !== undefined) params.append('page', String(options.page))
+  if (options?.pageSize !== undefined) params.append('pageSize', String(options.pageSize))
+  const query = params.toString() ? `?${params.toString()}` : ''
+  return request(app.getHttpServer()).get(`/users/${userId}/questions${query}`)
+}
