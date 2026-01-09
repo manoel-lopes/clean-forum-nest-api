@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common'
 
 import { makeApp } from '@tests/helpers/app/make-app'
 import { aQuestion } from '@tests/builders/question.builder'
-import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { signUp, makeExpiredToken } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createAnswer, fetchQuestionAnswers } from '@tests/helpers/domain/enterprise/answers/answer-requests'
 import { commentOnAnswer } from '@tests/helpers/domain/enterprise/answers/answer-comment-requests'
@@ -39,6 +39,23 @@ describe('FetchQuestionAnswers', () => {
       error: 'Not Found',
       message: 'Question not found',
     })
+  })
+
+  it('should return 401 when invalid token is provided', async () => {
+    const { token } = await signUp(app)
+    const { body: question } = await createQuestion(app, token, aQuestion().build())
+    const response = await fetchQuestionAnswers(app, question.id, 'invalid-token')
+
+    expect(response.statusCode).toBe(401)
+  })
+
+  it('should return 401 when token is expired', async () => {
+    const { token } = await signUp(app)
+    const { body: question } = await createQuestion(app, token, aQuestion().build())
+    const expiredToken = makeExpiredToken(app)
+    const response = await fetchQuestionAnswers(app, question.id, expiredToken)
+
+    expect(response.statusCode).toBe(401)
   })
 
   it('should return 200 and fetch question answers with pagination metadata', async () => {

@@ -6,7 +6,7 @@ import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-re
 import { commentOnAnswer } from '@tests/helpers/domain/enterprise/answers/answer-comment-requests'
 import { deleteComment } from '@tests/helpers/domain/enterprise/comments/comment-requests'
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { makeExpiredToken, signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 
 describe('DeleteComment', () => {
@@ -40,6 +40,13 @@ describe('DeleteComment', () => {
       message: 'Invalid or missing authentication token',
       error: 'Unauthorized',
     })
+  })
+
+  it('should return 401 when token is expired', async () => {
+    const expiredToken = makeExpiredToken(app)
+    const response = await deleteComment(app, expiredToken, { commentId: 'any-id' })
+
+    expect(response.statusCode).toBe(401)
   })
 
   it('should return 404 when comment does not exist', async () => {

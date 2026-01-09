@@ -1,7 +1,7 @@
 import type { INestApplication } from '@nestjs/common'
 import { PrismaService } from '@/infra/persistence/prisma.service'
 import { makeApp } from '@tests/helpers/app/make-app'
-import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { makeExpiredToken, signUp } from '@tests/helpers/infra/auth/authentication-requests'
 import { readNotification } from '@tests/helpers/domain/notification/notification-requests'
 
 describe('ReadNotification', () => {
@@ -26,6 +26,13 @@ describe('ReadNotification', () => {
       message: 'Invalid or missing authentication token',
       error: 'Unauthorized',
     })
+  })
+
+  it('should return 401 when token is expired', async () => {
+    const expiredToken = makeExpiredToken(app)
+    const response = await readNotification(app, expiredToken, 'notification-id')
+
+    expect(response.statusCode).toBe(401)
   })
 
   it('should return 404 when notification does not exist', async () => {

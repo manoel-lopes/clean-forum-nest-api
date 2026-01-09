@@ -4,7 +4,7 @@ import { DeleteAccountUseCase } from '@/domain/application/usecases/delete-accou
 import { makeApp } from '@tests/helpers/app/make-app'
 import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stub'
 import { deleteUser } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { makeExpiredToken, signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('DeleteAccount', () => {
   let app: INestApplication
@@ -37,6 +37,14 @@ describe('DeleteAccount', () => {
       message: 'Invalid or missing authentication token',
       error: 'Unauthorized',
     })
+  })
+
+  it('should return 401 when token is expired', async () => {
+    const expiredToken = makeExpiredToken(app)
+
+    const response = await deleteUser(app, expiredToken)
+
+    expect(response.statusCode).toBe(401)
   })
 
   it('should return 404 when user does not exist', async () => {

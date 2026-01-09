@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common'
 
 import { makeApp } from '@tests/helpers/app/make-app'
 import { aQuestion } from '@tests/builders/question.builder'
-import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { signUp, makeExpiredToken } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion, getQuestionBySlug } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { attachToQuestion } from '@tests/helpers/domain/enterprise/questions/question-attachment-requests'
 import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
@@ -18,6 +18,19 @@ describe('GetQuestionBySlug', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  it('should return 401 when invalid token is provided', async () => {
+    const response = await getQuestionBySlug(app, 'any-slug', 'invalid-token')
+
+    expect(response.statusCode).toBe(401)
+  })
+
+  it('should return 401 when token is expired', async () => {
+    const expiredToken = makeExpiredToken(app)
+    const response = await getQuestionBySlug(app, 'any-slug', expiredToken)
+
+    expect(response.statusCode).toBe(401)
   })
 
   it('should return 404 when question with slug does not exist', async () => {

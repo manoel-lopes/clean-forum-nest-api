@@ -7,7 +7,7 @@ import { makeAppWithErrorStub } from '@tests/helpers/app/make-app-with-error-stu
 import { aQuestion } from '@tests/builders/question.builder'
 import { anAnswer } from '@tests/builders/answer.builder'
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
-import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { makeExpiredToken, signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('AnswerQuestion', () => {
   let app: INestApplication
@@ -45,6 +45,16 @@ describe('AnswerQuestion', () => {
       message: 'Invalid or missing authentication token',
       error: 'Unauthorized',
     })
+  })
+
+  it('should return 401 when token is expired', async () => {
+    const expiredToken = makeExpiredToken(app)
+    const response = await request(app.getHttpServer())
+      .post('/questions/any-id/answers')
+      .set('Authorization', `Bearer ${expiredToken}`)
+      .send({ content: 'Some content' })
+
+    expect(response.statusCode).toBe(401)
   })
 
   it('should return 404 when question does not exist', async () => {

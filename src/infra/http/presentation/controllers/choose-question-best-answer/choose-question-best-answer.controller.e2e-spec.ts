@@ -5,7 +5,7 @@ import { makeApp } from '@tests/helpers/app/make-app'
 import { aQuestion } from '@tests/builders/question.builder'
 import { createQuestion } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createAnswer } from '@tests/helpers/domain/enterprise/answers/answer-requests'
-import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { makeExpiredToken, signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('ChooseQuestionBestAnswer', () => {
   let app: INestApplication
@@ -41,6 +41,15 @@ describe('ChooseQuestionBestAnswer', () => {
       message: 'Invalid or missing authentication token',
       error: 'Unauthorized',
     })
+  })
+
+  it('should return 401 when token is expired', async () => {
+    const expiredToken = makeExpiredToken(app)
+    const response = await request(app.getHttpServer())
+      .patch('/answers/any-id/best')
+      .set('Authorization', `Bearer ${expiredToken}`)
+
+    expect(response.statusCode).toBe(401)
   })
 
   it('should return 422 when answerId is not a valid UUID', async () => {

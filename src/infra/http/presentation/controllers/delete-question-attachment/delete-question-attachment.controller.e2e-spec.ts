@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common'
 
 import { makeApp } from '@tests/helpers/app/make-app'
 import { aQuestion } from '@tests/builders/question.builder'
-import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { makeExpiredToken, signUp } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion, getQuestionBySlug } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createQuestionAttachment, deleteQuestionAttachment } from '@tests/helpers/domain/enterprise/questions/question-attachment-requests'
 
@@ -37,6 +37,14 @@ describe('DeleteQuestionAttachment', () => {
       message: 'Invalid or missing authentication token',
       error: 'Unauthorized',
     })
+  })
+
+  it('should return 401 when token is expired', async () => {
+    const expiredToken = makeExpiredToken(app)
+
+    const response = await deleteQuestionAttachment(app, expiredToken, 'any-id')
+
+    expect(response.statusCode).toBe(401)
   })
 
   it('should return 422 when attachmentId is not a valid UUID', async () => {

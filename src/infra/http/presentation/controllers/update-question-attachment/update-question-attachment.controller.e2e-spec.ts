@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common'
 
 import { aQuestion } from '@tests/builders/question.builder'
-import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { makeExpiredToken, signUp } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion, getQuestionBySlug } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { createQuestionAttachment, updateQuestionAttachment } from '@tests/helpers/domain/enterprise/questions/question-attachment-requests'
 import { makeApp } from '@tests/helpers/app/make-app'
@@ -46,6 +46,17 @@ describe('UpdateQuestionAttachment', () => {
       message: 'Invalid or missing authentication token',
       error: 'Unauthorized',
     })
+  })
+
+  it('should return 401 when token is expired', async () => {
+    const expiredToken = makeExpiredToken(app)
+    const response = await updateQuestionAttachment(app, expiredToken, {
+      attachmentId: 'any-id',
+      title: 'Title',
+      url: 'https://example.com/file.pdf',
+    })
+
+    expect(response.statusCode).toBe(401)
   })
 
   it('should return 400 when title is missing', async () => {

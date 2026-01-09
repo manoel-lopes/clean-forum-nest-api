@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common'
 
 import { makeApp } from '@tests/helpers/app/make-app'
 import { aQuestion } from '@tests/builders/question.builder'
-import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { signUp, makeExpiredToken } from '@tests/helpers/infra/auth/authentication-requests'
 import { createQuestion, fetchQuestions } from '@tests/helpers/domain/enterprise/questions/question-requests'
 import { attachToQuestion } from '@tests/helpers/domain/enterprise/questions/question-attachment-requests'
 
@@ -15,6 +15,19 @@ describe('FetchQuestions', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  it('should return 401 when invalid token is provided', async () => {
+    const response = await fetchQuestions(app, 'invalid-token')
+
+    expect(response.statusCode).toBe(401)
+  })
+
+  it('should return 401 when token is expired', async () => {
+    const expiredToken = makeExpiredToken(app)
+    const response = await fetchQuestions(app, expiredToken)
+
+    expect(response.statusCode).toBe(401)
   })
 
   it('should return 200 and fetch questions with pagination metadata', async () => {
