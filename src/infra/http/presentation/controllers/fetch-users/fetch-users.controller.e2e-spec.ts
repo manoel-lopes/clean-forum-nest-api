@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common'
 
 import { makeApp } from '@tests/helpers/app/make-app'
 import { fetchUsers } from '@tests/helpers/domain/enterprise/users/user-requests'
-import { signUp } from '@tests/helpers/infra/auth/authentication-requests'
+import { makeExpiredToken, signUp } from '@tests/helpers/infra/auth/authentication-requests'
 
 describe('FetchUsers', () => {
   let app: INestApplication
@@ -13,6 +13,36 @@ describe('FetchUsers', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  it('should return 401 when no token is provided', async () => {
+    const response = await fetchUsers(app, '')
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
+  })
+
+  it('should return 401 when invalid token is provided', async () => {
+    const response = await fetchUsers(app, 'invalid-token')
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'Invalid or missing authentication token',
+      error: 'Unauthorized',
+    })
+  })
+
+  it('should return 401 when token is expired', async () => {
+    const expiredToken = makeExpiredToken(app)
+
+    const response = await fetchUsers(app, expiredToken)
+
+    expect(response.statusCode).toBe(401)
   })
 
   it('should return 200 and fetch users with pagination metadata', async () => {
